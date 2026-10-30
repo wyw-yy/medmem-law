@@ -33,6 +33,7 @@ plt.rcParams["font.size"] = 9
 plt.rcParams["axes.grid"] = True
 plt.rcParams["grid.alpha"] = 0.3
 COLORS = ["#4C72B0", "#DD8452", "#55A868", "#C44E52", "#8172B3", "#937860"]
+NOISE_MIN = 0.02   # 低于 2%（≈10/512）视为整档无可测记忆化
 
 
 def _save(fig, name: str):
@@ -53,7 +54,6 @@ def load() -> pd.DataFrame | None:
     df = df[df["M"].notna()].copy()
     df["n"] = df["n"].astype(int)
     df["epoch"] = df["epoch"].astype(int)
-    df = df[df["epoch"] <= 2000]
     if len(df) < 5:
         print("[plot] 测量点太少")
         return None
@@ -75,13 +75,126 @@ def fig_m_vs_e(df: pd.DataFrame):
     ax.set_xlabel("training epoch $E$")
     ax.set_ylabel("memorization rate $M$")
     ax.set_yscale("symlog", linthresh=0.005)
+    ax.axhline(3.0 / C.N_SAMPLE, color="0.6", lw=0.7, ls=":")
+    # 参考线：单张样本即 1/N_SAMPLE，是这条曲线能取到的最小非零值（离散噪声地板）
+    ax.axhline(1.0 / C.N_SAMPLE, ls=":", lw=1.0, color="0.55")
+    ax.text(0.99, 1.0 / C.N_SAMPLE, " 1 sample ", transform=ax.get_yaxis_transform(),
+            va="bottom", ha="right", fontsize=6, color="0.45")
     ax.legend(frameon=False, fontsize=8)
     ax.set_title("Memorization rises with training time; larger $N$ delays it")
     _save(fig, "fig_M_vs_E")
 
 
-def fig_collapse(df: pd.DataFrame, gamma: float):
-    """头图：M 对 E/N^γ 塌缩成一条曲线。"""
+def _law_params(law_json: dict) -> dict:
+    best = law_json["best"]
+    return dict(zip(L.CANDIDATES[best]["pnames"], law_json["fits"][best]["params"]))
+
+
+def _onset_table(df: pd.DataFrame, eps_list, need_consecutive: int = 2):
+    """每个 N 上，记忆率**连续** ≥ ε 的起点轮次。
+
+    要求连续点数：单点越过 ε 很可能是 1–2 张样本的量化噪声（512 样本里 1 张 = 0.002），
+    用它当"发作时间"会让大 N 档出现虚假的早发作点。
+    另外 N 档的 M 最大值 < NOISE_MIN 时视为"整档无可测记忆化"，返回 None。
+    """
+    out = {}
+    for N in sorted(df["n"].unique()):
+        sub = df[df["n"] == N].groupby("epoch")["M"].mean().sort_index()
+        vals = sub.to_numpy()
+        for eps in eps_list:
+            hit = None
+            if vals.size and vals.max() >= NOISE_MIN:
+                flags = vals >= eps
+                for i in range(len(flags) - need_consecutive + 1):
+                    if flags[i:i + need_consecutive].all():
+                        hit = int(sub.index[i])
+                        break
+            out[(int(N), eps)] = hit
+    return out
+
+
+def fig_collapse(df: pd.DataFrame, law_json: dict):
+    """头图（实证版）：记忆化"发作时间"随 N 的移动。
+
+    为什么不用 M vs E/N^γ 的塌缩图：L1/L2/L3 假设平台高度与 N 无关，
+    而实测平台 0.80/0.40/0.07/≤0.01/≤0.02 随 N 陡降，单轴塌缩必然拉开；
+    改成"到达 ε 所需轮次 vs N"后，纵轴本身就是要交付的量（安全窗口），
+    不需要任何模型假设，再用拟合律叠加成虚线做一致性检验。
+    """
+    d = _law_params(law_json)
+    eps_list = [0.01, 0.05, 0.10, 0.20]
+    tab = _onset_table(df, eps_list)
+    Ns = sorted(int(x) for x in df["n"].unique())
+
+    fig, ax = plt.subplots(figsize=(4.8, 3.6))
+    B = float(C.BATCH)
+    slopes = {}
+    for i, eps in enumerate(eps_list):
+        col = COLORS[i % len(COLORS)]
+        xs = [N for N in Ns if tab.get((N, eps))]
+        ys = [tab[(N, eps)] * N / B for N in xs]          # 换算到优化步
+        if len(xs):
+            ax.plot(xs, ys, "o", ms=5, color=col, label=rf"measured  $\epsilon$={eps:g}")
+            for x, y in zip(xs, ys):
+                ax.annotate(int(x), (x, y), textcoords="offset points", xytext=(0, 5),
+                            fontsize=5.5, ha="center", color=col)
+            if len(xs) >= 2:
+                slopes[eps] = float(np.polyfit(np.log(xs), np.log(ys), 1)[0])
+        # 律的预测（epoch 反解后同样换算到步）
+        gx, gy = [], []
+        for N in Ns:
+            e = L.solve_E_star(law_json["best"], law_json["fits"][law_json["best"]]["params"], N, eps)
+            if e == e and e is not None:
+                gx.append(N)
+                gy.append(e * N / B)
+        if gx:
+            ax.plot(gx, gy, "--", lw=1.0, color=col, alpha=0.85,
+                    label=rf"law      $\epsilon$={eps:g}")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xticks(Ns)
+    ax.set_xticklabels([str(n) for n in Ns])
+    ax.minorticks_off()
+    ax.set_xlabel("dataset size $N$")
+    ax.set_ylabel("optimization steps to reach $\\epsilon$")
+    ax.legend(frameon=False, fontsize=6, ncol=2)
+    if slopes:
+        txt = ", ".join(rf"$\epsilon$={e:g}: {s:.2f}" for e, s in sorted(slopes.items()))
+        ax.text(0.03, 0.97, "fitted slope vs $N$:  " + txt, transform=ax.transAxes,
+                fontsize=5.8, va="top", color="0.25")
+    ax.set_title("Memorization onset grows with data size (in steps)")
+    _save(fig, "fig_collapse")
+
+
+def fig_amplitude(df: pd.DataFrame, law_json: dict):
+    """平台高度随 N 的衰减（纯实测，不叠模型线）。"""
+    rows = []
+    for N in sorted(df["n"].unique()):
+        sub = df[df["n"] == N].sort_values("epoch")
+        if sub.empty:
+            continue
+        tail = sub.tail(max(3, len(sub) // 5))
+        rows.append((int(N), float(tail["M"].max())))
+    if not rows:
+        return
+    fig, ax = plt.subplots(figsize=(4.0, 3.2))
+    Ns = np.array([r[0] for r in rows], float)
+    Ms = np.array([r[1] for r in rows], float)
+    ax.plot(Ns, Ms, "o-", ms=5, lw=1.2, color=COLORS[0], label="measured")
+    floor = 3.0 / C.N_SAMPLE
+    ax.axhline(floor, color="0.6", lw=0.7, ls=":")
+    ax.text(Ns.min() * 0.9, floor * 1.15, f"detection floor 3/{C.N_SAMPLE}",
+            fontsize=6, color="0.4")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel("dataset size $N$")
+    ax.set_ylabel("plateau memorization rate")
+    ax.legend(frameon=False, fontsize=7)
+    ax.set_title("More data, less memorization")
+    _save(fig, "fig_amplitude")
+
+
+def _fig_collapse_plain(df: pd.DataFrame, gamma: float):
     fig, ax = plt.subplots(figsize=(4.6, 3.4))
     for i, N in enumerate(sorted(df["n"].unique())):
         sub = df[df["n"] == N].sort_values("epoch")
@@ -198,9 +311,10 @@ def main():
     if not only or only in "m,me":
         fig_m_vs_e(df)
     if lawjson:
-        gamma = lawjson.get("gamma_hat", 1.0)
         if not only or only in "all,collapse,c":
-            fig_collapse(df, gamma)
+            fig_collapse(df, lawjson)
+        if not only or only in "all,amp,a":
+            fig_amplitude(df, lawjson)
         if not only or only in "all,parity,p":
             fig_parity(df, lawjson)
         if not only or only in "all,estar,e":

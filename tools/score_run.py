@@ -30,7 +30,7 @@ import metric as MT
 CSV = C.RESULTS / "metrics_long.csv"
 COLS = ["run", "dataset", "n", "seed", "epoch", "M", "tau", "sim_mean", "sim_p50", "sim_p95",
         "sim_max", "n_gen", "ref_max_sim_mean", "n_leak_dropped", "fid", "encoder",
-        "M_050", "M_060", "M_070"]
+        "M_050", "M_060", "M_070", "M_080", "M_090", "M_095"]
 
 
 def parse_tag(run: str) -> tuple[str, int, int]:

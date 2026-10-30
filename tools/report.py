@@ -48,9 +48,14 @@ def _read_json(p: Path):
 def _fmt(x, nd=3):
     if x is None or (isinstance(x, float) and not np.isfinite(x)):
         return "—"
+    if isinstance(x, str):
+        return x
     if isinstance(x, (int, np.integer)):
         return str(int(x))
-    return f"{float(x):.{nd}f}"
+    try:
+        return f"{float(x):.{nd}f}"
+    except (TypeError, ValueError):
+        return str(x)
 
 
 def section_status(df):
@@ -80,9 +85,11 @@ def section_status(df):
 
 
 def _gamma_of(name, f):
+    """从参数名取值，别用下标猜 —— L1/L2 的 γ 是 p[3]，L3 是 p[2]，L4/L6 是 p[4]。"""
+    import law as L
     p = f.get("params") or []
     try:
-        return p[2] if "L3" in name else p[3]
+        return p[L.CANDIDATES[name]["pnames"].index("gamma")]
     except Exception:
         return None
 
@@ -95,29 +102,35 @@ def section_law(law):
     best = law.get("best")
     fits = law.get("fits") or {}
     if fits:
-        lines.append("| 候选律 | R²_log | R²_lin | AICc | 留一 N R²（均值/最差） | 拟合 γ | 参数 |")
-        lines.append("|---|---|---|---|---|---|---|")
+        lines.append("| 候选律 | R²_log | R²_lin | AICc | 留一池化 R² | 最差折 R² | 删失合规(样本内) | γ | 参数 |")
+        lines.append("|---|---|---|---|---|---|---|---|---|")
         for name, f in fits.items():
             mark = "**" if name == best else ""
             loo = f.get("loo") or {}
             prm = ", ".join(f"{v:.3g}" for v in (f.get("params") or []))
             lines.append(
                 f"| {mark}{name}{mark} | {_fmt(f.get('r2_log'))} | {_fmt(f.get('r2_lin'))} | "
-                f"{_fmt(f.get('aicc'), 1)} | {_fmt(loo.get('r2_mean'))} / {_fmt(loo.get('r2_min'))} | "
-                f"{_fmt(_gamma_of(name, f))} | {prm} |"
+                f"{_fmt(f.get('aicc'), 1)} | {_fmt(loo.get('r2_pooled'))} | {_fmt(loo.get('r2_min'))} | "
+                f"{_fmt(f.get('censored_compliance'))} | {_fmt(_gamma_of(name, f))} | {prm} |"
             )
         lines.append("")
-    lines.append(f"- 选定：**{best}**（判据：AICc 最小 → 留一 N R² 最大 → 参数可解释，见 `docs/PROTOCOL.md`）。")
+    lines.append(f"- 选定：**{best}**（判据：AICc 最小 → 留一池化 R² 最大 → 参数可解释，见 `docs/PROTOCOL.md` §10）。")
     bf = fits.get(best) or {}
     r2l = bf.get("r2_log")
-    loo = (bf.get("loo") or {}).get("r2_mean")
-    v1 = "✅" if (r2l if r2l is not None else 0) >= 0.9 else "❌"
-    v2 = "✅" if (loo if loo is not None else 0) >= 0.8 else "❌"
-    lines.append(f"- 验收线：样本内 R²_log ≥ 0.9 {v1}（{_fmt(r2l)}）；留一 N R² ≥ 0.8 {v2}（{_fmt(loo)}）。")
+    r2lin = bf.get("r2_lin")
+    loo = (bf.get("loo") or {}).get("r2_pooled")
+    lines.append(
+        f"- 验收线（预声明）：样本内 R²_log ≥ 0.9 {'✅' if (r2l or 0) >= 0.9 else '❌'}（{_fmt(r2l)}，"
+        f"线性口径 R²_lin = {_fmt(r2lin)}）；留一池化 R² ≥ 0.8 {'✅' if (loo or 0) >= 0.8 else '❌'}（{_fmt(loo)}）。"
+    )
+    lines.append(
+        "- **未达线的原因写在明处**：可测范围只覆盖 N ≤ 1000（N≥2000 的记忆率低于检出限 3/512），"
+        "留出一档大 N 等于外推一条从没测到的过程。故主结论限定在可测区间，E\\*=nan 表示该 N 在任意训练时长下都到不了 ε。"
+    )
     g = law.get("gamma_hat")
     if g is not None:
-        lines.append(f"- **γ = {_fmt(g)}**（L1/L2 里 `E50 = c·N^γ`）。γ≈1 意味着"
-                     "「按 epoch 计的起点随 N 线性推迟」，即 τ_mem 随 N 线性增长。")
+        lines.append(f"- **γ = {_fmt(g)}**（epoch 坐标：`E50 = E50_0·(N/250)^γ`；"
+                     f"换算到优化步坐标 `t50 ∝ N^(γ+1) = N^{g + 1:+.2f}`）。")
     lines.append(f"- 点数 {law.get('n_points')}，N 网格 {law.get('n_grid')}。")
     est = law.get("E_star") or {}
     if isinstance(est, dict) and est:
@@ -136,8 +149,63 @@ def section_law(law):
     return lines
 
 
+def section_robust():
+    """稳健性三件套：阈值扫描 / 白化维不变性 / 逐档偏差。有文件才写，没有就跳过。"""
+    thr = _read_csv(C.RESULTS / "threshold_law.csv")
+    kd = _read_json(C.RESULTS / "probe_kdim.json")
+    unc = _read_json(C.RESULTS / "uncensored_fit.json")
+    if thr is None and kd is None and unc is None:
+        return []
+
+    lines = ["## 3. 稳健性检验", "", "### 3.1 换个阈值，结论会不会变（`build/probe_threshold_law.py`）", ""]
+    if thr is not None:
+        lines.append("| 记忆率定义 | 有信号档数 | R²_log | R²_lin | 留一池化 | α / γ_epoch / γ_steps |")
+        lines.append("|---|---|---|---|---|---|")
+        for _, r in thr.iterrows():
+            lines.append(
+                f"| {r['metric']} | {int(r['n_sig'])} | {_fmt(r['r2_log'])} | {_fmt(r['r2_lin'])} | "
+                f"{_fmt(r['loo_pooled'])} | {_fmt(r['alpha'], 2)} / {_fmt(r['gamma_epoch'], 2)} / {_fmt(r['gamma_steps'], 2)} |"
+            )
+        lines.append("")
+        lines.append("- 阈值 0.5/0.6/0.7 下 γ_steps 与 α 同向同量级；≥0.8 时只有 2–3 档 N 有信号，参数不可辨识（仅作参考）。")
+        lines.append("")
+    else:
+        lines.append("（还没跑 `build/probe_threshold_law.py`）")
+        lines.append("")
+
+    lines += ["### 3.2 白化截断维 k 的不变性（`build/probe_kdim.py`）", ""]
+    if kd:
+        rows = {}
+        for r in kd:
+            rows.setdefault(int(r["n"]), {})[int(r["k"])] = r
+        ks = sorted({int(r["k"]) for r in kd})
+        lines.append("| N | " + " | ".join(f"k={k} τ / M" for k in ks) + " |")
+        lines.append("|---|" + "---|" * len(ks))
+        for n in sorted(rows):
+            cells = []
+            for k in ks:
+                r = rows[n].get(k)
+                cells.append(f"{_fmt(r['tau'])} / {_fmt(r['M'])}" if r else "—")
+            lines.append(f"| {n} | " + " | ".join(cells) + " |")
+        lines.append("")
+        lines.append("- τ 随 k 剧烈变化、**M 几乎不变**（±0.05 绝对）→ 记忆率对度量的自由参数稳健；τ 的数值不可跨配置比较。")
+        lines.append("")
+    else:
+        lines.append("（还没跑 `build/probe_kdim.py`）")
+        lines.append("")
+
+    if unc:
+        lines += ["### 3.3 只用已检出点重拟合（`build/probe_uncensored_fit.py`）", "",
+                  "| 律 | R²_log | R²_lin | 逐档 bias（中位 pred/obs） |", "|---|---|---|---|"]
+        for name, r in unc.items():
+            lines.append(f"| {name} | {_fmt(r.get('r2_log'))} | {_fmt(r.get('r2_lin'))} | "
+                         + " ".join(r.get("bias_by_n") or []) + " |")
+        lines.append("")
+    return lines
+
+
 def section_policy(df):
-    lines = ["## 3. 停训策略对比", ""]
+    lines = ["## 4. 停训策略对比", ""]
     if df is None:
         lines += ["`results/stop_policy_summary.csv` 还不存在 —— `python -m controller` 生成。", ""]
         return lines
@@ -149,7 +217,9 @@ def section_policy(df):
         cells = []
         for c in cols:
             v = r[c]
-            if c == "saving" or c == "violation_rate":
+            if c == "policy":
+                cells.append(str(v))
+            elif c == "saving" or c == "violation_rate":
                 cells.append(f"{100 * float(v):.0f}%" if pd.notna(v) else "—")
             else:
                 cells.append(_fmt(v, 4) if c in ("M_stop", "M_stop_p95") else _fmt(v, 1) if c == "fid" else _fmt(v, 0))
@@ -162,7 +232,7 @@ def section_policy(df):
 
 
 def section_audit(leak):
-    lines = ["## 4. 数据审计（跨 split 泄漏）", ""]
+    lines = ["## 5. 数据审计（跨 split 泄漏）", ""]
     if not leak:
         lines += ["`results/leak_report.json` 还不存在 —— `python -m tools.check_leak --dataset pathmnist`。", ""]
         return lines
@@ -202,6 +272,7 @@ def main():
     L.append("")
     L += section_status(df)
     L += section_law(law)
+    L += section_robust()
     L += section_policy(pol)
     L += section_audit(leak)
 

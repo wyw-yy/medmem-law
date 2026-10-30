@@ -44,6 +44,10 @@ def _entry(dataset: str, n: int, seed: int, stop_eps=None, epochs: int | None = 
 # 预算按"M=0.02 所需步数 ∝ N^1.3"估：N=1000≈1.1e4、2000≈2.6e4、4000≈6.4e4 步。
 DEEP = {1000: 2400, 2000: 2900, 4000: 1400}   # epoch（×N/BATCH = 步数）
 
+# seed 1 的最终预算（= 等步数 + 深度档合并）。复现实验必须用同一套预算，
+# 否则不同 seed 的曲线长度不同，平均/拟合都会串。
+FINAL = {250: 5125, 500: 2550, 1000: 2400, 2000: 2900, 4000: 1400}
+
 
 def build_plan(name: str) -> list[dict]:
     if name == "mvp":
@@ -55,11 +59,17 @@ def build_plan(name: str) -> list[dict]:
     if name == "deep":
         # 只给大 N 加预算（小 N 在等步数下已经饱和），用于律的形状识别。
         return [_entry("pathmnist", n, s, epochs=DEEP[n]) for s in (1,) for n in (1000, 2000, 4000)]
+    if name == "replicate":
+        # seed 2/3 复现：预算与 seed 1 完全一致（FINAL）。
+        return [_entry("pathmnist", n, s, epochs=FINAL[n]) for s in (2, 3) for n in C.N_GRID]
     if name == "cross":
-        # 64px 下每个 run 30–50 min，先只跑 seed 1（跨数据集推广性的证据够用），
-        # 有多余机器时间再放开 s in (1, 2)。
-        return [_entry(ds, n, s) for ds in ("bloodmnist", "pneumoniamnist")
-                for s in (1,) for n in (1000, 4000)]
+        # 跨数据集推广性：两档 N（250 已有饱和、1000 能看到起跳），预算与
+        # pathmnist 的 N=250/1000 完全一致，这样 γ 的口径可比。
+        return [_entry(ds, n, 1, epochs=FINAL[n]) for ds in ("bloodmnist", "pneumoniamnist")
+                for n in (250, 1000)]
+    if name == "night":
+        # deep 之后的一整夜：先补跨数据集（PPT 明明写了要有），再跑 seed 2 复现。
+        return build_plan("cross") + [_entry("pathmnist", n, 2, epochs=FINAL[n]) for n in C.N_GRID]
     if name == "controller":
         return [_entry("pathmnist", n, 1, stop_eps=C.EPS_MEM) for n in C.N_GRID]
     raise SystemExit(f"未知 plan: {name}")

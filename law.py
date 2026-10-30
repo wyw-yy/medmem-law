@@ -49,6 +49,48 @@ def model_L3(p, N, E):
     return Minf * 0.5 * (1.0 + erf((E - tau) / max(w, 1e-6)))
 
 
+# L4/L5：除了「什么时候开始背」，还允许「最多能背多少」随 N 衰减。
+# 动机（deep 档实测）：N=250 的平台 0.80，N=500 只有 0.40，N=2000/4000 在
+# 9 万步内都低于检出限（M_max 0.006/0.016）。如果强行让 Minf 与 N 无关
+# （L1/L2/L3），模型必然在大 N 处系统性高估 —— 这正是留一 N 崩的原因。
+# 理论上这也对应 Bonnaire et al.：数据越多，越不存在可长期记住的样本。
+def model_L4(p, N, E):
+    """幅度衰减 + 时间尺度平移，两者都锚定在 N0=250。
+
+    M(N,E) = A0·(N/N0)^(-α) · [1 - exp(-(E/E50)^β)],  E50 = E50_0·(N/N0)^γ
+
+    参考点锚定的原因：用 c·N^γ 时 c 和 γ 强相关（N 很大时 E50 不可见，
+    优化器会把 c 顶到上界 1e5、γ 掉到 -0.67 这种不可解释的角落）。
+    """
+    A0, alpha, beta, E50_0, gamma = p
+    r = np.maximum(N, 1.0) / 250.0
+    amp = A0 * np.power(r, -alpha)
+    return amp * (1.0 - np.exp(-np.power(E / (E50_0 * np.power(r, gamma)), beta)))
+
+
+def model_L6(p, N, E):
+    """幅度随 N **指数**衰减（物理动机：单个样本的平均曝光量 ∝ 步数/N）。
+
+    M(N,E) = A0·exp(-(N-250)/Nc) · [1 - exp(-(E/E50)^β)],  E50 = E50_0·(N/250)^γ
+
+    为什么加这条：实测平台高度 0.79/0.39/0.075/≈0/≈0.007 的逐次减半倍数是
+    2.0 / 5.2 / >10 / ≈1，**不是常数**，因此幂律（L4/L5）在 N=500 处系统性低估
+    2–3 倍；而指数衰减 e^{-250/Nc} 给出 2.0 / 4.0 / 16，与实测吻合得多。
+    """
+    A0, Nc, beta, E50_0, gamma = p
+    r = np.maximum(N, 1.0) / 250.0
+    amp = A0 * np.exp(-(np.maximum(N, 1.0) - 250.0) / max(Nc, 1.0))
+    return amp * (1.0 - np.exp(-np.power(E / (E50_0 * np.power(r, gamma)), beta)))
+
+
+def model_L5(p, N, E):
+    """只有幅度衰减，时间尺度与 N 无关（γ=0）。"""
+    A0, alpha, beta, E50_0 = p
+    r = np.maximum(N, 1.0) / 250.0
+    amp = A0 * np.power(r, -alpha)
+    return amp * (1.0 - np.exp(-np.power(E / max(E50_0, 1e-6), beta)))
+
+
 CANDIDATES = {
     "L1_stretched_exp": dict(f=model_L1, k=4,
                              pnames=["Minf", "beta_h", "E50_per_N", "gamma"],
@@ -62,7 +104,25 @@ CANDIDATES = {
                              pnames=["Minf", "a_tau", "gamma", "w"],
                              p0=[0.9, 1.0, 1.0, 40.0],
                              lo=[1e-3, 1e-2, -1.0, 1.0], hi=[1.0, 1e5, 3.0, 1e4]),
+    "L4_amp_decay": dict(f=model_L4, k=5,
+                         pnames=["A0_at250", "alpha", "beta_h", "E50_at250", "gamma"],
+                         p0=[0.85, 2.0, 1.5, 700.0, 0.2],
+                         lo=[1e-3, -2.0, 0.2, 1e-2, -1.0], hi=[1.0, 6.0, 8.0, 1e5, 3.0]),
+    "L5_amp_decay_only": dict(f=model_L5, k=4,
+                              pnames=["A0_at250", "alpha", "beta_h", "E50_at250"],
+                              p0=[0.85, 2.0, 1.5, 700.0],
+                              lo=[1e-3, -2.0, 0.2, 1e-2], hi=[1.0, 6.0, 8.0, 1e5]),
+    "L6_amp_exp": dict(f=model_L6, k=5,
+                       pnames=["A0_at250", "Nc", "beta_h", "E50_at250", "gamma"],
+                       p0=[0.85, 400.0, 1.5, 700.0, 0.2],
+                       lo=[1e-3, 50.0, 0.2, 1e-2, -1.0], hi=[1.0, 5000.0, 8.0, 1e5, 3.0]),
 }
+
+
+def _gamma_of(name: str, params) -> float:
+    """取 gamma 参数；没有 gamma 的律（L5）视为 0（时间尺度与 N 无关）。"""
+    pn = CANDIDATES[name]["pnames"]
+    return float(params[pn.index("gamma")]) if "gamma" in pn else 0.0
 
 
 def _pred(f, p, N, E):
@@ -87,6 +147,30 @@ def _mdet(df: pd.DataFrame) -> np.ndarray:
     else:
         ng = np.full(len(df), float(C.N_SAMPLE))
     return 3.0 / np.maximum(ng, 1.0)
+
+
+def _p0s(spec: dict) -> list[list[float]]:
+    """多起点初值：按**参数名**生成，不能硬编码下标。
+
+    踩过的坑：早期用 `p0[3] = g0` 把第 4 个参数当 gamma 扫，但 L4/L5 的第 4 个
+    参数是 E50（不是 gamma）→ 等于把时间尺度钉死在 0.3–1.5，优化器只能靠把
+    E50 顶到上界 1e5 来逃，得到一个退化解（γ=-0.67、E50=1e5）。
+    """
+    base = list(spec["p0"])
+    pn = spec["pnames"]
+    gammas = [0.0, 0.5, 1.0, 1.5] if "gamma" in pn else [None]
+    outs = []
+    for g in gammas:
+        for s in (0.5, 1.0, 3.0):
+            p = list(base)
+            if g is not None:
+                p[pn.index("gamma")] = g
+            for nm in ("E50_per_N", "E50_at250", "E50", "a_tau"):
+                if nm in pn:
+                    i = pn.index(nm)
+                    p[i] = float(np.clip(base[i] * s, spec["lo"][i], spec["hi"][i]))
+            outs.append(p)
+    return outs
 
 
 def _resid(f, p, N, E, M, mdet):
@@ -121,18 +205,14 @@ def fit_one(name: str, df: pd.DataFrame) -> dict:
 
     best = None
     # 多起点：非凸问题，单起点容易卡在 gamma 的假解上
-    for g0 in (0.3, 0.6, 1.0, 1.5):
-        for s0 in (0.5, 1.0, 2.0):
-            p0 = list(spec["p0"])
-            p0[3] = g0
-            p0[0] = p0[0] * min(1.0, s0)
-            try:
-                r = least_squares(resid, p0, bounds=(spec["lo"], spec["hi"]),
-                                  max_nfev=20000, x_scale="jac")
-            except Exception:  # noqa: BLE001
-                continue
-            if best is None or r.cost < best.cost:
-                best = r
+    for p0 in _p0s(spec):
+        try:
+            r = least_squares(resid, p0, bounds=(spec["lo"], spec["hi"]),
+                              max_nfev=20000, x_scale="jac")
+        except Exception:  # noqa: BLE001
+            continue
+        if best is None or r.cost < best.cost:
+            best = r
     if best is None:
         raise RuntimeError(f"{name} 拟合失败")
     p = best.x
@@ -172,6 +252,7 @@ def loo_by_n(name: str, df: pd.DataFrame) -> dict:
     R² 只 pooled 在真正有信号的档上，这才是诚实的外推检验。
     """
     out = {}
+    pooled_y, pooled_p = [], []
     for held in sorted(df["n"].unique()):
         tr = df[df["n"] != held]
         te = df[df["n"] == held]
@@ -186,9 +267,7 @@ def loo_by_n(name: str, df: pd.DataFrame) -> dict:
             return _resid(f, p, tr["n"].to_numpy(float), tr["epoch"].to_numpy(float), Mtr, mtr)
 
         best = None
-        for g0 in (0.3, 0.6, 1.0, 1.5):
-            p0 = list(spec["p0"])
-            p0[3] = g0
+        for p0 in _p0s(spec):
             try:
                 r = least_squares(resid, p0, bounds=(spec["lo"], spec["hi"]), max_nfev=20000)
             except Exception:  # noqa: BLE001
@@ -212,10 +291,21 @@ def loo_by_n(name: str, df: pd.DataFrame) -> dict:
             "censored_compliance": (float(np.mean(pred[~o] <= mt[~o])) if (~o).any() else None),
             "n_obs": int(o.sum()),
         }
+        if o.any():
+            pooled_y.append(np.log10(yte[o] + EPS_LOG))
+            pooled_p.append(np.log10(pred[o] + EPS_LOG))
     r2s = [v["r2_log"] for v in out.values() if v["r2_log"] is not None]
     cc = [v["censored_compliance"] for v in out.values() if v["censored_compliance"] is not None]
+    # 池化 R²：把所有留出折的预测拼在一起算一个 R²。
+    # 为什么必须有它：某一折如果几乎全是 M≈0（大 N 档），折内方差≈0，折内 R²
+    # 会被一个极小的分母放大成 −20 这种毫无意义的数（实测 LOO 出现 −1.2e6）。
+    r2_pooled = None
+    if pooled_y:
+        ay, ap = np.concatenate(pooled_y), np.concatenate(pooled_p)
+        r2_pooled = float(1 - np.sum((ay - ap) ** 2) / max(np.sum((ay - ay.mean()) ** 2), 1e-12))
     return {"per_n": out, "r2_mean": float(np.mean(r2s)) if r2s else None,
             "r2_min": float(np.min(r2s)) if r2s else None,
+            "r2_pooled": r2_pooled,
             "censored_compliance_mean": float(np.mean(cc)) if cc else None}
 
 
@@ -263,13 +353,16 @@ def main(metrics_csv: str | None = None, out: str | None = None):
             continue
         fits[name] = {k: v for k, v in fit.items() if k != "pred"} | {"loo": loo}
         rows.append((name, fit["r2_log"], fit["r2_lin"], fit["aicc"], loo["r2_mean"],
-                     loo["r2_min"], loo.get("censored_compliance_mean")))
+                     loo["r2_min"], loo.get("censored_compliance_mean"),
+                     loo.get("r2_pooled")))
 
     print("\n候选律对比（选型按 AICc 最小 + 留一 R² 最大；删失点只进单侧惩罚，不进 R²）")
-    print(f"{'律':<20}{'R²_log':>9}{'R²_lin':>9}{'AICc':>10}{'LOO_R²':>9}{'LOO_min':>9}{'删失合规':>10}")
+    print(f"{'律':<20}{'R²_log':>9}{'R²_lin':>9}{'AICc':>10}{'LOO折内':>9}{'LOO_min':>9}"
+          f"{'LOO池化':>9}{'删失合规':>10}")
     for r in rows:
         print(f"{r[0]:<20}{r[1]:>9.4f}{r[2]:>9.4f}{r[3]:>10.1f}"
               f"{(r[4] or float('nan')):>9.4f}{(r[5] or float('nan')):>9.4f}"
+              f"{(r[7] if r[7] is not None else float('nan')):>9.4f}"
               f"{(r[6] if r[6] is not None else float('nan')):>10.2f}")
 
     if not rows:
@@ -277,9 +370,14 @@ def main(metrics_csv: str | None = None, out: str | None = None):
     # 选型：AICc 最小者（并列时看 LOO）
     best_name = min(rows, key=lambda r: (r[3], -(r[4] or -9)))[0]
     best = dict(fits[best_name])
-    gam = best["params"][2] if best_name == "L3_two_timescale" else best["params"][3]
-    print(f"\n选定：{best_name}  R²_log={best['r2_log']:.4f}  LOO_R²={best['loo']['r2_mean']}")
-    print(f"γ = {gam:.3f}  （E50 = c·N^γ；γ≈1 = 数据翻倍，开始背的 epoch 也翻倍）")
+    gam = _gamma_of(best_name, best["params"])
+    print(f"\n选定：{best_name}  R²_log={best['r2_log']:.4f}  "
+          f"LOO池化={best['loo'].get('r2_pooled')}")
+    print(f"γ = {gam:+.3f}  （epoch 坐标：E50 = E50_0·(N/250)^γ；"
+          f"换算到优化步坐标 t50 ∝ N^(γ+1) = N^{gam + 1:+.2f}）")
+    if "alpha" in CANDIDATES[best_name]["pnames"]:
+        i = CANDIDATES[best_name]["pnames"].index("alpha")
+        print(f"α = {best['params'][i]:.3f}  （平台高度 ∝ N^-α：α>0 = 数据越多越背不住）")
 
     # 敏感性检验：只用"有信号"的 N 重拟合。若 γ 明显变化，说明大 N 档全靠删失约束撑着，
     # 结论必须写成"在可测范围内"。
@@ -288,7 +386,7 @@ def main(metrics_csv: str | None = None, out: str | None = None):
     if len(sig_n) >= 3:
         try:
             fu = fit_one(best_name, df[df["n"].isin(sig_n)])
-            gamma_unc = float(fu["params"][2] if best_name == "L3_two_timescale" else fu["params"][3])
+            gamma_unc = float(_gamma_of(best_name, fu["params"]))
             r2_unc = float(fu["r2_log"])
             print(f"敏感性（只用有信号的 N={sig_n} 拟合）：γ={gamma_unc:.3f}，R²_log={r2_unc:.4f}")
         except Exception as e:  # noqa: BLE001
@@ -313,7 +411,7 @@ def main(metrics_csv: str | None = None, out: str | None = None):
         "n_points": int(len(df)),
         "n_grid": sorted(int(x) for x in df["n"].unique()),
         "epochs": sorted(int(x) for x in df["epoch"].unique()),
-        "gamma_hat": float(best["params"][2] if best_name == "L3_two_timescale" else best["params"][3]),
+        "gamma_hat": _gamma_of(best_name, best["params"]),
         "gamma_uncensored_fit": gamma_unc,
         "r2_log_uncensored_fit": r2_unc,
         "n_signal_only": sig_n,
