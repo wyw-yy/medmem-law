@@ -167,8 +167,17 @@ def fig_collapse(df: pd.DataFrame, law_json: dict):
     ax.legend(frameon=False, fontsize=6, ncol=2)
     if slopes:
         txt = ", ".join(rf"$\epsilon$={e:g}: {s:.2f}" for e, s in sorted(slopes.items()))
-        ax.text(0.03, 0.97, "fitted slope vs $N$:  " + txt, transform=ax.transAxes,
-                fontsize=5.8, va="top", color="0.25")
+        # 放进 x 轴标签的第二行 —— 放在图内任何位置都会跟点或图例打架
+        ax.set_xlabel("dataset size $N$\n" + "fitted slope vs $N$:  " + txt, fontsize=8)
+    else:
+        ax.set_xlabel("dataset size $N$")
+    # 大 N 档在预算内根本没有越过任何 ε —— 空白的右半边要自己解释，
+    # 否则读者会以为图画漏了。
+    silent = [N for N in Ns if all(tab.get((N, e)) is None for e in eps_list)]
+    if silent:
+        ax.text(0.60, 0.55,
+                f"N={', '.join(str(n) for n in silent)}:\nnever reaches any $\\epsilon$\nwithin budget",
+                transform=ax.transAxes, fontsize=6, color="0.5", ha="left", va="center")
     ax.set_title("Memorization onset grows with data size (in steps)")
     _save(fig, "fig_collapse")
 
