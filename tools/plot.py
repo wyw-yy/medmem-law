@@ -360,10 +360,10 @@ def main():
         return
 
     def want(keys: str) -> bool:
-        # 注意：`only in keys` 是子串匹配，所以 "all" 必须在每个 keys 里出现，
-        # 否则 `--only all` 会静默漏掉那张图（fig_M_vs_E 就漏过一次，
-        # 导致主图一直停在 22:05 的旧版本，而其他图都更新了）。
-        return (not only) or only == "all" or only in keys
+        # 精确 token 匹配（不是子串）：`--only m` 曾因为 "m" in "all,amp,a" 而顺带
+        # 重画了振幅图；`--only all` 也一度漏掉主图。
+        toks = [k.strip() for k in keys.split(",")]
+        return (not only) or only == "all" or only in toks
 
     if want("all,m,me"):
         fig_m_vs_e(df)
