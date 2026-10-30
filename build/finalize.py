@@ -25,6 +25,7 @@ STEPS = [
     ("controller", ["-m", "controller"], False),
     ("safety", ["-m", "tools.safety"], False),
     ("plot", ["-m", "tools.plot", "--only", "all"], False),
+    ("audit", ["-m", "tools.audit"], False),
     ("report", ["-m", "tools.report"], False),
 ]
 
