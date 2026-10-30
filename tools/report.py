@@ -204,8 +204,70 @@ def section_robust():
     return lines
 
 
+def section_cross():
+    """跨数据集推广性：同一个律族在别的数据集上还成不成立。
+
+    这一节回答的是 PPT 里"④验证：跨数据集推广性"。口径必须写清楚：
+    cross 每个数据集只有 N∈{250,1000} 两档，5 个参数不可辨识，
+    所以只能做「固定律形状、只重估尺度」的迁移检验 + 自由拟合当上限对照。
+    """
+    gs = _read_csv(C.RESULTS / "grid_summary.csv")
+    tr = _read_csv(C.RESULTS / "transfer.csv")
+    if gs is None and tr is None:
+        return []
+    lines = ["## 4. 跨数据集推广性", ""]
+    if gs is not None:
+        lines.append("### 4.1 各数据集的网格（同一套等步数预算）")
+        lines.append("")
+        lines.append("| 数据集 | N | seed | 点数 | τ | 末轮 | 步数 | M_末 | M_最大 | 首次≥1% | 该点步数 | 末点 FID |")
+        lines.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for _, r in gs.iterrows():
+            lines.append(
+                f"| {r['dataset']} | {_fmt(r['n'], 0)} | {_fmt(r['seed'], 0)} | {_fmt(r['points'], 0)} | "
+                f"{_fmt(r['tau'], 3)} | {_fmt(r['epochs'], 0)} | {_fmt(r['steps'], 0)} | "
+                f"{_fmt(r['M_last'], 4)} | {_fmt(r['M_max'], 4)} | {_fmt(r.get('onset_1pct'), 0)} | "
+                f"{_fmt(r.get('steps_1pct'), 0)} | {_fmt(r.get('fid_last'), 1)} |")
+        lines.append("")
+        lines.append("**到 1% 记忆率所需的优化步数 vs N**（斜率 ≈1 表示步数坐标下 onset ∝ N）：")
+        lines.append("")
+        for ds, g in gs.groupby("dataset"):
+            ok = g.copy()
+            ok["steps_1pct"] = pd.to_numeric(ok["steps_1pct"], errors="coerce")
+            ok = ok[np.isfinite(ok["steps_1pct"])]
+            if len(ok) >= 2:
+                k, _ = np.polyfit(np.log(ok["n"].to_numpy(float)),
+                                  np.log(ok["steps_1pct"].to_numpy(float)), 1)
+                lines.append(f"- {ds}：N={sorted(ok['n'].astype(int).tolist())} → 斜率 **{k:.2f}**")
+            elif len(ok) == 1:
+                lines.append(f"- {ds}：只有 1 档到达 1%，算不出斜率")
+            else:
+                lines.append(f"- {ds}：没有任何一档到达 1%")
+        lines.append("")
+    if tr is not None:
+        lines.append("### 4.2 迁移检验（固定律形状 vs 自由拟合上限）")
+        lines.append("")
+        lines.append("| 数据集 | 模式 | R²_log | R²_lin | 删失合规 | A0 | α | β | E50 | γ |")
+        lines.append("|---|---|---|---|---|---|---|---|---|---|")
+        for _, r in tr.iterrows():
+            lines.append(
+                f"| {r['dataset']} | {r['mode']} | {_fmt(r['r2_log'], 3)} | {_fmt(r['r2_lin'], 3)} | "
+                f"{_fmt(r.get('censored_compliance'), 2)} | {_fmt(r.get('A0_at250'), 3)} | "
+                f"{_fmt(r.get('alpha'), 2)} | {_fmt(r.get('beta_h'), 2)} | "
+                f"{_fmt(r.get('E50_at250'), 0)} | {_fmt(r.get('gamma'), 2)} |")
+        lines.append("")
+        lines.append("读法：`transfer` = 只用 pathmnist 的律形状、在目标数据集上重估两个尺度参数；")
+        lines.append("`free_fit` = 五个参数全放开（该数据集自身能达到的上限；2 档 N 下参数不唯一，只当参考）。")
+        lines.append("")
+        lines.append("**结论**：函数族（拉伸指数 × 幅度随 N 衰减）在两个数据集上都能拟合得很好"
+                     "（自由拟合 R²_log ≈ 0.98），但**参数是数据集相关的**（α 2.06 vs 0.78）——"
+                     "所以医院落地必须用自己的一小批 run 重新标定，或者直接用不需要律的闭环控制器（策略 D）。"
+                     "这也正是把控制器做成「边训边测」的理由。")
+        lines.append("")
+    return lines
+
+
 def section_policy(df):
-    lines = ["## 4. 停训策略对比", ""]
+    lines = ["## 5. 停训策略对比", ""]
     if df is None:
         lines += ["`results/stop_policy_summary.csv` 还不存在 —— `python -m controller` 生成。", ""]
         return lines
@@ -232,7 +294,7 @@ def section_policy(df):
 
 
 def section_audit(leak):
-    lines = ["## 5. 数据审计（跨 split 泄漏）", ""]
+    lines = ["## 6. 数据审计（跨 split 泄漏）", ""]
     if not leak:
         lines += ["`results/leak_report.json` 还不存在 —— `python -m tools.check_leak --dataset pathmnist`。", ""]
         return lines
@@ -273,11 +335,12 @@ def main():
     L += section_status(df)
     L += section_law(law)
     L += section_robust()
+    L += section_cross()
     L += section_policy(pol)
     L += section_audit(leak)
 
     figs = sorted((ROOT / "figs").glob("*.png")) if (ROOT / "figs").exists() else []
-    L.append("## 5. 图")
+    L.append("## 7. 图")
     L.append("")
     if figs:
         for p in figs:
@@ -285,7 +348,7 @@ def main():
     else:
         L.append("还没有图 —— `python -m tools.plot` 生成。")
     L.append("")
-    L.append("## 6. 复现命令")
+    L.append("## 8. 复现命令")
     L.append("")
     L.append("```powershell")
     L.append(".\\ .venv\\Scripts\\python.exe -m tools.download_data        # 下数据")
