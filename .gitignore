@@ -1,0 +1,28 @@
+# 数据：原始 npz 与参照集不进 git（体积大、可重下）
+data/raw/*
+data/subsets/*
+!data/raw/.keep
+!data/subsets/.keep
+
+# 缓存：特征、checkpoint、采样图都不进 git（可由 results/ 复现）
+cache/*
+!cache/.keep
+
+# 构建产物（日志、wheel 缓存、队列状态不进 git；但复现脚本要进）
+build/*
+!build/.keep
+!build/*.py
+!build/*.ps1
+.venv/
+*.egg-info/
+__pycache__/
+*.pyc
+
+# 图：草图不进，定稿图手动 git add
+figs/draft/*
+
+# 编辑器
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

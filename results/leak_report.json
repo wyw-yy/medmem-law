@@ -1,0 +1,38 @@
+[
+  {
+    "dataset": "pathmnist",
+    "n_train": 89996,
+    "n_val": 10004,
+    "n_test": 7180,
+    "exact_dup_test_in_train": 0,
+    "exact_dup_val_in_train": 0,
+    "near_dup_test_in_train_ge_0.995": 0,
+    "thumb_max_sim_mean": 0.7009987831115723,
+    "thumb_max_sim_p99": 0.9245780110359192,
+    "verdict": "OK"
+  },
+  {
+    "dataset": "bloodmnist",
+    "n_train": 11959,
+    "n_val": 1712,
+    "n_test": 3421,
+    "exact_dup_test_in_train": 5,
+    "exact_dup_val_in_train": 3,
+    "near_dup_test_in_train_ge_0.995": 4,
+    "thumb_max_sim_mean": 0.925187349319458,
+    "thumb_max_sim_p99": 0.978601336479187,
+    "verdict": "LEAK"
+  },
+  {
+    "dataset": "pneumoniamnist",
+    "n_train": 4708,
+    "n_val": 524,
+    "n_test": 624,
+    "exact_dup_test_in_train": 0,
+    "exact_dup_val_in_train": 8,
+    "near_dup_test_in_train_ge_0.995": 0,
+    "thumb_max_sim_mean": 0.9417321681976318,
+    "thumb_max_sim_p99": 0.9770761728286743,
+    "verdict": "OK"
+  }
+]
