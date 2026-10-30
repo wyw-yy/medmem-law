@@ -100,18 +100,29 @@ def evaluate(df: pd.DataFrame, law: dict | None, eps: float = C.EPS_MEM) -> pd.D
             "Dp_closed_predict": stop_D_predict(g, eps),
         }
         e_max = picks["A_fixed_max"]
+        # FID 只每隔 fid-stride 个点算过，停点处常常没有直接测量值。
+        # 用该 run 的 FID 采样点做线性插值（外推用最近端点），并标记 fid_interp，
+        # 免得把"没测"读成"没代价"。
+        fid_pts = g[g["fid"].notna()][["epoch", "fid"]] if "fid" in g else pd.DataFrame()
         for name, ep in picks.items():
             at = g[g["epoch"] <= ep]
             if len(at) == 0:
                 at = g.iloc[[0]]
             last = at.iloc[-1]
+            fid_val, fid_interp = np.nan, False
+            if pd.notna(last.get("fid")):
+                fid_val = float(last["fid"])
+            elif len(fid_pts) >= 2:
+                fid_val = float(np.interp(float(ep), fid_pts["epoch"].to_numpy(), fid_pts["fid"].to_numpy()))
+                fid_interp = True
             rows.append({
                 "run": run, "dataset": g["dataset"].iloc[0], "n": int(g["n"].iloc[0]),
                 "seed": int(g["seed"].iloc[0]) if "seed" in g else 0,
                 "policy": name, "epochs": ep,
                 "epoch_saving": 1.0 - ep / max(e_max, 1),
                 "M_stop": float(last["M"]),
-                "fid_stop": float(last["fid"]) if "fid" in g and pd.notna(last.get("fid")) else np.nan,
+                "fid_stop": fid_val,
+                "fid_interp": fid_interp,
                 "compliant": bool(last["M"] <= eps),
             })
     return pd.DataFrame(rows)
@@ -136,9 +147,19 @@ def main():
     ap.add_argument("--metrics", default=str(C.RESULTS / "metrics_long.csv"))
     ap.add_argument("--law", default=str(C.RESULTS / "law_fit.json"))
     ap.add_argument("--eps", type=float, default=C.EPS_MEM)
+    # 默认只在主数据集上比较停训策略：跨数据集混在一起算"平均省了多少轮"没有意义
+    # （bloodmnist N=1000 的 M 比 pathmnist 高 5 倍，两种 regime 会被平均掉）。
+    ap.add_argument("--dataset", default="pathmnist", help="只用某个数据集；空字符串=全部")
+    ap.add_argument("--seed", type=int, default=0, help="只用某个 seed；0=全部")
     a = ap.parse_args()
 
     df = pd.read_csv(a.metrics)
+    if a.dataset:
+        df = df[df["dataset"] == a.dataset].copy()
+    if a.seed:
+        df = df[df["seed"] == a.seed].copy()
+    if df.empty:
+        raise SystemExit(f"没有数据（dataset={a.dataset!r} seed={a.seed}）")
     law = json.loads(Path(a.law).read_text(encoding="utf-8")) if Path(a.law).exists() else None
     if law is None:
         print("提示：没找到 law_fit.json，策略 C 会退化成跑满")
