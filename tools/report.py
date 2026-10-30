@@ -283,7 +283,7 @@ def section_cross():
 
 
 def section_policy(df):
-    lines = ["## 5. 停训策略对比", ""]
+    lines = ["## 6. 停训策略对比", ""]
     if df is None:
         lines += ["`results/stop_policy_summary.csv` 还不存在 —— `python -m controller` 生成。", ""]
         return lines
@@ -310,7 +310,7 @@ def section_policy(df):
 
 
 def section_audit(leak):
-    lines = ["## 6. 数据审计（跨 split 泄漏）", ""]
+    lines = ["## 7. 数据审计（跨 split 泄漏）", ""]
     if not leak:
         lines += ["`results/leak_report.json` 还不存在 —— `python -m tools.check_leak --dataset pathmnist`。", ""]
         return lines
@@ -330,6 +330,37 @@ def section_audit(leak):
     lines.append("- 校准 τ 时用 `LEAK_COS=0.99` 把参照集里这些重复图剔除，否则 τ 会被抬高、M 恒为 0。")
     lines.append("")
     return lines
+
+
+def section_safe():
+    """交付物：可直接给医院看的早停建议表（results/safe_early_stop.csv）。"""
+    d = _read_csv(C.RESULTS / "safe_early_stop.csv")
+    L = ["## 5. 安全早停建议（交付物）", ""]
+    if d is None or len(d) == 0:
+        return L + ["`results/safe_early_stop.csv` 还不存在 —— `python -m tools.safety`。", ""]
+    L.append("`E*` 由拟合律反解，`M_停`/`FID停` 是停点实测值，`发作点` 是**不依赖律**的实测记忆化起点"
+             "（首次连续 2 个测量点 M ≥ ε）。`E*/发作 < 1` 才说明律的停点落在发作之前。")
+    L.append("")
+    L.append("| 数据集 | N | ε | E* | M_停 | M_满 | 省% | FID停 | FID满 | E*/发作 | 隐私OK | 质量OK | **推荐** |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for _, r in d.sort_values(["dataset", "eps", "n"]).iterrows():
+        L.append(
+            f"| {r['dataset']} | {int(r['n'])} | {r['eps']:g} | {r['E_star']:.0f} | "
+            f"{_fmt(r['M_stop'], 4)} | {_fmt(r['M_full'], 4)} | {100 * r['epoch_saving']:.0f}% | "
+            f"{_fmt(r['fid_stop'], 1)} | {_fmt(r['fid_full'], 1)} | "
+            f"{_fmt(r['onset_ratio'], 2)} | {'✅' if r['ok'] else '❌'} | "
+            f"{'✅' if r['ok_quality'] else '❌'} | {'🟢 可用' if r['recommended'] else '—'} |")
+    L.append("")
+    n_ok = int(d["recommended"].sum())
+    L.append(f"- 可同时满足隐私（M_停 ≤ ε）与质量（FID 不超过跑满的 1.5 倍）的组合：**{n_ok} / {len(d)}**。")
+    # 把张力说白了：小 N 的安全停点远早于图像变好看的轮次，所以"又安全又好看"在小 N 上不存在。
+    small = d[(d["n"] <= 500) & (d["ok"])]
+    if len(small) and not small["recommended"].any():
+        L.append("- **关键张力（必须写进论文）**：N ≤ 500 时所有隐私合规的停点都远早于 FID 变好的轮次"
+                 "（FID 约为跑满时的 2–3 倍）。也就是说小数据集上「安全」与「可用」不可兼得——"
+                 "正确的处方是**加数据**（N 增大后安全窗口变宽），而不是硬把停点往后推。")
+    L.append("")
+    return L
 
 
 def main():
@@ -352,11 +383,12 @@ def main():
     L += section_law(law)
     L += section_robust()
     L += section_cross()
+    L += section_safe()
     L += section_policy(pol)
     L += section_audit(leak)
 
     figs = sorted((ROOT / "figs").glob("*.png")) if (ROOT / "figs").exists() else []
-    L.append("## 7. 图")
+    L.append("## 8. 图")
     L.append("")
     if figs:
         for p in figs:
@@ -364,7 +396,7 @@ def main():
     else:
         L.append("还没有图 —— `python -m tools.plot` 生成。")
     L.append("")
-    L.append("## 8. 复现命令")
+    L.append("## 9. 复现命令")
     L.append("")
     L.append("```powershell")
     L.append(".\\ .venv\\Scripts\\python.exe -m tools.download_data        # 下数据")
