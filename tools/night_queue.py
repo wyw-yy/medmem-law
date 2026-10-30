@@ -64,6 +64,11 @@ def build_plan(name: str) -> list[dict]:
     if name == "replicate":
         # seed 2/3 复现：预算与 seed 1 完全一致（FINAL）。
         return [_entry("pathmnist", n, s, epochs=FINAL[n]) for s in (2, 3) for n in C.N_GRID]
+    if name == "replicate_small":
+        # 只复现 seed 3 的**可测档**（N ≤ 1000）。理由见 PROTOCOL R5：
+        # N≥2000 在 seed1 里 M≤0.016（≤8/512），只当删失数据用，复现它们
+        # 要多花 5 h 却对律的拟合没有贡献。
+        return [_entry("pathmnist", n, 3, epochs=FINAL[n]) for n in (250, 500, 1000)]
     if name == "cross":
         # 跨数据集推广性：两档 N（250 已有饱和、1000 能看到起跳），预算与
         # pathmnist 的 N=250/1000 完全一致，这样 γ 的口径可比。

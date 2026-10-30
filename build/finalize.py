@@ -19,7 +19,10 @@ PY = str(ROOT / ".venv" / "Scripts" / "python.exe")
 
 STEPS = [
     ("score_all", ["-m", "tools.score_run", "--all", "--fid", "--fid-stride", "4"], True),
-    ("law", ["-m", "law"], False),
+    # 主律只用主数据集 pathmnist：cross 的 bloodmnist/pneumoniamnist 只有两档 N，
+    # 混进主拟合会把"函数族"的估计带偏；它们的可迁移性由 transfer 步骤单独检验。
+    # 输出仍写到 results/law_fit.json，因为 controller/safety/train --stop-law 都读这个文件名。
+    ("law", ["-m", "law", "--dataset", "pathmnist", "--out", "results/law_fit.json"], False),
     ("law_ci", ["-m", "tools.law_ci", "--boot", "200"], False),
     ("transfer", ["-m", "tools.transfer"], False),
     ("controller", ["-m", "controller"], False),

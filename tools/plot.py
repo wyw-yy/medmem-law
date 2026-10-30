@@ -45,17 +45,21 @@ def _save(fig, name: str):
     print(f"  -> {p.relative_to(C.ROOT)}")
 
 
-def load() -> pd.DataFrame | None:
+def load(dataset: str | None = "pathmnist") -> pd.DataFrame | None:
     p = C.RESULTS / "metrics_long.csv"
     if not p.exists():
         print(f"[plot] 没有 {p}，先跑 tools.score_run")
         return None
     df = pd.read_csv(p)
     df = df[df["M"].notna()].copy()
+    # 必须按数据集过滤：cross 跑完后 bloodmnist/pneumoniamnist 的行与 pathmnist
+    # 共用同一张 CSV，不过滤的话"N=250"会把三个数据集平均在一起（曲线全错）。
+    if dataset and "dataset" in df.columns:
+        df = df[df["dataset"] == dataset].copy()
     df["n"] = df["n"].astype(int)
     df["epoch"] = df["epoch"].astype(int)
     if len(df) < 5:
-        print("[plot] 测量点太少")
+        print(f"[plot] {dataset} 的测量点太少（{len(df)}）")
         return None
     return df
 
@@ -291,13 +295,57 @@ def fig_e_star(law_json: dict):
     _save(fig, "fig_E_star")
 
 
+def fig_cross_dataset():
+    """跨数据集：同一套预算下，不同医学子域的记忆化倾向差多少。
+
+    每个数据集一个面板，横轴 epoch、纵轴 M，按 N 分色。目的是让读者看到
+    "函数族相同、参数不同"（bloodmnist 在 N=1000 时记忆率就已经 0.34，
+    pathmnist 同预算只有 0.07）。
+    """
+    p = C.RESULTS / "metrics_long.csv"
+    if not p.exists():
+        return
+    df = pd.read_csv(p)
+    df = df[df["M"].notna()].copy()
+    ds_list = [d for d in ("pathmnist", "bloodmnist", "pneumoniamnist")
+               if (df["dataset"] == d).any()]
+    if len(ds_list) < 2:
+        print("  [skip] fig_cross_dataset：还没有第二个数据集的结果")
+        return
+    fig, axes = plt.subplots(1, len(ds_list), figsize=(3.2 * len(ds_list), 3.0), sharey=True)
+    if len(ds_list) == 1:
+        axes = [axes]
+    # 只画所有数据集都有的 N 档 —— 跨数据集比较必须"同 N 同预算"才成立，
+    # 否则 pathmnist 的 2000/4000（全是检出限以下的噪声）会把面板画花。
+    common_n = sorted(set.intersection(*[set(df[df["dataset"] == d]["n"].unique()) for d in ds_list]))
+    for ax, ds in zip(axes, ds_list):
+        sub = df[df["dataset"] == ds]
+        for i, N in enumerate(common_n):
+            g = sub[sub["n"] == N].groupby("epoch")["M"].mean()
+            # 纵轴用 symlog（不是 log）：M=0 的点要在 0 处画成平的，
+            # 用 log(M+1e-4) 会让"0 与非 0 交替"变成假的锯齿振荡。
+            ax.plot(g.index.to_numpy(), g.to_numpy(), color=COLORS[i % len(COLORS)],
+                    lw=1.5, label=f"N={N}")
+        ax.set_yscale("symlog", linthresh=0.005)
+        ax.axhline(3.0 / C.N_SAMPLE, color="0.6", ls=":", lw=0.8)
+        ax.set_title(ds, fontsize=9)
+        ax.set_xlabel("epoch $E$")
+        ax.legend(frameon=False, fontsize=6)
+    axes[0].set_ylabel("memorization rate $M$")
+    fig.suptitle("Same budget, different memorization propensity", fontsize=9)
+    fig.tight_layout()
+    _save(fig, "fig_cross_dataset")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", default="")
+    ap.add_argument("--dataset", default="pathmnist",
+                    help="画哪一份数据集的主图（cross 数据集单独出 fig_cross_dataset）")
     a = ap.parse_args()
     only = a.only.lower()
 
-    df = load()
+    df = load(a.dataset)
     lawjson = None
     lp = C.RESULTS / "law_fit.json"
     if lp.exists():
@@ -323,6 +371,8 @@ def main():
         fig_quality(df)
     if not only or only in "all,stop,s":
         fig_stop_policy()
+    if not only or only in "all,cross,x":
+        fig_cross_dataset()
 
 
 if __name__ == "__main__":

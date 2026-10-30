@@ -179,3 +179,26 @@ L3 双时间尺度  M = Minf·Φ((E - τ(N))/w),       τ   = a·N^γ
 - 对照：seed 1 的满预算曲线（同 N 同分辨率），比较停点 M、FID 与后续增长。
 
 **口径**：seed 4 vs seed 1 属跨 seed 比较，需说明；seed 2/3 的全网格跑完后可用 seed 间标准差给出不确定性。
+
+## 12. 设计修订 R5：复现只做可测档；主律与跨数据集律分开拟合
+
+**R5a — seed 3 只复现 N ≤ 1000**（`tools.night_queue --plan replicate_small`）。
+
+触发：seed 1 的横轴上，N=2000/4000 在全预算（9.0 万、8.75 万优化步）内末点 M 只有 0.006 / 0.002，即每 512 张生成图里 1–3 张勉强越线 —— 这些点**在拟合里只作为删失观测**（上限约束），不提供曲线形状信息。对它们再做 seed 3 复现要额外约 5 h 墙钟，换来的只是"删失点的删失更确定"。
+判断：seed 间方差只在**有信号**的档位上有意义，所以 seed 3 只跑 N ∈ {250, 500, 1000}（合计约 2.5 h），大 N 档的 seed 方差用 seed 2 单独报告，并明写"大 N 档只做了 2 个 seed"。
+代价与披露：这是**有意的样本量不均衡**，论文表格里必须标出每个 (N, seed) 的实际组合数（`results/grid_summary.csv` 里逐行可见）。
+
+**R5b — 主律只用 pathmnist 拟合，跨数据集单独检验**。
+
+原因：cross 的 bloodmnist / pneumoniamnist 每套只有 N ∈ {250, 1000} 两档，5 个参数在这种覆盖下不可辨识（`tools.transfer.py` 冒烟时 A0 直接撞上界 1.0）。若把它们混进主拟合，会让"函数族"的估计被两档数据的局部形状带偏。
+做法：
+- `python -m law --dataset pathmnist --out results/law_fit.json` → 主律（`build/finalize.py` 已固定这一条，且仍写 `law_fit.json`，因为 `controller.py` / `tools/safety.py` / `train.py --stop-law` 都读这个文件名）；
+- `python -m tools.transfer` → 对每个数据集：①固定 pathmnist 的 α/β/γ、只重估 A0 与 E50（`transfer` 行）；②五参全放开（`free_fit` 行，上限对照）。
+
+首批结果（bloodmnist, seed 1）：
+| mode | R²_log | R²_lin | α | γ | E50@250 |
+|---|---|---|---|---|---|
+| transfer（固定形状） | 0.534 | 0.832 | 2.056（固定） | −0.689（固定） | — |
+| **free_fit（自由拟合）** | **0.984** | **0.962** | **0.78** | **−0.31** | 1806 |
+
+→ **函数族可迁移，参数不可迁移**。这正好支撑两个落地结论：医院换数据域时必须用自己的少量 run 重新标定（而不是照抄论文里的 E\*），或者干脆用不依赖律形状的**闭环**控制器（策略 D，在线测 M 再停）。cross 的 onset 步数斜率（log-log）也差一倍：bloodmnist 0.66、pathmnist 1.29。

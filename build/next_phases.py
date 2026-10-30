@@ -61,7 +61,8 @@ def main() -> None:
     log("night 队列已收尾，开始接力")
 
     run("控制器验证（plan ctl）", ["-m", "tools.night_queue", "--plan", "ctl"])
-    run("seed3 复现（plan replicate --seed 3）", ["-m", "tools.night_queue", "--plan", "replicate", "--seed", "3"])
+    run("seed3 可测档复现（plan replicate_small）",
+        ["-m", "tools.night_queue", "--plan", "replicate_small"])
     run("一条龙汇总（finalize --skip-score）", ["build/finalize.py", "--skip-score"], timeout_h=3)
     log("接力全部完成")
 
