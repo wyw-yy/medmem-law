@@ -21,6 +21,7 @@ STEPS = [
     ("score_all", ["-m", "tools.score_run", "--all", "--fid", "--fid-stride", "4"], True),
     ("law", ["-m", "law"], False),
     ("law_ci", ["-m", "tools.law_ci", "--boot", "200"], False),
+    ("transfer", ["-m", "tools.transfer"], False),
     ("controller", ["-m", "controller"], False),
     ("safety", ["-m", "tools.safety"], False),
     ("plot", ["-m", "tools.plot", "--only", "all"], False),

@@ -338,10 +338,19 @@ def load_metrics(path: Path | None = None) -> pd.DataFrame:
     return df
 
 
-def main(metrics_csv: str | None = None, out: str | None = None):
+def main(metrics_csv: str | None = None, out: str | None = None,
+         datasets: list[str] | None = None, seeds: list[int] | None = None):
     df = load_metrics(Path(metrics_csv) if metrics_csv else None)
+    if datasets:
+        df = df[df["dataset"].isin(datasets)].copy()
+    if seeds:
+        df = df[df["seed"].isin(seeds)].copy()
+    if not len(df):
+        raise SystemExit("筛选后没有测量点 —— 检查 --dataset / --seed")
     print(f"读入 {len(df)} 个测量点，N={sorted(df['n'].unique())}，"
-          f"run={df['run'].nunique()}，E∈[{df['epoch'].min()},{df['epoch'].max()}]")
+          f"run={df['run'].nunique()}，E∈[{df['epoch'].min()},{df['epoch'].max()}]"
+          + (f"，数据集={datasets}" if datasets else "")
+          + (f"，seed={seeds}" if seeds else ""))
 
     fits, rows = {}, []
     for name in CANDIDATES:
@@ -430,6 +439,18 @@ def main(metrics_csv: str | None = None, out: str | None = None):
 
 
 if __name__ == "__main__":
+    import argparse
     import sys
 
-    main(*(sys.argv[1:3]))
+    ap = argparse.ArgumentParser(description="拟合记忆化控制律 M(N,E)")
+    ap.add_argument("--metrics", default=None, help="测量 CSV（默认 results/metrics_long.csv）")
+    ap.add_argument("--out", default=None, help="输出 JSON（默认 results/law_fit.json）")
+    ap.add_argument("--dataset", default="", help="只用某个数据集，逗号分隔；跨数据集验证时用")
+    ap.add_argument("--seed", default="", help="只用某些 seed，逗号分隔")
+    a = ap.parse_args(sys.argv[1:])
+    dst = [x for x in a.dataset.split(",") if x] or None
+    sds = [int(x) for x in a.seed.split(",") if x] or None
+    out = a.out
+    if out is None and dst:
+        out = str(C.RESULTS / f"law_fit_{'_'.join(dst)}.json")
+    main(a.metrics, out, datasets=dst, seeds=sds)

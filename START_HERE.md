@@ -41,10 +41,12 @@ medmem-law/
   tools/
     check_leak.py      训练前泄漏审计（**必须先跑**）
     score_run.py       对已有采样逐点评分 → results/metrics_long.csv（幂等）
-    night_queue.py     夜间队列（可中断、可续跑；plan: mvp/main/deep/cross/controller）
+    night_queue.py     夜间队列（可中断、可续跑；plan: mvp/main/deep/cross/replicate/controller/ctl）
     plot.py            出图（figs/*.png）
     report.py          生成 RESULTS.md
     law_ci.py          按 N 分层的 bootstrap，给参数与 E* 的置信区间
+    transfer.py        跨数据集迁移检验（固定律形状，只重估两个尺度参数）
+    safety.py          把律翻译成医院能看的安全早停表（results/safe_early_stop.csv）
     machine_profile.py 实测本机速度/显存，给排期用
     download_data.py   预下载数据
   build/               安装/转换脚本、日志、队列状态（不进 git）
@@ -93,8 +95,16 @@ $py = ".\.venv\Scripts\python.exe"
 & $py -m law
 & $py -m tools.law_ci --boot 200
 
-# 7) 四种停训策略对比
+# 7) 四种停训策略对比（离线回放）
 & $py -m controller
+
+# 7b) 真·开环律早停：训练循环自己按 E*(N, eps) 停（这是"优化后的代码"）
+#     例：N=250 预算 5125 轮，律算出 E*=612，训练到 612 轮自动停并存点采样
+& $py -m train --dataset pathmnist --n 250 --seed 4 --epochs 5125 --stop-law --eps 0.01
+& $py -m tools.night_queue --plan ctl        # 两条正式的控制器验证 run
+
+# 7c) 跨数据集推广性（需要 cross 跑完）：固定律形状，只重估尺度参数
+& $py -m tools.transfer
 
 # 8) 出图 + 结果登记簿
 & $py -m tools.plot

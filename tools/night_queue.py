@@ -32,10 +32,12 @@ import config as C
 STATE = C.BUILD / "queue_state.json"
 
 
-def _entry(dataset: str, n: int, seed: int, stop_eps=None, epochs: int | None = None) -> dict:
+def _entry(dataset: str, n: int, seed: int, stop_eps=None, epochs: int | None = None,
+           stop_law: bool = False, eps: float | None = None) -> dict:
     ep = C.epochs_for(n) if epochs is None else int(epochs)
     return dict(dataset=dataset, n=n, seed=seed, epochs=ep,
-                ckpt_every=C.ckpt_every_for(ep), stop_eps=stop_eps)
+                ckpt_every=C.ckpt_every_for(ep), stop_eps=stop_eps,
+                stop_law=stop_law, eps=C.EPS_MEM if eps is None else eps)
 
 
 # 深度档（不等步数）：等步数预算下 N=2000/4000 全是 M=0（低于检出限），
@@ -72,6 +74,10 @@ def build_plan(name: str) -> list[dict]:
         return build_plan("cross") + [_entry("pathmnist", n, 2, epochs=FINAL[n]) for n in C.N_GRID]
     if name == "controller":
         return [_entry("pathmnist", n, 1, stop_eps=C.EPS_MEM) for n in C.N_GRID]
+    if name == "ctl":
+        # 真·开环律早停（策略 C）：在训练循环里按 E*(N,eps) 自己停。
+        # 用新 seed 4，避免覆盖主网格的 seed 1 结果；对照用 seed 1 的满预算曲线。
+        return [_entry("pathmnist", n, 4, epochs=FINAL[n], stop_law=True) for n in (250, 1000)]
     raise SystemExit(f"未知 plan: {name}")
 
 
@@ -160,9 +166,25 @@ def main():
             try:
                 import train
 
+                stop_epoch, stop_rule = None, ""
+                if p.get("stop_law"):
+                    import law as L
+
+                    j = json.loads((C.RESULTS / "law_fit.json").read_text(encoding="utf-8"))
+                    best = j["best"]
+                    e_star = L.solve_E_star(best, j["fits"][best]["params"],
+                                            float(p["n"]), float(p.get("eps", C.EPS_MEM)))
+                    if e_star == e_star:  # 非 nan
+                        stop_epoch = int(-(-e_star // 1))
+                        stop_rule = f"{best} eps={p.get('eps', C.EPS_MEM)} E*={e_star:.0f}"
+                        print(f"  [law] {stop_rule} → 第 {stop_epoch} 轮停", flush=True)
+                    else:
+                        print("  [law] 该 N 永远达不到 eps —— 数据本身安全", flush=True)
+
                 train.train_run(p["dataset"], p["n"], p["seed"],
                                 epochs=p["epochs"], stop_eps=p.get("stop_eps"),
-                                ckpt_every=p["ckpt_every"])
+                                ckpt_every=p["ckpt_every"],
+                                stop_epoch=stop_epoch, stop_rule=stop_rule)
                 state["done"].append(run)
             except Exception as e:  # noqa: BLE001
                 print(f"{run} 训练失败：{type(e).__name__}: {e}")

@@ -151,7 +151,8 @@ def _load_ckpt(run: str, net, opt, device: str, ema: "WeightEMA | None" = None) 
 def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
               stop_eps: float | None = None, amp: bool = True,
               sample_n: int = C.N_SAMPLE, device: str = C.DEVICE,
-              ckpt_every: int = C.CKPT_EVERY) -> dict:
+              ckpt_every: int = C.CKPT_EVERY,
+              stop_epoch: int | None = None, stop_rule: str = "") -> dict:
     run = C.run_tag(dataset, n, seed)
     log_path = C.BUILD / "logs" / f"{run}.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -220,7 +221,11 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
             cnt += len(xb)
         hist.append({"epoch": epoch, "loss": tot / max(cnt, 1)})
 
-        if epoch % ckpt_every == 0 or epoch == epochs:
+        # 开环律早停（策略 C）：E* 由 results/law_fit.json 在训练开始前算好传进来，
+        # 训练时不需要任何额外测量 —— 这是给医院用的"零成本"版本。
+        is_measure = (epoch % ckpt_every == 0 or epoch == epochs
+                      or (stop_epoch is not None and epoch >= stop_epoch))
+        if is_measure:
             _save_ckpt(run, net, opt, epoch, ema=ema)
 
             t0 = time.time()
@@ -246,6 +251,10 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
             _log(msg, log_path)
             if stopped_early:
                 break
+            if stop_epoch is not None and epoch >= stop_epoch:
+                stopped_early = epoch
+                _log(f"开环律早停（{stop_rule}）：E*={stop_epoch} 已到，停止训练", log_path)
+                break
 
     total = time.time() - t_start
     out = {
@@ -254,6 +263,8 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
         "epochs_done": int(hist[-1]["epoch"]) if hist else start_epoch,
         "stopped_early_at": stopped_early,
         "stop_eps": stop_eps,
+        "stop_rule": stop_rule or None,
+        "stop_epoch_law": stop_epoch,
         "seconds": round(total, 1),
         "s_per_epoch": round(total / max(len(hist), 1), 2),
         "loss_curve": hist,
@@ -283,10 +294,33 @@ def main():
     ap.add_argument("--sample-n", type=int, default=C.N_SAMPLE)
     ap.add_argument("--ckpt-every", type=int, default=C.CKPT_EVERY,
                     help="每多少 epoch 存 checkpoint + 采样；主网格按 config.ckpt_every_for 缩放")
+    ap.add_argument("--stop-law", nargs="?", const="auto", default=None,
+                    help="开环律早停（策略 C）：从 results/law_fit.json 反解 E*(N, eps) 并在该轮停止。"
+                         "可给 JSON 路径，默认 results/law_fit.json")
+    ap.add_argument("--eps", type=float, default=C.EPS_MEM,
+                    help="配合 --stop-law 的记忆率上限（默认 1%%）")
     a = ap.parse_args()
+
+    stop_epoch, stop_rule = None, ""
+    if a.stop_law:
+        import law as L
+
+        path = C.RESULTS / "law_fit.json" if a.stop_law == "auto" else Path(a.stop_law)
+        j = json.loads(path.read_text(encoding="utf-8"))
+        best = j["best"]
+        params = j["fits"][best]["params"]
+        e_star = L.solve_E_star(best, params, float(a.n), a.eps)
+        if not np.isfinite(e_star):
+            print(f"[warn] 律 {best} 在 N={a.n} 处再怎么训练也到不了 M={a.eps}，"
+                  f"没有可停的点 —— 这批数据本身就安全，直接按 --epochs 跑（可按需减半）")
+        else:
+            stop_epoch = int(np.ceil(e_star))
+            stop_rule = f"{best}@{path.name} eps={a.eps} E*={e_star:.0f}"
+            print(f"[law] {stop_rule} → 训练到第 {stop_epoch} 轮停止")
+
     try:
         train_run(a.dataset, a.n, a.seed, a.epochs, a.stop_eps, not a.no_amp, a.sample_n,
-              ckpt_every=a.ckpt_every)
+                  ckpt_every=a.ckpt_every, stop_epoch=stop_epoch, stop_rule=stop_rule)
     except Exception:
         traceback.print_exc()
         raise
