@@ -80,6 +80,9 @@ def fig_m_vs_e(df: pd.DataFrame):
     ax.set_ylabel("memorization rate $M$")
     ax.set_yscale("symlog", linthresh=0.005)
     ax.axhline(3.0 / C.N_SAMPLE, color="0.6", lw=0.7, ls=":")
+    ax.text(0.99, 3.0 / C.N_SAMPLE, "detection limit 3/512 ",
+            transform=ax.get_yaxis_transform(), va="bottom", ha="right",
+            fontsize=6, color="0.45")
     # 参考线：单张样本即 1/N_SAMPLE，是这条曲线能取到的最小非零值（离散噪声地板）
     ax.axhline(1.0 / C.N_SAMPLE, ls=":", lw=1.0, color="0.55")
     ax.text(0.99, 1.0 / C.N_SAMPLE, " 1 sample ", transform=ax.get_yaxis_transform(),
@@ -356,22 +359,28 @@ def main():
             fig_e_star(lawjson)
         return
 
-    if not only or only in "m,me":
+    def want(keys: str) -> bool:
+        # 注意：`only in keys` 是子串匹配，所以 "all" 必须在每个 keys 里出现，
+        # 否则 `--only all` 会静默漏掉那张图（fig_M_vs_E 就漏过一次，
+        # 导致主图一直停在 22:05 的旧版本，而其他图都更新了）。
+        return (not only) or only == "all" or only in keys
+
+    if want("all,m,me"):
         fig_m_vs_e(df)
     if lawjson:
-        if not only or only in "all,collapse,c":
+        if want("all,collapse,c"):
             fig_collapse(df, lawjson)
-        if not only or only in "all,amp,a":
+        if want("all,amp,a"):
             fig_amplitude(df, lawjson)
-        if not only or only in "all,parity,p":
+        if want("all,parity,p"):
             fig_parity(df, lawjson)
-        if not only or only in "all,estar,e":
+        if want("all,estar,e"):
             fig_e_star(lawjson)
-    if not only or only in "all,quality,q":
+    if want("all,quality,q"):
         fig_quality(df)
-    if not only or only in "all,stop,s":
+    if want("all,stop,s"):
         fig_stop_policy()
-    if not only or only in "all,cross,x":
+    if want("all,cross,x"):
         fig_cross_dataset()
 
 

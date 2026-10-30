@@ -58,21 +58,37 @@ def _fmt(x, nd=3):
         return str(x)
 
 
+def _run_json(dataset, n, seed):
+    """读 runs/*.json，拿真实预算 —— 不能再用 C.epochs_for 猜：
+    deep 档（R1）把大 N 的预算改大过，猜出来的"预算"会让完成度表全错。"""
+    import json
+    p = C.RESULTS / "runs" / f"{C.run_tag(dataset, int(n), int(seed))}.json"
+    if not p.exists():
+        return {}
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
 def section_status(df):
     lines = ["## 1. 主网格完成度", ""]
     if df is None:
         lines += ["`results/metrics_long.csv` 还不存在 —— 先跑 `python -m tools.night_queue --plan main`。", ""]
         return lines
-    lines.append("| N | seed | 测量点 | 最后 epoch / 预算 | τ | M_max | FID_min | 状态 |")
-    lines.append("|---|---|---|---|---|---|---|---|")
-    for (n, s), g in df.groupby(["n", "seed"], sort=True):
+    lines.append("| 数据集 | N | seed | 测量点 | 最后 epoch / 预算 | τ | M_max | FID_min | 状态 |")
+    lines.append("|---|---|---|---|---|---|---|---|---|")
+    # 必须按 (dataset, n, seed) 分组：三个数据集共用同一张 CSV，
+    # 只按 (n, seed) 分组会把 bloodmnist 的 M_max 混进 pathmnist 的行里。
+    for (ds, n, s), g in df.groupby(["dataset", "n", "seed"], sort=True):
         eps = sorted(g["epoch"].unique())
-        want = C.epochs_for(int(n))
+        meta = _run_json(ds, n, s)
+        want = int(meta.get("epochs_target") or C.epochs_for(int(n)))
         done = int(eps[-1]) if eps else 0
         ok = "✅ 完成" if done >= want * 0.99 else f"⏳ {done}/{want}"
         fmin = g["fid"].min() if g["fid"].notna().any() else None
         lines.append(
-            f"| {int(n)} | {int(s)} | {len(eps)} | {done} / {want} | "
+            f"| {ds} | {int(n)} | {int(s)} | {len(eps)} | {done} / {want} | "
             f"{_fmt(g['tau'].iloc[-1], 4)} | {_fmt(g['M'].max())} | {_fmt(fmin, 1)} | {ok} |"
         )
     lines.append("")
