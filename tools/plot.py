@@ -278,16 +278,21 @@ def fig_stop_policy():
         print("[plot] 没有 stop_policy_summary.csv，跳过 fig_stop")
         return
     d = pd.read_csv(p)
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.0))
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.2))
     x = np.arange(len(d))
+    # 策略名较长，横排会互相压住 → 旋转 + 右对齐；缩写后更易读
+    short = [s.replace("_closed_predict", "+pred").replace("_closed_loop", "(loop)")
+             .replace("_fid_plateau", "(FID)").replace("_fixed_max", "(max)")
+             .replace("_open_loop", "(law)") for s in d["policy"]]
     axes[0].bar(x, d["epochs"], color=COLORS[: len(d)])
-    axes[0].set_xticks(x, d["policy"], fontsize=8)
     axes[0].set_ylabel("epochs used")
     axes[0].set_title("training cost")
     axes[1].bar(x, d["violation_rate"], color=COLORS[: len(d)])
-    axes[1].set_xticks(x, d["policy"], fontsize=8)
     axes[1].set_ylabel("fraction of runs exceeding $\\epsilon$")
     axes[1].set_title("privacy violations")
+    for ax in axes:
+        ax.set_xticks(x, short, fontsize=8, rotation=20, ha="right")
+        ax.grid(axis="y", alpha=0.3)
     _save(fig, "fig_stop_policies")
 
 
