@@ -234,6 +234,22 @@ def section_robust():
             lines.append(f"| {name} | {_fmt(r.get('r2_log'))} | {_fmt(r.get('r2_lin'))} | "
                          + " ".join(r.get("bias_by_n") or []) + " |")
         lines.append("")
+
+    fpr = _read_csv(C.RESULTS / "fpr_sensitivity.csv")
+    if fpr is not None and len(fpr):
+        lines += ["### 3.4 换 FPR，τ 与 M 会不会变（`build/fpr_sens.py`）", "",
+                  "τ 是本套度量唯一的外部自由参数：按非成员参照图的 99.5 分位校准，即假阳率 0.5%。"
+                  "下表对同一批特征重设 FPR 再算 M。", "",
+                  "| run | 检查点 | FPR | τ | 记忆率 M | 命中/生成 |",
+                  "|---|---|---|---|---|---|"]
+        for _, r in fpr.iterrows():
+            lines.append(f"| {r['run']} | e{int(r['epoch'])} | {float(r['fpr']) * 100:.1f}% | "
+                         f"{_fmt(r['tau'])} | {_fmt(r['M'])} | "
+                         f"{int(round(float(r['M']) * float(r['n_gen'])))}/{int(r['n_gen'])} |")
+        lines.append("")
+        lines.append("- FPR 从 0.1% 放宽到 1%（10 倍）时 M 只变动几个百分点 → 结论不依赖 FPR 的具体取值；"
+                     "但 τ 的绝对值不可跨 FPR 比较，报告里统一用 0.5%。")
+        lines.append("")
     return lines
 
 

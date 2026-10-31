@@ -198,6 +198,10 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
     t_start = time.time()
     hist = []
     stopped_early = None
+    # 闭环控制的交付语义：越界那个 ckpt 不作为交付物，交付**上一个仍然合规的检查点**
+    # （部署时丢弃它就行；这里两个都留在磁盘上，审计链完整）
+    last_ok_epoch, last_ok_M = None, None
+    m_detect = None
 
     for epoch in range(start_epoch + 1, epochs + 1):
         net.train()
@@ -244,7 +248,11 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
                 msg += f" M={res['M']:.4f} sim_max={res['sim_max']:.3f}"
                 if res["M"] >= stop_eps:
                     stopped_early = epoch
-                    msg += "  >>> 触发早停"
+                    m_detect = float(res["M"])
+                    msg += (f"  >>> 触发早停（越界 ckpt 不交付，交付 e{last_ok_epoch or 0:04d}，"
+                            f"M={last_ok_M if last_ok_M is not None else float('nan'):.4f}）")
+                else:
+                    last_ok_epoch, last_ok_M = epoch, float(res["M"])
             el = time.time() - t_start
             done = epoch - start_epoch
             msg += f" | {el/done:.1f}s/epoch ETA {(epochs-epoch)*el/done/60:.1f}min"
@@ -262,6 +270,9 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
         "params_M": n_par / 1e6, "epochs_target": epochs,
         "epochs_done": int(hist[-1]["epoch"]) if hist else start_epoch,
         "stopped_early_at": stopped_early,
+        "deliver_epoch": last_ok_epoch if stopped_early else None,
+        "M_at_detect": m_detect,
+        "M_at_deliver": last_ok_M if stopped_early else None,
         "stop_eps": stop_eps,
         "stop_rule": stop_rule or None,
         "stop_epoch_law": stop_epoch,

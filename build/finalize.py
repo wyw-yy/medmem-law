@@ -26,9 +26,12 @@ STEPS = [
     ("law_ci", ["-m", "tools.law_ci", "--n-boot", "200"], False),
     ("law_perseed", ["-m", "law", "--dataset", "pathmnist", "--per-seed",
                      "--out", "results/law_fit_perseed.json"], False),
+    # τ 的唯一自由参数是 FPR：0.1%/0.5%/1% 各算一遍，看记忆率结论是否依赖它。
+    ("fpr_sens", ["-m", "build.fpr_sens"], False),
     ("transfer", ["-m", "tools.transfer"], False),
     ("controller", ["-m", "controller"], False),
     ("safety", ["-m", "tools.safety"], False),
+    ("grid_summary", ["-m", "tools.grid_summary"], False),
     ("plot", ["-m", "tools.plot", "--only", "all"], False),
     ("audit", ["-m", "tools.audit"], False),
     ("report", ["-m", "tools.report"], False),

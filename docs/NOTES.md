@@ -219,3 +219,25 @@ pathmnist N=250，同一预算下三个 seed 的 M：
 选哪个？**报主口径（种子均值），把逐 run 放附录并说明差异来源**。
 理由：律描述的是"给定 (N,E) 的期望记忆率"，种子是噪声；用带噪声的口径去换高 R² 是自欺。
 同理，`R²(可测)` 只在 M ≥ 0.02 上算，它比全体低（0.65–0.73）恰恰说明误差在信号区 —— 这条必须写进 limitation。
+
+---
+
+## 7. 工程坑位补遗
+
+### 7.1 "脚本总返回 exit code 1"是 PowerShell 的假警报
+DINOv2 每次加载都会往 **stderr** 打 `UserWarning: xFormers is not available`。
+PowerShell 把原生程序写在 stderr 的文本当作 `NativeCommandError`，所以
+`python -m ... 2>&1 | Select-Object ...` 这类调用看起来退出码是 1，其实 python 正常退出。
+**判成败只看两样**：①`python ... > out.txt 2> err.txt` 之后 `.venv\Scripts\python.exe` 的真实 rc；
+②产物是否存在/是否更新（CSV 行数、JSON 的 mtime）。`build/queue_tonight.log` 与 `build/finalize.py`
+都按这个原则写（前者把 stderr 落单独文件，后者直接读 `p.returncode`）。
+
+### 7.2 日志编码
+`*>> $log` 在 pwsh 下会写成 **UTF-16LE**，中文再经 GBK 转一道，`Get-Content -Encoding UTF8` 读出来是乱码；
+`... 2>&1 | Out-File -Append -Encoding utf8 $log` 才得到可读的 UTF-8。
+反过来，判断"队列是否结束"不能只匹配中文串：编码一变就永远匹配不到（为此白等过 3.7 h），
+兜底做法是同时认 ASCII 标记（`done=`）与"日志 20 分钟没更新"。
+
+### 7.3 PowerShell 里不要写多行 Python
+`python - <<'PY'`（heredoc）不可用（报 `MissingFileSpecification`）；`python -c "...双引号..."` 里的引号
+会被 pwsh 吞掉导致 `SyntaxError`。多行代码一律落成 `.py` 文件再执行 —— `build/` 下那批探针脚本就是这么来的。

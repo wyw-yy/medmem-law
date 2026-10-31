@@ -341,14 +341,19 @@ def solve_E_star(name: str, params, N: float, eps: float) -> float:
 
 
 def _stopped_runs() -> set[str]:
-    """被律提前停掉的 run（results/runs/*.json 里带 stop_rule 的）。"""
+    """被干预停掉的 run（开环律 stop_rule，或在线闭环 stop_eps）。
+
+    为什么必须排除：这些曲线在停点处被截断，停点之后的数据缺失。若混进拟合，
+    (a) 长 E 区间的样本被系统性挖空，(b) 更糟——停点本身就是"按 M≥ε 停"选出来的，
+    把它们的样本点算进去会让律在 ε 附近显得特别准，属于自我实现。
+    """
     out: set[str] = set()
     for p in sorted((C.RESULTS / "runs").glob("*.json")):
         try:
             j = json.loads(p.read_text(encoding="utf-8"))
         except Exception:
             continue
-        if j.get("stop_rule"):
+        if j.get("stop_rule") or j.get("stop_eps") is not None:
             out.add(j.get("run", p.stem))
     return out
 

@@ -83,6 +83,20 @@ def build_plan(name: str) -> list[dict]:
         # 真·开环律早停（策略 C）：在训练循环里按 E*(N,eps) 自己停。
         # 用新 seed 4，避免覆盖主网格的 seed 1 结果；对照用 seed 1 的满预算曲线。
         return [_entry("pathmnist", n, 4, epochs=FINAL[n], stop_law=True) for n in (250, 1000)]
+    if name == "dense":
+        # 加密 N 网格（等步数 20000 步）：补 1500 / 3000 两档。
+        # 动机：现有 5 档是 2 倍间隔，α/γ 靠跨档外推；中间插值档能检验
+        # "幂律在档内也成立"，也是把 R² 推到 0.9 的唯一合法路径（补数据，不换口径）。
+        return [_entry("pathmnist", n, s, epochs=C.epochs_for(n))
+                for s in (1, 2) for n in (1500, 3000)]
+    if name == "seeds56":
+        # 再补两个 seed（5/6）只跑可测档：现有 3 个 seed 的种子方差已达 20 倍，
+        # 5 个 seed 才能把"安全余量 E* - k·σ"写实。预算与 FINAL 一致。
+        return [_entry("pathmnist", n, s, epochs=FINAL[n]) for s in (5, 6) for n in (250, 500, 1000)]
+    if name == "ctl_online":
+        # 真·闭环（策略 D）：训练中每个检查点采样 + 实测 M，越界即停并交付上一个合规 ckpt。
+        # ε 取 0.02（= 4×FPR，0.01 低于度量的假阳性地板，没有信息量）。
+        return [_entry("pathmnist", n, 7, epochs=FINAL[n], stop_eps=0.02) for n in (250, 500, 1000)]
     raise SystemExit(f"未知 plan: {name}")
 
 
