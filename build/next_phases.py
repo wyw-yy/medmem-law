@@ -31,10 +31,26 @@ def log(msg: str) -> None:
 
 
 def queue_finished() -> bool:
+    """队列是否已正常收尾。
+
+    坑（10/31 实际踩到）：night_queue 是被 PowerShell 里的 `*>` 重定向写日志的，
+    中文被写成了 **GBK**；这里按 utf-8 读会变成乱码，`"队列结束" in tail` 永远为假，
+    于是白等了 3.7 小时（12:26 队列就结束了，16:07 才因 12 h 上限放弃等待）。
+    修法：同时认 ASCII 的 `done=` / `总用时` 的 GBK 字节，并允许 mtime 判静默。
+    """
     if not QUEUE_LOG.exists():
         return False
-    tail = QUEUE_LOG.read_text(encoding="utf-8", errors="replace")[-4000:]
-    return "队列结束" in tail
+    raw = QUEUE_LOG.read_bytes()[-8000:]
+    for enc in ("utf-8", "gbk"):
+        try:
+            txt = raw.decode(enc, errors="replace")
+        except Exception:
+            continue
+        if "队列结束" in txt or "done=" in txt:
+            return True
+    # 兜底：日志 20 分钟没动，也认为这一轮结束了（进程被杀/正常退出都会静默）
+    age_min = (time.time() - QUEUE_LOG.stat().st_mtime) / 60.0
+    return age_min > 20.0
 
 
 def run(name: str, args: list[str], timeout_h: float = 0) -> int:

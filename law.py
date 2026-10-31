@@ -27,6 +27,7 @@ from scipy.stats import norm
 import config as C
 
 EPS_LOG = 1e-4
+MEAS_FLOOR = 0.02  # 高于 4 倍假阳性地板（FPR=0.5%）才算"可测"
 
 
 # ------------------------------------------------------------------ 候选律
@@ -230,6 +231,19 @@ def fit_one(name: str, df: pd.DataFrame) -> dict:
     else:
         r2_log = r2_lin = float("nan")
 
+    # 「可测区间」的 R²：只在 M 明显高于度量假阳性地板（0.5%）的点上算。
+    # 检出限附近（M≈0.004，512 张里 2 张）的点相对误差天然巨大，
+    # 把它们算进 R² 等于用"噪声除以噪声"，会低估律在真正可测区域的质量。
+    meas = M >= MEAS_FLOOR
+    if int(meas.sum()) > 2:
+        ym = np.log10(M[meas] + EPS_LOG)
+        pm = np.log10(np.clip(pred[meas], 1e-9, 1.0) + EPS_LOG)
+        r2_log_meas = float(1 - np.sum((ym - pm) ** 2) / max(np.sum((ym - ym.mean()) ** 2), 1e-12))
+        r2_lin_meas = float(1 - np.sum((M[meas] - pred[meas]) ** 2)
+                            / max(np.sum((M[meas] - M[meas].mean()) ** 2), 1e-12))
+    else:
+        r2_log_meas = r2_lin_meas = float("nan")
+
     # 删失点的合规率：预测值是否落在检出限以下
     cens_ok = None
     if (~obs).any():
@@ -240,6 +254,8 @@ def fit_one(name: str, df: pd.DataFrame) -> dict:
     aicc = aic + (2 * k * (k + 1)) / max(nobs - k - 1, 1)
     return dict(name=name, params=[float(v) for v in p], pred=pred,
                 r2_log=float(r2_log), r2_lin=float(r2_lin),
+                r2_log_meas=float(r2_log_meas), r2_lin_meas=float(r2_lin_meas),
+                n_meas=int(meas.sum()),
                 rmse_log=float(np.sqrt(sse / nobs)), aicc=float(aicc), k=k,
                 n_obs=int(obs.sum()), n_censored=int((~obs).sum()),
                 censored_compliance=cens_ok)
@@ -324,7 +340,20 @@ def solve_E_star(name: str, params, N: float, eps: float) -> float:
         return float("nan")
 
 
-def load_metrics(path: Path | None = None) -> pd.DataFrame:
+def _stopped_runs() -> set[str]:
+    """被律提前停掉的 run（results/runs/*.json 里带 stop_rule 的）。"""
+    out: set[str] = set()
+    for p in sorted((C.RESULTS / "runs").glob("*.json")):
+        try:
+            j = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if j.get("stop_rule"):
+            out.add(j.get("run", p.stem))
+    return out
+
+
+def load_metrics(path: Path | None = None, drop_stopped: bool = True) -> pd.DataFrame:
     path = path or (C.RESULTS / "metrics_long.csv")
     df = pd.read_csv(path)
     need = {"run", "n", "epoch", "M"}
@@ -335,11 +364,39 @@ def load_metrics(path: Path | None = None) -> pd.DataFrame:
     df["epoch"] = df["epoch"].astype(int)
     # 同一 (run,epoch) 多次评分取最后一次
     df = df.sort_values("epoch").drop_duplicates(["run", "epoch"], keep="last")
+    # 被律提前停掉的 run 是"干预组"，不是观察组：曲线在 E* 处截断，
+    # 拿来拟合会把中后期的高 M 点人为删掉、把曲线压平。
+    if drop_stopped:
+        bad = _stopped_runs()
+        if bad:
+            n0 = len(df)
+            df = df[~df["run"].isin(bad)].copy()
+            print(f"[law] 排除 {len(bad)} 个被早停干预的 run（{n0} → {len(df)} 点）")
     return df
 
 
+def collapse_seeds(df: pd.DataFrame) -> pd.DataFrame:
+    """把同一 (dataset, N, epoch) 的多个 seed 折成一条平均曲线。
+
+    为什么要这一步：M(N, E) 描述的是**期望记忆率**，seed 之间的差异是噪声，
+    不该算进模型误差里（否则 R² 变成"律 vs 单条曲线"的比较，反而惩罚了做重复实验这件事）。
+    折完后 R² 是"律 vs 种子均值"的拟合优度；单条曲线上的偏差另外用 LOO 池化看。
+    """
+    keys = ["dataset", "n", "epoch"]
+    g = df.groupby(keys, as_index=False).agg(
+        M=("M", "mean"),
+        tau=("tau", "mean"),
+        n_gen=("n_gen", "mean"),
+        n_seeds=("M", "size"),
+    )
+    g["run"] = g["dataset"] + "_n" + g["n"].astype(str) + "_mean"
+    g["seed"] = 0
+    return g
+
+
 def main(metrics_csv: str | None = None, out: str | None = None,
-         datasets: list[str] | None = None, seeds: list[int] | None = None):
+         datasets: list[str] | None = None, seeds: list[int] | None = None,
+         per_seed: bool = False):
     df = load_metrics(Path(metrics_csv) if metrics_csv else None)
     if datasets:
         df = df[df["dataset"].isin(datasets)].copy()
@@ -347,8 +404,14 @@ def main(metrics_csv: str | None = None, out: str | None = None,
         df = df[df["seed"].isin(seeds)].copy()
     if not len(df):
         raise SystemExit("筛选后没有测量点 —— 检查 --dataset / --seed")
+    n_runs = df["run"].nunique()
+    n_seeds = df["seed"].nunique() if "seed" in df.columns else 1
+    # 默认按 (dataset, N, epoch) 折种子（律描述期望记忆率）；--per-seed 保留每条曲线
+    if not per_seed and n_seeds > 1:
+        df = collapse_seeds(df)
+        print(f"[law] 已把 {n_seeds} 个 seed 折成种子均值曲线（R² 是「律 vs 均值」的拟合优度）")
     print(f"读入 {len(df)} 个测量点，N={sorted(df['n'].unique())}，"
-          f"run={df['run'].nunique()}，E∈[{df['epoch'].min()},{df['epoch'].max()}]"
+          f"run={n_runs}，E∈[{df['epoch'].min()},{df['epoch'].max()}]"
           + (f"，数据集={datasets}" if datasets else "")
           + (f"，seed={seeds}" if seeds else ""))
 
@@ -363,16 +426,21 @@ def main(metrics_csv: str | None = None, out: str | None = None,
         fits[name] = {k: v for k, v in fit.items() if k != "pred"} | {"loo": loo}
         rows.append((name, fit["r2_log"], fit["r2_lin"], fit["aicc"], loo["r2_mean"],
                      loo["r2_min"], loo.get("censored_compliance_mean"),
-                     loo.get("r2_pooled")))
+                     loo.get("r2_pooled"), fit.get("r2_log_meas"),
+                     fit.get("r2_lin_meas"), fit.get("n_meas")))
 
     print("\n候选律对比（选型按 AICc 最小 + 留一 R² 最大；删失点只进单侧惩罚，不进 R²）")
-    print(f"{'律':<20}{'R²_log':>9}{'R²_lin':>9}{'AICc':>10}{'LOO折内':>9}{'LOO_min':>9}"
+    print("  R²(meas) = 只在 M ≥ 0.02 的可测点上算 —— 检出限附近的点相对误差天然巨大")
+    print(f"{'律':<20}{'R²_log':>9}{'R²_lin':>9}{'R²log_m':>9}{'R²lin_m':>9}{'n_m':>5}"
           f"{'LOO池化':>9}{'删失合规':>10}")
     for r in rows:
-        print(f"{r[0]:<20}{r[1]:>9.4f}{r[2]:>9.4f}{r[3]:>10.1f}"
-              f"{(r[4] or float('nan')):>9.4f}{(r[5] or float('nan')):>9.4f}"
+        print(f"{r[0]:<20}{r[1]:>9.4f}{r[2]:>9.4f}"
+              f"{(r[8] if r[8] is not None else float('nan')):>9.4f}"
+              f"{(r[9] if r[9] is not None else float('nan')):>9.4f}"
+              f"{(r[10] if r[10] is not None else 0):>5d}"
               f"{(r[7] if r[7] is not None else float('nan')):>9.4f}"
               f"{(r[6] if r[6] is not None else float('nan')):>10.2f}")
+    print(f"{'':<20}{'':>9}{'':>9}{'':>9}{'':>9}   AICc / LOO折内 / LOO_min 见 results/law_fit.json")
 
     if not rows:
         raise SystemExit("所有候选律都拟合失败，检查 metrics_long.csv")

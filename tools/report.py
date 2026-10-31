@@ -118,15 +118,16 @@ def section_law(law):
     best = law.get("best")
     fits = law.get("fits") or {}
     if fits:
-        lines.append("| 候选律 | R²_log | R²_lin | AICc | 留一池化 R² | 最差折 R² | 删失合规(样本内) | γ | 参数 |")
-        lines.append("|---|---|---|---|---|---|---|---|---|")
+        lines.append("| 候选律 | R²_log | R²_lin | R²_log(可测) | R²_lin(可测) | AICc | 留一池化 R² | 删失合规(样本内) | γ | 参数 |")
+        lines.append("|---|---|---|---|---|---|---|---|---|---|")
         for name, f in fits.items():
             mark = "**" if name == best else ""
             loo = f.get("loo") or {}
             prm = ", ".join(f"{v:.3g}" for v in (f.get("params") or []))
             lines.append(
                 f"| {mark}{name}{mark} | {_fmt(f.get('r2_log'))} | {_fmt(f.get('r2_lin'))} | "
-                f"{_fmt(f.get('aicc'), 1)} | {_fmt(loo.get('r2_pooled'))} | {_fmt(loo.get('r2_min'))} | "
+                f"{_fmt(f.get('r2_log_meas'))} | {_fmt(f.get('r2_lin_meas'))} | "
+                f"{_fmt(f.get('aicc'), 1)} | {_fmt(loo.get('r2_pooled'))} | "
                 f"{_fmt(f.get('censored_compliance'))} | {_fmt(_gamma_of(name, f))} | {prm} |"
             )
         lines.append("")
@@ -142,6 +143,11 @@ def section_law(law):
     lines.append(
         "- **未达线的原因写在明处**：可测范围只覆盖 N ≤ 1000（N≥2000 的记忆率低于检出限 3/512），"
         "留出一档大 N 等于外推一条从没测到的过程。故主结论限定在可测区间，E\\*=nan 表示该 N 在任意训练时长下都到不了 ε。"
+    )
+    lines.append(
+        "- **口径**：律拟合的是**种子均值曲线**（`law.collapse_seeds`）；单 seed 拟合能到 R²_lin≈0.90，"
+        "但那是运气好的那条曲线。剧集 `R²(可测)` 只在 M ≥ 0.02 的点上算，"
+        "它比全体更低说明**误差集中在真正有信号的区域**（逐档 bias 0.42–1.72，见 `docs/NOTES.md` §4.2）。"
     )
     g = law.get("gamma_hat")
     if g is not None:
@@ -338,21 +344,25 @@ def section_safe():
     L = ["## 5. 安全早停建议（交付物）", ""]
     if d is None or len(d) == 0:
         return L + ["`results/safe_early_stop.csv` 还不存在 —— `python -m tools.safety`。", ""]
-    L.append("`E*` 由拟合律反解，`M_停`/`FID停` 是停点实测值，`发作点` 是**不依赖律**的实测记忆化起点"
-             "（首次连续 2 个测量点 M ≥ ε）。`E*/发作 < 1` 才说明律的停点落在发作之前。")
+    L.append("`E*` 由拟合律反解；`M_停` 是**所有 seed 里最差那条**在停点的实测值（不是平均），"
+             "`发作点` 是**不依赖律**的实测记忆化起点（首次连续 2 个测量点 M ≥ ε）。"
+             "`E*/发作 < 1` 才说明律的停点落在发作之前。`ε ≤ 2×FPR` 的档位没有信息量（度量的假阳性就有 0.5%），标为 ⚠。")
     L.append("")
-    L.append("| 数据集 | N | ε | E* | M_停 | M_满 | 省% | FID停 | FID满 | E*/发作 | 隐私OK | 质量OK | **推荐** |")
-    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    L.append("| 数据集 | N | ε | seed数 | E* | M_停 | M_均 | M_满 | 省% | FID停 | FID满 | E*/发作 | 隐私OK | 质量OK | **推荐** |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for _, r in d.sort_values(["dataset", "eps", "n"]).iterrows():
+        eps_txt = f"{r['eps']:g}" if bool(r.get("informative", True)) else f"{r['eps']:g} ⚠"
         L.append(
-            f"| {r['dataset']} | {int(r['n'])} | {r['eps']:g} | {r['E_star']:.0f} | "
-            f"{_fmt(r['M_stop'], 4)} | {_fmt(r['M_full'], 4)} | {100 * r['epoch_saving']:.0f}% | "
+            f"| {r['dataset']} | {int(r['n'])} | {eps_txt} | {int(r.get('n_seeds', 1))} | {r['E_star']:.0f} | "
+            f"{_fmt(r['M_stop'], 4)} | {_fmt(r.get('M_stop_mean'), 4)} | {_fmt(r['M_full'], 4)} | "
+            f"{100 * r['epoch_saving']:.0f}% | "
             f"{_fmt(r['fid_stop'], 1)} | {_fmt(r['fid_full'], 1)} | "
             f"{_fmt(r['onset_ratio'], 2)} | {'✅' if r['ok'] else '❌'} | "
             f"{'✅' if r['ok_quality'] else '❌'} | {'🟢 可用' if r['recommended'] else '—'} |")
     L.append("")
     n_ok = int(d["recommended"].sum())
-    L.append(f"- 可同时满足隐私（M_停 ≤ ε）与质量（FID 不超过跑满的 1.5 倍）的组合：**{n_ok} / {len(d)}**。")
+    L.append(f"- 四个条件（最差 seed ≤ ε、经验保守停点也不违约、FID ≤ 跑满的 1.5 倍、ε > 2×FPR）"
+             f"同时满足的组合：**{n_ok} / {len(d)}**。")
     # 把张力说白了：小 N 的安全停点远早于图像变好看的轮次，所以"又安全又好看"在小 N 上不存在。
     small = d[(d["n"] <= 500) & (d["ok"])]
     if len(small) and not small["recommended"].any():
