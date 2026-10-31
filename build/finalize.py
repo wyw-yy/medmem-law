@@ -23,7 +23,9 @@ STEPS = [
     # 混进主拟合会把"函数族"的估计带偏；它们的可迁移性由 transfer 步骤单独检验。
     # 输出仍写到 results/law_fit.json，因为 controller/safety/train --stop-law 都读这个文件名。
     ("law", ["-m", "law", "--dataset", "pathmnist", "--out", "results/law_fit.json"], False),
-    ("law_ci", ["-m", "tools.law_ci", "--boot", "200"], False),
+    ("law_ci", ["-m", "tools.law_ci", "--n-boot", "200"], False),
+    ("law_perseed", ["-m", "law", "--dataset", "pathmnist", "--per-seed",
+                     "--out", "results/law_fit_perseed.json"], False),
     ("transfer", ["-m", "tools.transfer"], False),
     ("controller", ["-m", "controller"], False),
     ("safety", ["-m", "tools.safety"], False),

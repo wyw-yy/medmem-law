@@ -70,9 +70,16 @@ def main() -> None:
             problems.append(f"n_gen: {len(odd)} 行不是 {C.N_SAMPLE}"
                             f"（{sorted(set(odd['n_gen'].dropna()))[:5]}）")
 
-    # 5) 点数
+    # 5) 点数（干预组豁免：plan ctl 的 run 由律提前刹停，本来就只有几个点）
+    def _is_intervention(run: str) -> bool:
+        rj = C.RESULTS / "runs" / f"{run}.json"
+        if not rj.exists():
+            return False
+        j = json.loads(rj.read_text(encoding="utf-8"))
+        return bool(j.get("stop_rule")) or j.get("stopped_early_at") is not None
+
     for run, g in d.groupby("run"):
-        if len(g) < 8:
+        if len(g) < 8 and not _is_intervention(run):
             problems.append(f"{run}: 只有 {len(g)} 个测量点")
 
     # 6) 最后 epoch 与 run json 一致

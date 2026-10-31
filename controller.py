@@ -63,13 +63,20 @@ def stop_C(df_run, eps, law: dict | None = None) -> int:
 
 
 def stop_D(df_run, eps, margin: float = 0.0) -> int:
-    """闭环：第一次实测 M ≥ eps*(1-margin) 的 epoch。margin>0 更保守（提前停）。"""
+    """闭环：每个检查点实测一次 M，一旦 M ≥ eps*(1-margin)，就交付**上一个检查点**
+    （最后一个仍然合规的权重），而不是那个已经越界的权重。
+
+    上一版直接返回越界点本身 → 停点 M 必然 > eps，违规率按定义就是 100%，
+    这不是控制器的行为而是一个评测 bug（部署时丢弃越界 ckpt 是标准做法）。
+    若第一个检查点就已经越界，说明没有安全点可交付，只好返回它并计为违规。
+    """
     d = _by_epoch(df_run)
     thr = eps * (1 - margin)
-    hit = d[d["M"] >= thr]
-    if len(hit) == 0:
+    hit_idx = d.index[d["M"] >= thr]
+    if len(hit_idx) == 0:
         return int(d["epoch"].max())
-    return int(hit["epoch"].iloc[0])
+    i = int(hit_idx[0])
+    return int(d["epoch"].iloc[max(i - 1, 0)])
 
 
 def stop_D_predict(df_run, eps, slope_k: float = 1.0) -> int:

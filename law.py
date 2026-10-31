@@ -515,10 +515,12 @@ if __name__ == "__main__":
     ap.add_argument("--out", default=None, help="输出 JSON（默认 results/law_fit.json）")
     ap.add_argument("--dataset", default="", help="只用某个数据集，逗号分隔；跨数据集验证时用")
     ap.add_argument("--seed", default="", help="只用某些 seed，逗号分隔")
+    ap.add_argument("--per-seed", action="store_true",
+                    help="不折种子，把每个 seed 当独立观测拟合（口径敏感性检验用）")
     a = ap.parse_args(sys.argv[1:])
     dst = [x for x in a.dataset.split(",") if x] or None
     sds = [int(x) for x in a.seed.split(",") if x] or None
     out = a.out
     if out is None and dst:
         out = str(C.RESULTS / f"law_fit_{'_'.join(dst)}.json")
-    main(a.metrics, out, datasets=dst, seeds=sds)
+    main(a.metrics, out, datasets=dst, seeds=sds, per_seed=a.per_seed)

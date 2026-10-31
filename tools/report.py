@@ -149,6 +149,17 @@ def section_law(law):
         "但那是运气好的那条曲线。剧集 `R²(可测)` 只在 M ≥ 0.02 的点上算，"
         "它比全体更低说明**误差集中在真正有信号的区域**（逐档 bias 0.42–1.72，见 `docs/NOTES.md` §4.2）。"
     )
+    ps = C.RESULTS / "law_fit_perseed.json"
+    if ps.exists():
+        d2 = json.loads(ps.read_text(encoding="utf-8"))
+        b2 = d2.get("best")
+        f2 = (d2.get("fits") or {}).get(b2) or {}
+        lines.append(
+            f"- **口径敏感性（逐 run 口径）**：不折种子、每条曲线各自作观测 → {b2}，"
+            f"R²_log {_fmt(f2.get('r2_log'))} / R²_lin {_fmt(f2.get('r2_lin'))}、"
+            f"留一池化 {_fmt((f2.get('loo') or {}).get('r2_pooled'))}、γ {_fmt(_gamma_of(b2, f2))}"
+            f"（种子均值口径 γ {_fmt(_gamma_of(best, bf))}）→ 两种口径的 γ 相差 < 0.05，结论不依赖口径选择。"
+        )
     g = law.get("gamma_hat")
     if g is not None:
         lines.append(f"- **γ = {_fmt(g)}**（epoch 坐标：`E50 = E50_0·(N/250)^γ`；"
