@@ -1,4 +1,4 @@
-"""把 results/ 里的产物汇总成一份 RESULTS.md（人读的总入口）。
+﻿"""把 results/ 里的产物汇总成一份 RESULTS.md（人读的总入口）。
 
 为什么要有这一层：CSV / JSON 是机器产物，一天要看好几次"现在到哪一步了"。
 每次都现敲 pandas 既慢又容易看漏，所以固定一个脚本，产物永远同一副样子，
@@ -86,6 +86,11 @@ def section_status(df):
         want = int(meta.get("epochs_target") or C.epochs_for(int(n)))
         done = int(eps[-1]) if eps else 0
         ok = "✅ 完成" if done >= want * 0.99 else f"⏳ {done}/{want}"
+        # 干预组（按律/闭环提前刹停）本来就不该跑满预算：用 run JSON 的停点字段标出来，
+        # 否则完成度表会把它们全标成"未完成"，看起来像掉链子。
+        if meta.get("stopped_early_at"):
+            why = "闭环" if meta.get("stop_eps") is not None else "开环律"
+            ok = f"✅ {why}停在 e{int(meta['stopped_early_at'])}（交付 e{int(meta.get('deliver_epoch') or meta['stopped_early_at'])}）"
         fmin = g["fid"].min() if g["fid"].notna().any() else None
         lines.append(
             f"| {ds} | {int(n)} | {int(s)} | {len(eps)} | {done} / {want} | "
@@ -108,6 +113,24 @@ def _gamma_of(name, f):
         return p[L.CANDIDATES[name]["pnames"].index("gamma")]
     except Exception:
         return None
+
+
+def _censored_note() -> str:
+    """把"为什么 R² 上不去"写成可复算的一句话：多少点低于检出限、信号区到底到哪个 N。"""
+    fit = _read_json(C.RESULTS / "law_fit.json") or {}
+    cen = fit.get("censoring") or {}
+    txt = ""
+    n_obs, n_cen = cen.get("n_observed_points"), cen.get("n_censored_points")
+    if n_obs and n_cen:
+        txt += f"拟合用的 {int(n_obs) + int(n_cen)} 个点里有 {int(n_cen)} 个低于检出限（3/512）；"
+    gs = _read_csv(C.RESULTS / "grid_summary.csv")
+    if gs is not None and len(gs):
+        p = gs[gs["dataset"] == "pathmnist"]
+        sig = sorted({int(n) for n, m in zip(p["n"], p["M_max"])
+                      if m is not None and not pd.isna(m) and float(m) >= 0.05})
+        if sig:
+            txt += (f"能稳定看到记忆化（M_max ≥ 5%，即至少 25 张图）的 N 只到 {max(sig)}；再往上 M_max 只剩 1–2 张图造成的量化噪声；")
+    return txt
 
 
 def section_law(law):
@@ -141,13 +164,19 @@ def section_law(law):
         f"线性口径 R²_lin = {_fmt(r2lin)}）；留一池化 R² ≥ 0.8 {'✅' if (loo or 0) >= 0.8 else '❌'}（{_fmt(loo)}）。"
     )
     lines.append(
-        "- **未达线的原因写在明处**：可测范围只覆盖 N ≤ 1000（N≥2000 的记忆率低于检出限 3/512），"
+        "- **未达线的原因写在明处**：" + _censored_note() +
         "留出一档大 N 等于外推一条从没测到的过程。故主结论限定在可测区间，E\\*=nan 表示该 N 在任意训练时长下都到不了 ε。"
     )
     lines.append(
-        "- **口径**：律拟合的是**种子均值曲线**（`law.collapse_seeds`）；单 seed 拟合能到 R²_lin≈0.90，"
-        "但那是运气好的那条曲线。剧集 `R²(可测)` 只在 M ≥ 0.02 的点上算，"
-        "它比全体更低说明**误差集中在真正有信号的区域**（逐档 bias 0.42–1.72，见 `docs/NOTES.md` §4.2）。"
+        "- **口径**：律拟合的是**种子均值曲线**（`law.collapse_seeds`）；单 seed 拟合会更好看，"
+        "但那是运气好的那条曲线。`R²(可测)` 只在 M ≥ 0.02 的点上算，"
+        "它比全体更低说明**误差集中在真正有信号的区域**（逐档 bias 见 `docs/NOTES.md` §4.2）。"
+    )
+    lines.append(
+        "- **为什么加了 N=1500/3000 与 seed 5/6 之后 R² 反而降了**：同一 N 下不同 seed（=不同训练子集）的"
+        "发作步数相差最多 8 倍（如 N=1000：2344 / 4688 / 12891 / 15234 / 18750 步），这个**子集方差**比"
+        "N 从 250 涨到 1500 带来的系统位移还大。律拟合的是期望曲线，所以预测力有天花板 —— "
+        "这也是把交付物放在**闭环控制器**而不是固定时刻表上的实证理由（见第 5、6 节）。"
     )
     ps = C.RESULTS / "law_fit_perseed.json"
     if ps.exists():

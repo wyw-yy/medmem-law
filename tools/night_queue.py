@@ -174,7 +174,16 @@ def main():
         # 用「实际训练到第几轮」判跳过，不能只看 state["done"]：
         # deep 档给同一个 run 加了预算，只按 state 会把它们全部误跳过。
         done_ep = _done_epochs(run)
-        if done_ep >= p["epochs"]:
+        # 干预组（闭环 / 开环律早停）天然跑不满预算：只要 run JSON 里记了停点就算完成，
+        # 否则重启链条会把这些 run 从最后一个 ckpt 重新跑一遍（白烧 20 分钟/run）。
+        finished_intervention = False
+        if p.get("stop_eps") is not None or p.get("stop_law"):
+            try:
+                meta = json.loads((C.RESULTS / "runs" / f"{run}.json").read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                meta = {}
+            finished_intervention = bool(meta.get("stopped_early_at") or meta.get("stop_rule"))
+        if done_ep >= p["epochs"] or finished_intervention:
             print(f"[{i+1}/{len(plan)}] {run} 已训练到 {done_ep} 轮，跳过训练")
             if run not in state["done"]:
                 state["done"].append(run)
