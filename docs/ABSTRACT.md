@@ -15,29 +15,30 @@ anchored to a 0.5% false-positive rate on a held-out non-member reference set. E
 ~30 checkpoints, giving 973 measurement points.
 
 Three findings. (i) The **plateau** of M decays steeply with data: fitting a stretched-exponential
-law with power-law amplitude decay, A(N) ∝ N^(−1.97) [95% CI 1.88–2.05], so that at N≥2,000 the
-model never reaches our detection floor within 90 k updates. (ii) The **onset time** grows with N,
-but far slower than the update-normalized prediction (γ_epoch = −0.85 ⟺ t₅₀ ∝ N^0.15), and per-seed
-onset varies by up to 8× at fixed N — so a fitted schedule can describe the *expectation* but cannot
-*guarantee* compliance. (iii) Consequently, a **closed-loop controller** that measures M online and
-stops before the threshold is crossed delivers 59% of the training budget while violating the privacy
-budget in 0 of 28 runs, versus 75% violations for FID-plateau stopping and 18% for the open-loop law.
-The fitted law reaches R²_lin 0.774 (in-sample) but leave-one-N-out R² 0.44 — we report it as a
-descriptive law with an explicit validity boundary, not as a predictive guarantee.
+law with power-law amplitude decay, A(N) ∝ N^(−1.90) [95% CI 1.88–2.05 in the 3-seed fit], so that at
+N≥2,000 the model never leaves the measurement floor (3/512 = 0.6%) within 80 k updates — four times
+the equal-step budget. (ii) The **onset time** grows with N, but far slower than the update-normalized
+prediction (γ_epoch = −0.83 ⟺ t₅₀ ∝ N^0.17), and per-seed onset varies by up to 8× at fixed N — so a
+fitted schedule can describe the *expectation* but cannot *guarantee* compliance. (iii) Consequently, a
+**closed-loop controller** that measures M online and stops before the threshold is crossed delivers 64%
+savings of the training budget while violating the privacy budget in 0 of 28 runs, versus 75% violations
+for FID-plateau stopping and 11% for the open-loop law. The fitted law reaches R²_lin 0.716 (in-sample)
+but leave-one-N-out R² 0.47 — we report it as a descriptive law with an explicit validity boundary, not
+as a predictive guarantee.
 
 ## 一句话结论（组会/答辩直接用）
 
 > **"少训一点"这件事有规律，但没有保证；要保证就得在线测。**
-> 规律：平台 ∝ N^(−1.97)，起跳时间 ∝ N^(0.15–0.65)（口径不同）；保证：闭环 0/28 违规、省 59%，
-> 开环律 17.9% 违规，FID 早停 75% 违规。
+> 规律：平台 ∝ N^(−1.9)，起跳时间 ∝ N^(0.17–0.65)（口径不同）；保证：闭环 0/28 违规、省 64%，
+> 开环律 10.7% 违规，FID 早停 75% 违规。
 
 ## 三条主结论 + 各自的可核对出处
 
 | # | 结论 | 数字 | 出处 |
 |---|---|---|---|
-| 1 | 平台高度随数据量快速衰减 | A(N) ∝ N^(−1.97)，CI [1.88, 2.05] | `results/law_fit.json`、`results/law_bootstrap.json`、`figs/fig1_triptych.png (b)` |
-| 2 | 真实起跳时间随 N 增长，但远慢于"步数归一"的预测；且 seed 方差极大 | 实测 onset 斜率 0.64（pathmnist）/0.66/1.20；γ_epoch=−0.848 ⟺ t₅₀∝N^0.15；同 N 不同 seed 的 onset 极差 8× | `results/fid_onset_vs_n.csv`、`docs/NOTES.md` §8.1、`docs/COMPARISON.md` |
-| 3 | 只有闭环能在"省时间"和"守隐私"之间同时成立 | D/D′：省 59%、违规 0/28；C 开环：省 64%、违规 17.9%；B(FID)：省 18%、违规 75%；A：违规 78.6% | `results/stop_policy_summary.csv`、`figs/fig1_triptych.png (c)` |
+| 1 | 平台高度随数据量快速衰减 | A(N) ∝ N^(−1.90)；7 档平台 0.863/0.469/0.092/0.021/0.007/0.011/0.014（N=250→4000，后三档贴地板） | `results/law_fit.json`、`figs/fig1_triptych.png (b)` |
+| 2 | 真实起跳时间随 N 增长，但远慢于"步数归一"的预测；且 seed 方差极大 | 实测 onset 斜率 0.64（pathmnist）/0.66/1.20；γ_epoch=−0.827 ⟺ t₅₀∝N^0.173；同 N 不同 seed 的 onset 极差 8× | `results/fid_onset_vs_n.csv`、`docs/NOTES.md` §8.1、`docs/COMPARISON.md` |
+| 3 | 只有闭环能在"省时间"和"守隐私"之间同时成立 | D/D′：省 63.6%、违规 0/28；C 开环：省 61.1%、违规 10.7%；B(FID)：省 27.7%、违规 75%；A：违规 75% | `results/stop_policy_summary.csv`、`figs/fig1_triptych.png (c)` |
 
 ## 必须写进 limitation 的四件事
 

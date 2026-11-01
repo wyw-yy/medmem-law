@@ -135,9 +135,14 @@ def _done_epochs(run: str) -> int:
         return 0
 
 
-def _skey(run: str) -> str:
-    """scored 的键要带分辨率 —— 28px 评过的 run 换了 64px 必须重评。"""
-    return f"{run}@{C.IMAGE_SIZE}"
+def _skey(run: str, epochs: int | None = None) -> str:
+    """scored 的键要带分辨率与预算 —— 28px 评过/给同一 run 加了 epoch 预算后都必须重评。
+
+    B8 踩过：dense_deep 把 n1500/n3000 的预算从 850/425 抬到 3400/1700 并补采了
+    新检查点，但 scored 键不含预算 → 判"已评分"跳过，新样本永远不进 CSV。
+    """
+    k = f"{run}@{C.IMAGE_SIZE}"
+    return k if epochs is None else f"{k}@{epochs}"
 
 
 def score(run: str) -> None:
@@ -230,10 +235,10 @@ def main():
                 state["failed"].append({"run": run, "error": f"{type(e).__name__}: {e}"})
             save_state(state)
 
-        if not a.no_score and _skey(run) not in state.get("scored", []):
+        if not a.no_score and _skey(run, p["epochs"]) not in state.get("scored", []):
             try:
                 score(run)
-                state.setdefault("scored", []).append(_skey(run))
+                state.setdefault("scored", []).append(_skey(run, p["epochs"]))
             except Exception as e:  # noqa: BLE001
                 print(f"{run} 评分失败：{type(e).__name__}: {e}")
             save_state(state)

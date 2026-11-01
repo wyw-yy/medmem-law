@@ -1,4 +1,4 @@
-"""用另一个编码器重算记忆率曲线（B10：度量稳健性，不是模型改动）。
+﻿"""用另一个编码器重算记忆率曲线（B10：度量稳健性，不是模型改动）。
 
 动机：整篇的 M 依赖一个自由选择——特征编码器。主结果用 DINOv2 ViT-S/14（dim 384，
 tau≈0.67）。若结论（记忆率随 E 上升、平台随 N 下降、闭环能控住）在 ResNet50（dim 2048，
@@ -38,7 +38,7 @@ def run_meta(run: str):
     return dataset, n, seed
 
 
-def score_one(run: str, encoder, rows: list[dict], epochs: list[int]):
+def score_one(run: str, encoder, enc_name: str, rows: list[dict], epochs: list[int]):
     dataset, n, seed = run_meta(run)
     train = D.load_split(dataset, "train")
     idx = D.train_subset_indices(dataset, n, seed)
@@ -63,7 +63,7 @@ def score_one(run: str, encoder, rows: list[dict], epochs: list[int]):
         gen = MT.apply_whitening(MT.encode(gen_u8, encoder=encoder), mu, W)
         res = MT.memorization_rate(gen, bank, tau)
         rows.append(dict(run=run, dataset=dataset, n=n, seed=seed, epoch=int(ep),
-                         encoder=f"{C.ENCODER}:{encoder[1]}", tau=float(tau),
+                         encoder=f"{enc_name}:{encoder[1]}", tau=float(tau),
                          M=float(res["M"]), sim_mean=float(res["sim_mean"]),
                          sim_p95=float(res["sim_p95"]), sim_max=float(res["sim_max"]),
                          n_gen=int(len(gen_u8))))
@@ -93,7 +93,7 @@ def main() -> int:
             print(f"跳过 {run}（没有样本）", flush=True)
             continue
         eps = sorted(int(p.stem[1:]) for p in ep_dir.glob("e*.npy"))
-        score_one(run, enc, rows, eps)
+        score_one(run, enc, a.encoder, rows, eps)
 
     df = pd.DataFrame(rows, columns=OUT_COLS)
     df.to_csv(out, index=False, encoding="utf-8")
