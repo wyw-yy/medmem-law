@@ -49,9 +49,22 @@ def main() -> int:
     ap.add_argument("--n-boot", type=int, default=200)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--eps", type=float, default=C.EPS_MEM)
+    # 默认必须与主拟合同口径：只主数据集 + 种子均值。
+    # 踩过的坑：早期这里直接拿整张 CSV（三个数据集 + 每个 seed 各算观测），
+    # 结果 bootstrap 的"点估计"跟 law_fit.json 对不上（γ −0.88 vs −0.85，
+    # R²_log 0.737 vs 0.709）——给人的区间是另一个量的区间。
+    ap.add_argument("--dataset", default="pathmnist")
+    ap.add_argument("--per-seed", action="store_true", help="不折种子（与 law --per-seed 对应）")
+    ap.add_argument("--all-datasets", action="store_true", help="不按数据集过滤")
     a = ap.parse_args()
 
     df = L.load_metrics(Path(a.metrics) if a.metrics else None)
+    if not a.all_datasets:
+        df = df[df["dataset"] == a.dataset].copy()
+    if not a.per_seed:
+        df = L.collapse_seeds(df)
+    print(f"[law_ci] 口径：dataset={a.dataset if not a.all_datasets else 'all'}，"
+          f"{len(df)} 点，{'逐 run' if a.per_seed else '种子均值'}")
     name = pick_model(df)
     spec = L.CANDIDATES[name]
     base = L.fit_one(name, df)

@@ -1,6 +1,6 @@
 # 实验结果总览（自动生成）
 
-> 生成时间 2026-11-01 03:40:54 · 由 `python -m tools.report` 从 `results/` 汇总。
+> 生成时间 2026-11-01 13:26:58 · 由 `python -m tools.report` 从 `results/` 汇总。
 > 数字的出处见每节标注；协议与判据见 `docs/PROTOCOL.md`，踩坑记录见 `docs/NOTES.md`。
 
 ## 1. 主网格完成度
@@ -131,6 +131,39 @@
 | pathmnist_n1000_s1 | e2400 | 1.0% | 0.433 | 0.088 | 45/512 |
 
 - FPR 从 0.1% 放宽到 1%（10 倍）时 M 只变动几个百分点 → 结论不依赖 FPR 的具体取值；但 τ 的绝对值不可跨 FPR 比较，报告里统一用 0.5%。
+
+### 3.5 R 独立复算（`R/verify_in_R.R`，base R 无外部包）
+
+同一份测量点、同一个目标函数，用 R 的 `optim` 重新拟合、自己重写留一 N 与 bootstrap。两条完全独立的实现给出同样的数字，比多发一百个 seed 更能说明结论没算错。
+
+| 检查 | 项目 | R | Python | 差异 | 判定 |
+|---|---|---|---|---|---|
+| A_model | max_abs_diff_pred | 0.0 | 0.0 | 0.0 | exact |
+| B_metrics | R2_log | 0.708533 | 0.708533 | 0.0 | exact |
+| B_metrics | R2_lin | 0.773969 | 0.773969 | 0.0 | exact |
+| B_metrics | R2_log_meas | 0.604295 | 0.604295 | 0.0 | exact |
+| B_metrics | R2_lin_meas | 0.591593 | 0.591593 | 0.0 | exact |
+| B_metrics | censored_compliance | 0.804124 | 0.804124 | 0.0 | exact |
+| C_refit | objective | 50.669525 | 50.669525 | 3.17e-09 | exact |
+| C_refit | objective_at_py | 50.669525 | 50.669525 | 4.26e-14 | exact |
+| C_refit | A0_at250 | 0.640818 | 0.640815 | 2.9e-06 | match |
+| C_refit | alpha | 1.968587 | 1.968585 | 1.8e-06 | match |
+| C_refit | beta_h | 2.112168 | 2.112178 | 9.76e-06 | match |
+| C_refit | E50_at250 | 2401.66487 | 2401.67113 | 2.61e-06 | match |
+| C_refit | gamma | -0.847521 | -0.84752 | 9.12e-07 | exact |
+| C_refit | R2_log | 0.708534 | 0.708533 | 3.83e-07 | exact |
+| D_loo | R2_pooled_loo | 0.441504 | 0.441508 | 3.96e-06 | match |
+| E_ci | alpha_lo | 1.866037 | 1.880545 | 0.0145 | consistent |
+| E_ci | alpha_hi | 2.083333 | 2.051729 | 0.0316 | consistent |
+| E_ci | gamma_lo | -0.938813 | -0.929177 | 0.00964 | consistent |
+| E_ci | gamma_hi | -0.768871 | -0.739148 | 0.0297 | consistent |
+| E_ci | alpha_sd | 0.056394 | nan | nan | nan |
+| E_ci | gamma_sd | 0.047321 | nan | nan | nan |
+| F_onset | slope_bloodmnist | 0.660964 | nan | nan | nan |
+| F_onset | slope_pathmnist | 0.64089 | nan | nan | nan |
+| F_onset | slope_pneumoniamnist | 1.196159 | nan | nan | nan |
+
+- `exact/match` = 两条实现逐位一致或差异 <0.1%；`consistent` 是 bootstrap 分位，两端各自用不同随机数流，差异在蒙特卡洛噪声（约 0.01–0.03）内。
 
 ## 4. 跨数据集推广性
 

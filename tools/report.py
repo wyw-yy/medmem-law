@@ -1,4 +1,4 @@
-﻿"""把 results/ 里的产物汇总成一份 RESULTS.md（人读的总入口）。
+"""把 results/ 里的产物汇总成一份 RESULTS.md（人读的总入口）。
 
 为什么要有这一层：CSV / JSON 是机器产物，一天要看好几次"现在到哪一步了"。
 每次都现敲 pandas 既慢又容易看漏，所以固定一个脚本，产物永远同一副样子，
@@ -278,6 +278,22 @@ def section_robust():
         lines.append("")
         lines.append("- FPR 从 0.1% 放宽到 1%（10 倍）时 M 只变动几个百分点 → 结论不依赖 FPR 的具体取值；"
                      "但 τ 的绝对值不可跨 FPR 比较，报告里统一用 0.5%。")
+        lines.append("")
+
+    # 3.5 R 独立复算：第二个实现，用于排除"pipeline 算错"
+    rv = _read_csv(C.RESULTS / "r_verify.csv")
+    if rv is not None and len(rv):
+        lines += ["### 3.5 R 独立复算（`R/verify_in_R.R`，base R 无外部包）", "",
+                  "同一份测量点、同一个目标函数，用 R 的 `optim` 重新拟合、自己重写留一 N 与 "
+                  "bootstrap。两条完全独立的实现给出同样的数字，比多发一百个 seed 更能说明结论没算错。", "",
+                  "| 检查 | 项目 | R | Python | 差异 | 判定 |",
+                  "|---|---|---|---|---|---|"]
+        for _, r in rv.iterrows():
+            lines.append(f"| {r['check']} | {r['item']} | {r['r']} | {r['python']} | "
+                         f"{r['abs_diff']} | {r['status']} |")
+        lines.append("")
+        lines.append("- `exact/match` = 两条实现逐位一致或差异 <0.1%；`consistent` 是 bootstrap 分位，"
+                     "两端各自用不同随机数流，差异在蒙特卡洛噪声（约 0.01–0.03）内。")
         lines.append("")
     return lines
 

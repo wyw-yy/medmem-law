@@ -24,6 +24,9 @@ STEPS = [
     # 输出仍写到 results/law_fit.json，因为 controller/safety/train --stop-law 都读这个文件名。
     ("law", ["-m", "law", "--dataset", "pathmnist", "--out", "results/law_fit.json"], False),
     ("law_ci", ["-m", "tools.law_ci", "--n-boot", "200"], False),
+    # R 独立复算（base R 的 optim 重拟合 + 自写 bootstrap + 留一 N）：见 docs/NOTES.md §9。
+    # 放在 law_ci 之后，因为它要读 law_fit.json 与 law_bootstrap.json 做对照。
+    ("r_verify", ["-m", "tools.r_verify"], False),
     ("law_perseed", ["-m", "law", "--dataset", "pathmnist", "--per-seed",
                      "--out", "results/law_fit_perseed.json"], False),
     # τ 的唯一自由参数是 FPR：0.1%/0.5%/1% 各算一遍，看记忆率结论是否依赖它。
