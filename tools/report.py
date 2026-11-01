@@ -445,6 +445,73 @@ def section_safe():
     return L
 
 
+def section_appendix():
+    """第 8 节：附录（分辨率对照 / 记忆化类型学 / 逐格核查表）。"""
+    L = ["## 8. 附录", ""]
+
+    L.append("### 8.1 28px pilot 与 64px 主线（`tools/pilot_appendix.py`）")
+    L.append("")
+    pv = _read_csv(C.RESULTS / "pilot_vs_main.csv")
+    if pv is not None and len(pv):
+        L.append("| N | 分辨率 | τ | 末点 M | 跑满轮次 | 步数 | onset 步数(ε=1%) |")
+        L.append("|---|---|---|---|---|---|---|")
+        for r in pv.sort_values(["n", "res"]).itertuples():
+            onset = "—" if r.onset_steps != r.onset_steps else f"{r.onset_steps:.0f}"
+            L.append(f"| {r.n} | {r.res} | {r.tau:.4f} | {r.M_last:.4f} | {r.epochs} | "
+                     f"{r.steps} | {onset} |")
+        L.append("")
+        L.append("- τ 在 64px 上系统低 0.015–0.096（换分辨率必须重新校准，跨分辨率不可比）。")
+        L.append("- 同步数下 28px 的 M 更高（N=250：0.932 vs 0.617），但这一差异远小于同 N 的"
+                 "种子方差（最高 33×），**分辨率不改变定性结论**；绝对 M 与 FID 不可跨分辨率比较。")
+        L.append("- 28px pilot 只在附录出现：主线全部结论都来自 64px 数据。")
+    else:
+        L.append("`results/pilot_vs_main.csv` 不存在 —— `python -m tools.pilot_appendix` 生成。")
+    L.append("")
+
+    L.append("### 8.2 记忆化类型学：被复刻的是哪一类训练样本（`build/typology.py`）")
+    L.append("")
+    ty = _read_csv(C.RESULTS / "typology.csv")
+    if ty is not None and len(ty):
+        L.append("| run | 检查点 | 命中/样本 | 去重目标 | top1 占比 | 离群度(命中 vs 全体) | 最大类别 overrep |")
+        L.append("|---|---|---|---|---|---|---|")
+        for r in ty.itertuples():
+            L.append(f"| {r.run} | e{r.epoch} | {r.n_hit}/{r.n_gen} | {r.distinct_targets} | "
+                     f"{r.top1_share:.2f} | {r.atyp_mem_med:.3f} vs {r.atyp_all_med:.3f} | "
+                     f"{r.max_overrep:.2f} |")
+        L.append("")
+        L.append("- 三个假说全部被否：**不是**「少数几张图被反复复刻」（top1 只占 8–10%）、"
+                 "**不是**「复刻离群样本」（离群度与全体几乎相同）、**不是**「集中在少数类别」（最大 overrep 1.57）。")
+        L.append("- 含义：记忆化弥散在数据流形上，人工挑「危险样本」删掉的防线不可靠；"
+                 "要控只能在训练时间轴上控（这正是闭环早停的动机）。")
+    else:
+        L.append("`results/typology.csv` 不存在 —— `python -m build.typology` 生成。")
+    L.append("")
+
+    L.append("### 8.3 逐格核查表（`build/verify_claims.py`）")
+    L.append("")
+    vc = _read_csv(C.RESULTS / "verify_claims.csv")
+    if vc is not None and len(vc):
+        bad = vc[vc["status"] == "FAIL"]
+        L.append(f"共 {len(vc)} 条断言，**PASS {len(vc) - len(bad)} / FAIL {len(bad)}**。"
+                 "每一条都从原始产物重算（不看文档）。")
+        L.append("")
+        if len(bad):
+            L.append("| PPT 位置 | 断言 | 期望 | 实测 |")
+            L.append("|---|---|---|---|")
+            for r in bad.itertuples():
+                L.append(f"| {r.ppt} | {r.claim} | {r.expect} | {r.actual} |")
+            L.append("")
+            L.append("- 未达成的红线集中在一处：**预声明 R²≥0.9 未达成**（R²_lin 0.774 / R²_log 0.709）"
+                     "与**严格口径下安全表 0 行全过**。两条都在 `docs/ALIGNMENT.md` 与 "
+                     "`docs/PROTOCOL.md` §16/§17 里提前声明并解释，不作事后修改。")
+        else:
+            L.append("全部 PASS。")
+    else:
+        L.append("`results/verify_claims.csv` 不存在 —— `python -m build.verify_claims` 生成。")
+    L.append("")
+    return L
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--print", action="store_true", help="同时打屏")
@@ -468,9 +535,10 @@ def main():
     L += section_safe()
     L += section_policy(pol)
     L += section_audit(leak)
+    L += section_appendix()
 
     figs = sorted((ROOT / "figs").glob("*.png")) if (ROOT / "figs").exists() else []
-    L.append("## 8. 图")
+    L.append("## 9. 图")
     L.append("")
     if figs:
         for p in figs:
@@ -478,7 +546,7 @@ def main():
     else:
         L.append("还没有图 —— `python -m tools.plot` 生成。")
     L.append("")
-    L.append("## 9. 复现命令")
+    L.append("## 10. 复现命令")
     L.append("")
     L.append("```powershell")
     L.append(".\\ .venv\\Scripts\\python.exe -m tools.download_data        # 下数据")
