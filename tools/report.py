@@ -520,7 +520,30 @@ def section_appendix():
         L.append("`results/pilot_vs_main.csv` 不存在 —— `python -m tools.pilot_appendix` 生成。")
     L.append("")
 
-    L.append("### 8.2 记忆化类型学：被复刻的是哪一类训练样本（`build/typology.py`）")
+    L.append("### 8.2 224px pilot：跑了 30,000 步，结论是「没有结论」（`build/pilot224.py`）")
+    L.append("")
+    p224 = _read_csv(C.RESULTS / "pilot224_metrics.csv")
+    if p224 is not None and len(p224):
+        p224 = p224.sort_values("epoch")
+        L.append("pneumoniamnist、N=1000、seed=21、batch=16、480 epoch（30,000 步）、8 个测量点 × 128 张。")
+        L.append("")
+        L.append("| 轮次 | M | τ | sim_max | FID |")
+        L.append("|---|---|---|---|---|")
+        for r in p224.itertuples():
+            fid = "—" if r.fid != r.fid else f"{r.fid:.1f}"
+            L.append(f"| {int(r.epoch)} | {r.M:.4f} | {r.tau:.4f} | {r.sim_max:.4f} | {fid} |")
+        L.append("")
+        L.append("- 判 **inconclusive**：FID 从 472 降到 110–117、像素 std 12→31（图像终于有纹理），"
+                 "但 `M` 全程 0、`sim_max` 0.24–0.27 始终低于 τ=0.352。")
+        L.append("- 既不能证明 224px 会记忆化，也不能证明不会：这一档的保真度还没到「会复刻」的水平，"
+                 "且 batch 16 与主网格 64 是混杂因素。故**不据此声称分辨率无关**，只写进 limitation。")
+        L.append("- 过程教训：第一次「45 min 没出图」是同一个 pilot 被启动了两份（两 train 抢 8 GB 显存 → 换页），"
+                 "不是采样慢（`build/bench_sample224.py`：224px 采 128 张只要 ~46 s）。")
+    else:
+        L.append("`results/pilot224_metrics.csv` 不存在 —— `python -m build.pilot224` 生成（约 1.6 h）。")
+    L.append("")
+
+    L.append("### 8.3 记忆化类型学：被复刻的是哪一类训练样本（`build/typology.py`）")
     L.append("")
     ty = _read_csv(C.RESULTS / "typology.csv")
     if ty is not None and len(ty):
@@ -539,7 +562,7 @@ def section_appendix():
         L.append("`results/typology.csv` 不存在 —— `python -m build.typology` 生成。")
     L.append("")
 
-    L.append("### 8.3 逐格核查表（`build/verify_claims.py`）")
+    L.append("### 8.4 逐格核查表（`build/verify_claims.py`）")
     L.append("")
     vc = _read_csv(C.RESULTS / "verify_claims.csv")
     if vc is not None and len(vc):

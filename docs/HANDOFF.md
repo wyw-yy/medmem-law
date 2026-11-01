@@ -129,18 +129,22 @@ E50_0  = 2108    [1525, 2489]
 | B8 大 N 深度档（N=1500/3000，4× 步数预算） | ✅ **平台抬不起来**：N=1500 平台 0.021/0.020、N=3000 0.011/0.011 |
 | B10 换编码器（ResNet50 重算 M） | ✅ 定性一致、幅度不稳健（见 §1.6） |
 | B11 补 seed 8/9 | ✅ 可测三档 7–9 个 seed，产出 §1.4 的余量口径 |
-| B9 224px pilot | ⏳ 见 §4 |
+| B9 224px pilot | ⚠️ **inconclusive**：30k 步、8 点 × 128 张，M 全程 0、sim_max 0.24–0.27 < τ=0.352，但 FID 110–121 说明保真度仍不足（详见 §4） |
 
 ---
 
 ## 4. 还没做完的事
 
-1. **B9 224px pilot**：`pneumoniamnist`、N=1000、seed=21、batch=16、128 epoch（8000 步）、8 个测量点、输出隔离在
-   `results/pilot224_metrics.csv`。这台机器功耗墙把时钟压到 ~225 MHz，224px 采样很慢，所以它排在最后跑。
-   - 预声明（`docs/PROTOCOL.md` §20）：**只回答定性问题**——"224px 上记忆化是否仍出现"、"onset 是否仍晚于质量改善"；
-     **不比较绝对 M/FID**（跨分辨率不可比）。若末点 M 仍接近 0，只能写"40% 预算内未出现"。
-   - 状态与日志：`build/pilot224.log`（脚本用 `capture_output`，训练期间日志为空是正常的）、
-     `cache/ckpt/pneumoniamnist_n1000_s21/`、`cache/samples/pneumoniamnist_n1000_s21/`。
+1. **B9 224px pilot（已跑完，结论是"没结论"）**：`pneumoniamnist` N=1000 seed=21 batch=16，
+   **480 epoch = 30,000 步**，8 个测量点 × 128 张，结果在 `results/pilot224_metrics.csv`。
+   - 实测：FID 472(e32) → 315 → 122(e192) → 110(e320) → 117(e480)；像素 std 12.3 → 30.8（真实图仍更锐）；
+     **M 全程 0**，`sim_max` 0.24–0.27 始终低于 τ=0.352（τ 由 2,000 张真实图校准，FPR=0.5%）。
+   - 判定（判据在看结果之前就写死在 `docs/PROTOCOL.md` §23）：**inconclusive** —— 既不能证明 224px 会记忆化，
+     也不能证明不会，因为这一档的保真度还没到"会复刻"的水平（480 轮时 FID 仍在降），且 batch 16 vs 主网格 64 是混杂因素。
+   - 所以论文**不写**"分辨率不改变结论"，只把这条写进 limitation（`docs/ALIGNMENT.md` 第 7 条）。
+   - 过程教训：第一次"跑了 45 min 没出图"不是采样慢，而是**同一个 pilot 被启动了两份**（两个 train 抢 8 GB 显存 →
+     驱动回退共享显存换页，GPU 100% 但只有 29 W）。基准 `build/bench_sample224.py` 显示 224px 采 128 张只要 ~46 s。
+     另外新发现：`train.py` 的 DDIM 采样默认按 `MEDMEM_SAMPLE_BATCH`（默认 64）分批，224px 必须降到 16。
 2. **院内数据**（你说要等几周）→ 已在所有文档标为 future work，接口留好：`data.ensure_dataset` 换个 loader 即可，
    τ 校准与编码器都不用改。
 3. **论文正文**：`docs/OUTLINE.md` v3 + `docs/METHODS.md` + `docs/ABSTRACT.md` 已能直接扩写；

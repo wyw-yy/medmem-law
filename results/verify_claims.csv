@@ -18,4 +18,4 @@ ppt,claim,expect,actual,status
 类型学,被复刻的样本不是少数三张图（H1 反证）,top1 占比 < 0.3,pathmnist_n250_s1: 0.08 / pathmnist_n1000_s1: 0.09 / bloodmnist_n250_s1: 0.10,PASS
 类型学,类别偏斜温和（H3）,最大 overrep < 2,pathmnist_n250_s1: 0.50 / pathmnist_n1000_s1: 1.57 / bloodmnist_n250_s1: 0.37,PASS
 R 复算,Python 与 R 结果无冲突,CHECK 行数 = 0,0 行 CHECK,PASS
-图,主图齐备,≥6 张,10 张,PASS
+图,主图齐备,≥6 张,11 张,PASS
