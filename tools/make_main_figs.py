@@ -63,6 +63,13 @@ def panel_a(ax, df: pd.DataFrame):
         if not dense:
             ax.fill_between(e, lo, hi, color=COLORS[i % len(COLORS)], alpha=0.10, lw=0)
     ax.axhline(floor, color="0.55", lw=0.7, ls=":")
+    # 2% 以下按"量化噪声区"处理并标灰：512 张样本里 1–3 张越线就是 0.002–0.006，
+    # 这条带里的起伏不能读成"记忆化起跳"（否则 N≥1500 的抖动会被误读，见 docs/NOTES.md §11.4）。
+    ax.axhspan(eps, 2.0 * floor, color="0.5", alpha=0.06, lw=0)
+    ax.annotate("grey band: below 2% = 1–3 of 512 images\n(quantisation, not an onset)",
+                xy=(0.015, 0.965), xycoords="axes fraction", xytext=(0, 0),
+                textcoords="offset points", ha="left", va="top",
+                fontsize=6, color="0.42")
     ax.annotate(f"detection floor $3/{C.N_SAMPLE}$", xy=(0.985, floor),
                 xycoords=ax.get_yaxis_transform(), xytext=(0, 3),
                 textcoords="offset points", ha="right", va="bottom",
