@@ -1,6 +1,6 @@
 # 实验结果总览（自动生成）
 
-> 生成时间 2026-11-01 13:42:04 · 由 `python -m tools.report` 从 `results/` 汇总。
+> 生成时间 2026-11-01 13:48:17 · 由 `python -m tools.report` 从 `results/` 汇总。
 > 数字的出处见每节标注；协议与判据见 `docs/PROTOCOL.md`，踩坑记录见 `docs/NOTES.md`。
 
 ## 1. 主网格完成度
@@ -336,6 +336,7 @@
 
 ## 9. 图
 
+- `figs/fig1_triptych.png`
 - `figs/fig_amplitude.png`
 - `figs/fig_collapse.png`
 - `figs/fig_cross_dataset.png`

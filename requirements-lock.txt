@@ -1,0 +1,31 @@
+# 实测可跑的版本锁定（2026-11-01，RTX 5070 Laptop 8 GB / Windows）
+# 装法见 REPRODUCE.md §1：本机 pip 不可用，全部轮子由 build/get_wheels.py + build/unpack_wheels.py 装配。
+# 语言：Python 3.12.8（cp312；不要 3.13，torch cu128 轮子只到 cp312）
+
+# --- 主框架（cu128 轮子，sm_120 必需）---
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+
+# --- 数值与绘图 ---
+numpy==2.5.4
+pandas==3.0.6
+scipy==1.18.1
+matplotlib==3.11.2
+pillow==13.0.0
+tqdm==4.70.1
+
+# --- 数据 ---
+medmnist==3.0.2          # 只用它的下载器；实际数据是 build/get_hf64.py 从 224px 源转的 64px npz
+
+# --- torch 运行期依赖（随 torch 一起从 datadiet-ehr 的 venv 复制，不在 pip 里单独装）---
+# filelock fsspec jinja2 sympy networkx typing_extensions dateutil tzdata six
+
+# --- R（独立复算用，可选）---
+# R 4.6.1 (2026-06-24 ucrt)  C:\Program Files\R\R-4.6.1\bin\Rscript.exe
+# 只用 base R：optim / nls / lm / boot 手写，无外部包依赖
+
+# --- 明确不用的东西（都试过，见 docs/NOTES.md）---
+# faiss            不用：N≤4000，256×4000 的余弦就是一次矩阵乘
+# torchmetrics     不用：FID 用 torchvision inception_v3 自行实现，避免 github 权重下载
+# xformers         缺失只有 UserWarning，不影响 DINOv2 前向
+# uv / conda       本机没有，也不需要
