@@ -36,6 +36,8 @@ STEPS = [
     ("safety", ["-m", "tools.safety"], False),
     ("grid_summary", ["-m", "tools.grid_summary"], False),
     ("plot", ["-m", "tools.plot", "--only", "all"], False),
+    # 主图三联（论文 Fig.1）：直接读 CSV 现算，不用重训；放在 plot 之后保证用的是同一批数字。
+    ("main_figs", ["-m", "tools.make_main_figs"], False),
     ("audit", ["-m", "tools.audit"], False),
     ("report", ["-m", "tools.report"], False),
 ]
