@@ -23,7 +23,8 @@ PY = str(ROOT / ".venv" / "Scripts" / "python.exe")
 ENV = dict(os.environ, MEDMEM_IMAGE_SIZE="224", MEDMEM_BATCH="16",
            PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONPATH=".")
 
-RUN = "pneumoniamnist_n1000_s1"
+SEED = 21               # 独立 seed：绝不复用 64px 主网格已有的 run tag（否则会"续跑"到 2400 轮直接结束）
+RUN = f"pneumoniamnist_n1000_s{SEED}"
 EPOCHS = 128          # 128 ep × 1000 张 / 16 = 8000 步
 CKPT = 16             # 8 个测量点
 SAMPLE_N = 256
@@ -44,10 +45,10 @@ def main() -> int:
     log_path = ROOT / "build" / "pilot224.log"
     with open(log_path, "w", encoding="utf-8") as log:
         log.write(f"=== B9 224px pilot 开始 {time.ctime()} ===\n")
-        log.write(f"N=1000 seed=1 epochs={EPOCHS} batch=16 sample_n={SAMPLE_N}"
+        log.write(f"N=1000 seed={SEED} epochs={EPOCHS} batch=16 sample_n={SAMPLE_N}"
                   f" → {EPOCHS * 1000 // 16} 步\n")
         rc1 = call([PY, "-u", "-m", "train", "--dataset", "pneumoniamnist", "--n", "1000",
-                    "--seed", "1", "--epochs", str(EPOCHS), "--ckpt-every", str(CKPT),
+                    "--seed", str(SEED), "--epochs", str(EPOCHS), "--ckpt-every", str(CKPT),
                     "--sample-n", str(SAMPLE_N)], log)
         rc2 = call([PY, "-u", "-m", "tools.score_run", "--run", RUN,
                     "--out", "pilot224_metrics.csv", "--fid", "--fid-stride", "2"], log)

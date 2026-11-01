@@ -465,6 +465,35 @@ def section_safe():
                  "（FID 约为跑满时的 2–3 倍）。也就是说小数据集上「安全」与「可用」不可兼得——"
                  "正确的处方是**加数据**（N 增大后安全窗口变宽），而不是硬把停点往后推。")
     L.append("")
+
+    # 5.2 带 seed 余量的"廉价"开环方案（B11）：不测量、只靠时刻表 + 2σ 余量
+    sm = _read_csv(C.RESULTS / "seed_margin.csv")
+    if sm is not None and len(sm):
+        L.append("### 5.2 带 seed 余量的开环方案（`build/seed_margin.py`，B11 的 7–9 个 seed）")
+        L.append("")
+        L.append("`E*_safe = E*_law · 10^(−2σ_log)`，σ_log = std(log10 onset)。判据：在该停点上"
+                 "**所有 seed** 的 M 都 ≤ ε 才算安全。")
+        L.append("")
+        L.append("| N | ε | seed 数 | σ_log | E*_law | E*_safe | 省轮 | M@law | M@safe | 质量代价(FID 比) |")
+        L.append("|---|---|---|---|---|---|---|---|---|---|")
+        sd = sm[sm["eps"].isin([0.01, 0.02])].sort_values(["eps", "n"])
+        for r in sd.itertuples():
+            e_law = "—" if r.E_law != r.E_law else f"{int(r.E_law)}"
+            e_safe = "—" if r.E_safe != r.E_safe else f"{int(r.E_safe)}"
+            sav = "—" if r.saving_safe != r.saving_safe else f"{r.saving_safe * 100:.0f}%"
+            mlaw = "—" if r.M_law != r.M_law else f"{r.M_law:.3f}"
+            msafe = "—" if r.M_safe != r.M_safe else f"{r.M_safe:.3f}"
+            q = "—" if r.fid_rel_safe != r.fid_rel_safe else f"{r.fid_rel_safe:.2f}×"
+            L.append(f"| {int(r.n)} | {r.eps} | {int(r.n_seeds)} | {r.sigma_log:.3f} | {e_law} | "
+                     f"{e_safe} | {sav} | {mlaw} | {msafe} | {q} |")
+        L.append("")
+        L.append("- **廉价方案成立，但只在「隐私优先、质量可退」时成立**：N=250/500/1000 在 ε=0.01 上都能做到"
+                 "全部 seed 合规且省 88–94%，代价是 FID 为跑满的 1.55–2.54 倍。")
+        L.append("- **σ_log 随 N 变大**（250/500 约 0.05，N=1000 达 0.34）：数据越多平台越低，但「什么时候发作」更飘，"
+                 "所以固定时刻表的可信区间反而更宽。")
+        L.append("- 帕累托阶梯：闭环（省 64%、0 违规、质量 1.1–1.3×）> 开环+2σ（省 88–94%、0 违规、质量 1.5–2.5×）"
+                 "> 开环无余量（省 61%、10.7% 违规）> FID 早停（省 28%、75% 违规）。")
+        L.append("")
     return L
 
 

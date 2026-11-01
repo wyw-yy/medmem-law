@@ -20,10 +20,10 @@ N≥2,000 the model never leaves the measurement floor (3/512 = 0.6%) within 80 
 the equal-step budget. (ii) The **onset time** grows with N, but far slower than the update-normalized
 prediction (γ_epoch = −0.83 ⟺ t₅₀ ∝ N^0.17), and per-seed onset varies by up to 8× at fixed N — so a
 fitted schedule can describe the *expectation* but cannot *guarantee* compliance. (iii) Consequently, a
-**closed-loop controller** that measures M online and stops before the threshold is crossed delivers 64%
+**closed-loop controller** that measures M online and stops before the threshold is crossed delivers 67%
 savings of the training budget while violating the privacy budget in 0 of 28 runs, versus 75% violations
-for FID-plateau stopping and 11% for the open-loop law. The fitted law reaches R²_lin 0.716 (in-sample)
-but leave-one-N-out R² 0.47 — we report it as a descriptive law with an explicit validity boundary, not
+for FID-plateau stopping and 11% for the open-loop law. The fitted law reaches R²_lin 0.710 (in-sample)
+but leave-one-N-out R² 0.46 — we report it as a descriptive law with an explicit validity boundary, not
 as a predictive guarantee.
 
 ## 一句话结论（组会/答辩直接用）
@@ -38,7 +38,7 @@ as a predictive guarantee.
 |---|---|---|---|
 | 1 | 平台高度随数据量快速衰减 | A(N) ∝ N^(−1.90)；7 档平台 0.863/0.469/0.092/0.021/0.007/0.011/0.014（N=250→4000，后三档贴地板） | `results/law_fit.json`、`figs/fig1_triptych.png (b)` |
 | 2 | 真实起跳时间随 N 增长，但远慢于"步数归一"的预测；且 seed 方差极大 | 实测 onset 斜率 0.64（pathmnist）/0.66/1.20；γ_epoch=−0.827 ⟺ t₅₀∝N^0.173；同 N 不同 seed 的 onset 极差 8× | `results/fid_onset_vs_n.csv`、`docs/NOTES.md` §8.1、`docs/COMPARISON.md` |
-| 3 | 只有闭环能在"省时间"和"守隐私"之间同时成立 | D/D′：省 63.6%、违规 0/28；C 开环：省 61.1%、违规 10.7%；B(FID)：省 27.7%、违规 75%；A：违规 75% | `results/stop_policy_summary.csv`、`figs/fig1_triptych.png (c)` |
+| 3 | 只有闭环能在"省时间"和"守隐私"之间同时成立 | D/D′：省 66.6%、违规 0/34；C 开环：省 64.8%、违规 11.8%；B(FID)：省 23.9%、违规 79.4%；A：违规 79.4% | `results/stop_policy_summary.csv`、`figs/fig1_triptych.png (c)` |
 
 ## 必须写进 limitation 的四件事
 
