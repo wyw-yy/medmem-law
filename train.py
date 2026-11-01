@@ -234,7 +234,7 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
 
             t0 = time.time()
             # 采样用 EMA 权重（见 WeightEMA 的注释：非 EMA 权重会随机塌成均值图）
-            gen = diff.ddim_sample(ema.sample_net(), sample_n, (C.CHANNELS, C.IMAGE_SIZE, C.IMAGE_SIZE),
+            gen = diff.ddim_sample(ema.sample_net(), sample_n, (C.CHANNELS, C.IMAGE_SIZE, C.IMAGE_SIZE), batch=C.SAMPLE_BATCH,
                                    steps=C.DDIM_STEPS, device=device)
             gen_u8 = D.to_uint8(gen.float().cpu().numpy())
             np.save(_sample_dir(run) / f"e{epoch:04d}.npy", gen_u8)

@@ -30,8 +30,8 @@ ENV = dict(os.environ, MEDMEM_IMAGE_SIZE="224", MEDMEM_BATCH="16",
 
 SEED = 21               # 独立 seed：绝不复用 64px 主网格已有的 run tag（否则会"续跑"到 2400 轮直接结束）
 RUN = f"pneumoniamnist_n1000_s{SEED}"
-EPOCHS = 128          # 128 ep × 1000 张 / 16 = 8000 步
-CKPT = 32             # 4 个测量点（R14：224px 采样太贵，见 docstring）
+EPOCHS = 480          # R15：128 → 480 ep（30k 步）——128 ep 时采样仍是无纹理均值图
+CKPT = 64             # 8 个测量点（R15；e64..e480，采样 46 s/点）
 SAMPLE_N = 128
 
 

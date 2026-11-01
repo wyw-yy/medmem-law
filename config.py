@@ -88,6 +88,9 @@ EMA_DECAY = 0.999
 
 # ---------------------------------------------------------------- 采样
 DDIM_STEPS = 50          # 采样步数（不是训练步数）
+# DDIM 采样的每批张数。主网格 64px 用 64 没问题；224px 用 64 会撑爆 8 GB
+# 显存并触发 Windows 共享显存换页（实测比 batch=8 慢 70 倍以上）。
+SAMPLE_BATCH = int(os.environ.get("MEDMEM_SAMPLE_BATCH", 64))
 
 # ---------------------------------------------------------------- 记忆率度量
 ENCODER = os.environ.get("MEDMEM_ENCODER", "dinov2_s")   # dinov2_s | resnet50
