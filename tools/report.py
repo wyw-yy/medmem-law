@@ -295,6 +295,29 @@ def section_robust():
         lines.append("- `exact/match` = 两条实现逐位一致或差异 <0.1%；`consistent` 是 bootstrap 分位，"
                      "两端各自用不同随机数流，差异在蒙特卡洛噪声（约 0.01–0.03）内。")
         lines.append("")
+
+    # 3.6 换编码器重算：整篇的 M 依赖一个自由选择（特征编码器），这里给出第二套编码器的结果
+    ec = _read_csv(C.RESULTS / "encoder_summary.csv")
+    if ec is not None and len(ec):
+        lines += ["### 3.6 换编码器重算（DINOv2 → ResNet50，`build/rescore_encoder.py`）", "",
+                  "同一批生成样本，不重训练，只换特征与阈值（τ 逐 N 重校准）。"
+                  "它回答的是「M 是不是编码器的产物」。", "",
+                  "| run | N | 点 | τ(D→R) | 末点 M(D→R) | 平台(D→R) | Spearman | 最大点差 |",
+                  "|---|---|---|---|---|---|---|---|"]
+        for _, r in ec.iterrows():
+            lines.append(
+                f"| {r['run']} | {int(r['n'])} | {int(r['points'])} | "
+                f"{r['tau_dino']:.3f}→{r['tau_rn50']:.3f} | "
+                f"{r['M_last_dino']:.3f}→{r['M_last_rn50']:.3f} | "
+                f"{r['plat_dino']:.3f}→{r['plat_rn50']:.3f} | "
+                f"{r['spearman']:.3f} | {r['max_abs_diff']:.3f} |")
+        lines.append("")
+        lines.append("- **定性结论全部保留**：M 随训练上升（ρ 0.84–0.99）、平台随 N 单调下降（两种编码器都成立）、"
+                     "闭环有效性不依赖编码器。")
+        lines.append("- **定量幅度改变**：平台随 N 的下降斜率在 N=250→1500 上，DINOv2 约 −2.46、ResNet50 约 −1.13。"
+                     "所以 α 是「条件指数」（依赖 dataset + 编码器 + FPR 口径），跨论文比较 α 无效。")
+        lines.append("- 低 M 区间最不稳（N=1500：0.008 vs 0.066 = 4 张 vs 34 张图），与 §3.2、§8 的地板教训同源。")
+        lines.append("")
     return lines
 
 

@@ -1,4 +1,4 @@
-﻿"""用另一个编码器重算记忆率曲线（B10：度量稳健性，不是模型改动）。
+"""用另一个编码器重算记忆率曲线（B10：度量稳健性，不是模型改动）。
 
 动机：整篇的 M 依赖一个自由选择——特征编码器。主结果用 DINOv2 ViT-S/14（dim 384，
 tau≈0.67）。若结论（记忆率随 E 上升、平台随 N 下降、闭环能控住）在 ResNet50（dim 2048，
@@ -40,7 +40,7 @@ def run_meta(run: str):
 
 def score_one(run: str, encoder, enc_name: str, rows: list[dict], epochs: list[int]):
     dataset, n, seed = run_meta(run)
-    train = D.load_split(dataset, "train")
+    train, _ = D.load_split(dataset, "train")
     idx = D.train_subset_indices(dataset, n, seed)
     bank_u8 = train[idx]
     ref_u8 = D.reference_set(dataset, C.N_REF)
@@ -56,7 +56,7 @@ def score_one(run: str, encoder, enc_name: str, rows: list[dict], epochs: list[i
           f"(去泄漏 {cal['n_leak_dropped']} 张)", flush=True)
 
     for ep in epochs:
-        p = C.SAMPLES / run / f"e{ep:04d}.npy"
+        p = C.CACHE / "samples" / run / f"e{ep:04d}.npy"
         if not p.exists():
             continue
         gen_u8 = np.load(p)
@@ -88,7 +88,7 @@ def main() -> int:
     rows: list[dict] = []
     t0 = time.time()
     for run in a.runs:
-        ep_dir = C.SAMPLES / run
+        ep_dir = C.CACHE / "samples" / run
         if not ep_dir.exists():
             print(f"跳过 {run}（没有样本）", flush=True)
             continue

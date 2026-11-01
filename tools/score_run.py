@@ -179,7 +179,14 @@ def main():
     ap.add_argument("--epochs", default=None, help="逗号分隔，只评这些 epoch")
     ap.add_argument("--refill", action="store_true",
                     help="重算已有但缺 fid（或 M）的行；配合 --fid 可给旧行补 FID")
+    ap.add_argument("--out", default="",
+                    help="写到另一个 CSV（pilot 实验隔离用，默认 results/metrics_long.csv）")
     a = ap.parse_args()
+
+    if a.out:                      # 隔离输出：不让 pilot/探针污染主 CSV（审计链只认一份真相）
+        global CSV
+        CSV = C.RESULTS / a.out
+        print(f"[score_run] 输出改到 {CSV}")
 
     only = [int(x) for x in a.epochs.split(",")] if a.epochs else None
     if a.all:
