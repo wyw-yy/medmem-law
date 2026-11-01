@@ -96,6 +96,7 @@
 | 论文图 | 文件 | 说明 |
 |---|---|---|
 | Fig.1 概念图 | — | 手绘：双时间尺度 + 我们的网格 |
+| **Fig.1' 主图三联** | `figs/fig1_triptych.png`（+`.pdf`） | 一张图讲完主结论：(a) 7 档 N 的 M(E)、(b) 平台 vs N 的幂律、(c) 四策略的省轮 vs 违规；由 `tools/make_main_figs.py` 从 CSV 现算 |
 | Fig.2 M(E) 多条曲线 | `figs/fig_M_vs_E.png` | 主结果，symlog 纵轴 + 检出限线 |
 | Fig.3 平台随 N 衰减 | `figs/fig_amplitude.png` | α≈2.0 的直接证据 |
 | Fig.4 质量-隐私权衡 | `figs/fig_quality.png` | FID 与 M 双面板 |

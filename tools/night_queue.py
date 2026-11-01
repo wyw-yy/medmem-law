@@ -97,6 +97,17 @@ def build_plan(name: str) -> list[dict]:
         # 真·闭环（策略 D）：训练中每个检查点采样 + 实测 M，越界即停并交付上一个合规 ckpt。
         # ε 取 0.02（= 4×FPR，0.01 低于度量的假阳性地板，没有信息量）。
         return [_entry("pathmnist", n, 7, epochs=FINAL[n], stop_eps=0.02) for n in (250, 500, 1000)]
+    if name == "dense_deep":
+        # B8：加密档（N=1500/3000）平台深测。它们在等步数预算下 M_max 只有 0.002–0.020，
+        # 这里给 80k 步（4× 等步数）看是否进入可测平台，用来检验幅度律 A(N)∝N^-2
+        # 在 N=1000 之外的预测力。epochs = 80k*64/N（3413→3400、1707→1700）。
+        ep = {1500: 3400, 3000: 1700}
+        return [_entry("pathmnist", n, s, epochs=ep[n]) for s in (1, 2) for n in (1500, 3000)]
+    if name == "seeds89":
+        # B11：seed 8/9，只跑可测三档（N=250/500/1000）。加上已有的 1/2/3/5/6 共 7 个 seed，
+        # 才能把"安全余量 E* − kσ_seed"算成可交付的数（现在种子方差最大 8–20×）。
+        # 预算与 FINAL 一致，否则不同 seed 的曲线长度不同、平均与拟合会串。
+        return [_entry("pathmnist", n, s, epochs=FINAL[n]) for s in (8, 9) for n in (250, 500, 1000)]
     raise SystemExit(f"未知 plan: {name}")
 
 

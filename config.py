@@ -36,10 +36,14 @@ DATASETS = {
 # 唯一稳定可用的镜像是 HF hf-mirror 上的 albertvillanova/medmnist-v2（只有 28px npz）。
 # 所以主网格跑 28px；若 64px 源恢复（见 docs/NOTES.md 的三条备选路线），改回 64 重跑即可，
 # 全部下游代码只依赖这个常量。
-IMAGE_SIZE = 64        # 64 | 28（记忆化是分辨率相关的，写论文时必须写清用了哪档）
+IMAGE_SIZE = int(os.environ.get("MEDMEM_IMAGE_SIZE", 64))
+                       # 64 | 28 | 224（记忆化是分辨率相关的，写论文时必须写清用了哪档）
                        # 64px 由 build/get_hf64.py 从 MedMNIST+ 的 224px 源转出，
                        # 切分与官方一致：train 89996 / val 10004 / test 7180。
                        # 28px 是 pilot（results/pilot28/），只用来先验证方法链路。
+                       # 224px 只能按数据集逐个跑（8 GB 显存放不下 batch 64），用
+                       # MEDMEM_IMAGE_SIZE=224 + 独立 seed 避免和 64px 的 cache 撞车。
+BATCH = int(os.environ.get("MEDMEM_BATCH", 64))   # 大分辨率必须调小（224px 建议 16）
 CHANNELS = 3             # 统一升到 3 通道，UNet 不用改
 
 # ---------------------------------------------------------------- 数据规模网格
@@ -72,7 +76,7 @@ def ckpt_every_for(epochs: int, points: int = MEASURE_POINTS, step: int = 5) -> 
 
 # ---------------------------------------------------------------- 模型
 BASE_CH = 32             # UNet 基通道。8G 显存下 32 是甜点，48 会 OOM
-BATCH = 64
+# BATCH 在 §分辨率 那一段定义（可由 MEDMEM_BATCH 覆盖，供 224px 敏感性实验用）
 TIMESTEPS = 1000
 BETA_START = 1e-4
 BETA_END = 0.02
