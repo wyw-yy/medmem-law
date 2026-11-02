@@ -185,7 +185,14 @@ def main():
 
     if a.out:                      # 隔离输出：不让 pilot/探针污染主 CSV（审计链只认一份真相）
         global CSV
-        CSV = C.RESULTS / a.out
+        # 接受三种写法：绝对路径 / "results/xxx.csv"（相对仓库根）/ "xxx.csv"（相对 results/）
+        _p = Path(a.out)
+        if _p.is_absolute():
+            CSV = _p
+        elif _p.parts and _p.parts[0] == "results":
+            CSV = _p
+        else:
+            CSV = C.RESULTS / _p
         print(f"[score_run] 输出改到 {CSV}")
 
     only = [int(x) for x in a.epochs.split(",")] if a.epochs else None
