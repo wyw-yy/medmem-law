@@ -34,6 +34,9 @@ plt.rcParams["axes.grid"] = True
 plt.rcParams["grid.alpha"] = 0.3
 COLORS = ["#4C72B0", "#DD8452", "#55A868", "#C44E52", "#8172B3", "#937860"]
 NOISE_MIN = 0.02   # 低于 2%（≈10/512）视为整档无可测记忆化
+CRED_MIN = 0.05    # 平台 ≥ 5%（≈25/512）才允许该档参与 onset 斜率拟合：
+                   # 平台只有 1–2% 时，"首次越 1%"由 1–3 张图的量化噪声决定，
+                   # 会把斜率系统性压低（此前 0.64 就是这么来的，见 docs/NOTES.md §15）。
 
 
 def _save(fig, name: str):
@@ -121,63 +124,85 @@ def _onset_table(df: pd.DataFrame, eps_list, need_consecutive: int = 2):
 
 
 def fig_collapse(df: pd.DataFrame, law_json: dict):
-    """头图（实证版）：记忆化"发作时间"随 N 的移动。
+    """头图（实证版）：记忆化"发作时间"随 N 的移动 —— 每个点 = 一个训练 run。
 
-    为什么不用 M vs E/N^γ 的塌缩图：L1/L2/L3 假设平台高度与 N 无关，
-    而实测平台 0.80/0.40/0.07/≤0.01/≤0.02 随 N 陡降，单轴塌缩必然拉开；
-    改成"到达 ε 所需轮次 vs N"后，纵轴本身就是要交付的量（安全窗口），
-    不需要任何模型假设，再用拟合律叠加成虚线做一致性检验。
+    为什么用逐 run 的 onset（results/grid_summary.csv）而不是"种子均值曲线的 onset"：
+      * 种子均值曲线会把"某个 seed 早早起跳"抹平，得到的 onset 既不代表任何一次训练，
+        也不等于 onset 的均值；
+      * 工程上要回答的是"我这一次训练什么时候会不安全"，逐 run 才是对的统计单位，
+        而且能把 seed 方差直接画出来（同一 N 的点在竖直方向散开）。
+    斜率只在**平台 ≥ 5%**的档上拟合：平台只有 1–2% 时，"首越 1%"由 1–3 张图的
+    量化噪声决定，会把斜率系统性压低（此前 0.64 就是这么来的，见 docs/NOTES.md §15）。
     """
-    d = _law_params(law_json)
-    eps_list = [0.01, 0.05, 0.10, 0.20]
-    tab = _onset_table(df, eps_list)
-    Ns = sorted(int(x) for x in df["n"].unique())
+    gs_path = C.RESULTS / "grid_summary.csv"
+    if not gs_path.exists():
+        return
+    gs = pd.read_csv(gs_path)
+    gs = gs[gs["dataset"] == "pathmnist"]
 
-    fig, ax = plt.subplots(figsize=(4.8, 3.6))
     B = float(C.BATCH)
+    series = [("onset_1pct", 0.01), ("onset_5pct", 0.05)]
+    fig, ax = plt.subplots(figsize=(4.8, 3.6))
+    law_p = _law_params(law_json)
     slopes = {}
-    for i, eps in enumerate(eps_list):
-        col = COLORS[i % len(COLORS)]
-        xs = [N for N in Ns if tab.get((N, eps))]
-        ys = [tab[(N, eps)] * N / B for N in xs]          # 换算到优化步
-        if len(xs):
-            ax.plot(xs, ys, "o", ms=5, color=col, label=rf"measured  $\epsilon$={eps:g}")
-            for x, y in zip(xs, ys):
-                ax.annotate(int(x), (x, y), textcoords="offset points", xytext=(0, 5),
-                            fontsize=5.5, ha="center", color=col)
-            if len(xs) >= 2:
-                slopes[eps] = float(np.polyfit(np.log(xs), np.log(ys), 1)[0])
+
+    for i, (col, eps) in enumerate(series):
+        colr = COLORS[i % len(COLORS)]
+        rows = []
+        for N in sorted(int(x) for x in gs["n"].unique()):
+            sub = gs[gs["n"] == N]
+            ons = sub[col].dropna()
+            if len(ons) == 0:
+                continue
+            plateau = float(sub["M_max"].max())
+            steps = ons.to_numpy() * N / B
+            rows.append(dict(N=N, k=len(ons), mean=float(steps.mean()),
+                             plateau=plateau, steps=steps))
+        if not rows:
+            continue
+        for r in rows:
+            cred = r["plateau"] >= CRED_MIN
+            ax.plot([r["N"]] * len(r["steps"]), r["steps"], "o", ms=2.2,
+                    color=colr, alpha=0.30, mec="none")
+            ax.plot([r["N"]], [r["mean"]], "o", ms=6, color=colr,
+                    mfc=colr if cred else "white", mew=0.9,
+                    label=(rf"measured  $\epsilon$={eps:g}" if r is rows[0] else None))
+            ax.annotate(int(r["N"]), (r["N"], r["mean"]), textcoords="offset points",
+                        xytext=(0, 6), fontsize=5.5, ha="center", color=colr)
+        cred_rows = [r for r in rows if r["plateau"] >= CRED_MIN]
+        if len(cred_rows) >= 2:
+            slopes[eps] = float(np.polyfit(np.log([r["N"] for r in cred_rows]),
+                                           np.log([r["mean"] for r in cred_rows]), 1)[0])
         # 律的预测（epoch 反解后同样换算到步）
         gx, gy = [], []
-        for N in Ns:
+        for N in sorted(int(x) for x in gs["n"].unique()):
             e = L.solve_E_star(law_json["best"], law_json["fits"][law_json["best"]]["params"], N, eps)
             if e == e and e is not None:
                 gx.append(N)
                 gy.append(e * N / B)
         if gx:
-            ax.plot(gx, gy, "--", lw=1.0, color=col, alpha=0.85,
+            ax.plot(gx, gy, "--", lw=1.0, color=colr, alpha=0.85,
                     label=rf"law      $\epsilon$={eps:g}")
+
+    Ns = sorted(int(x) for x in gs["n"].unique())
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xticks(Ns)
     ax.set_xticklabels([str(n) for n in Ns])
     ax.minorticks_off()
-    ax.set_xlabel("dataset size $N$")
     ax.set_ylabel("optimization steps to reach $\\epsilon$")
-    ax.legend(frameon=False, fontsize=6, ncol=2)
     if slopes:
         txt = ", ".join(rf"$\epsilon$={e:g}: {s:.2f}" for e, s in sorted(slopes.items()))
-        # 放进 x 轴标签的第二行 —— 放在图内任何位置都会跟点或图例打架
-        ax.set_xlabel("dataset size $N$\n" + "fitted slope vs $N$:  " + txt, fontsize=8)
+        ax.set_xlabel("dataset size $N$\n"
+                      + "fitted slope vs $N$ (means, plateau $\\geq$ 5%):  " + txt,
+                      fontsize=8)
     else:
         ax.set_xlabel("dataset size $N$")
-    # 大 N 档在预算内根本没有越过任何 ε —— 空白的右半边要自己解释，
-    # 否则读者会以为图画漏了。
-    silent = [N for N in Ns if all(tab.get((N, e)) is None for e in eps_list)]
-    if silent:
-        ax.text(0.60, 0.55,
-                f"N={', '.join(str(n) for n in silent)}:\nnever reaches any $\\epsilon$\nwithin budget",
-                transform=ax.transAxes, fontsize=6, color="0.5", ha="left", va="center")
+    ax.legend(frameon=False, fontsize=6, ncol=2, loc="upper left")
+    ax.text(0.98, 0.04,
+            "small dots = individual runs (seed variance)\n"
+            "hollow mean = plateau < 5% (onset set by 1–3 images, excluded from slope)",
+            transform=ax.transAxes, fontsize=5.5, color="0.45", ha="right", va="bottom")
     ax.set_title("Memorization onset grows with data size (in steps)")
     _save(fig, "fig_collapse")
 

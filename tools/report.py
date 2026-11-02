@@ -318,6 +318,31 @@ def section_robust():
                      "所以 α 是「条件指数」（依赖 dataset + 编码器 + FPR 口径），跨论文比较 α 无效。")
         lines.append("- 低 M 区间最不稳（N=1500：0.008 vs 0.066 = 4 张 vs 34 张图），与 §3.2、§8 的地板教训同源。")
         lines.append("")
+
+    # 3.7 判据对齐：用 Bonnaire et al. 的 Eq.(6)（像素最近/次近比 < 1/3）复算同一批样本
+    eq6 = _read_csv(C.RESULTS / "eq6.csv")
+    if eq6 is not None and len(eq6):
+        ml = _read_csv(C.RESULTS / "metrics_long.csv")
+        lines += ["### 3.7 判据对齐：用原文 Eq.(6) 复算（`build/eq6.py`）", "",
+                  "原文（arXiv 2505.17638 §2）判定「记住」用的是**无参数相对判据**："
+                  "像素 L2 最近/次近距离比 < 1/3。我们的主指标是「白化特征余弦 ≥ τ(FPR=0.5%)」。"
+                  "两者排序是否一致，决定我们能不能与文献对话。", "",
+                  "| run | N | 我们的 M | 像素比中位 | f_mem（Eq.6） |",
+                  "|---|---|---|---|---|"]
+        for _, r in eq6.sort_values(["n", "epoch"]).iterrows():
+            M = float("nan")
+            if ml is not None:
+                sel = ml[(ml["run"] == r["run"]) & (ml["epoch"] == r["epoch"])]
+                if len(sel):
+                    M = float(sel["M"].iloc[0])
+            lines.append(f"| {r['run']}@{int(r['epoch'])} | {int(r['n'])} | "
+                         f"{M:.3f} | {r['ratio_p50']:.3f} | {r['f_mem']:.3f} |")
+        lines.append("")
+        lines.append("- **排序一致**：M 高 ↔ f_mem 高；像素级判据更严（约 2 倍），"
+                     "差额正是「像」与「复刻」的区别。")
+        lines.append("- **大 N 档是关键差别**：`pathmnist_n2000_s2` 早期 M≈0.04，但 f_mem=0、像素比中位 0.98 →"
+                     "那 21 张不是复刻，只是在特征空间里像。**大 N 档的 M 只能当复刻率的上界**。")
+        lines.append("")
     return lines
 
 
