@@ -36,12 +36,37 @@ MANIFEST_CSV = ROOT / "results" / "manifest.csv"
 MANIFEST_DATA = ROOT / "MANIFEST.data.sha256"
 MANIFEST_DATA_CSV = ROOT / "results" / "data_manifest.csv"
 
+# 清单自身不能进清单（自指会让"两次生成必须字节一致"永远不成立）
+DERIVED = {"MANIFEST.sha256", "MANIFEST.data.sha256",
+           "results/manifest.csv", "results/data_manifest.csv"}
 
-def sha256(path: Path, chunk: int = 1 << 20) -> str:
+
+def sha256(path: Path, chunk: int = 1 << 20, normalize_text: bool = True) -> str:
+    """文件内容的 sha256。
+
+    normalize_text=True 时，若文件是文本（前 8KB 无 NUL），先把 CRLF 归一成 LF 再算哈希。
+    原因：`.gitattributes` 里 `eol=lf`，Windows 工作区是 CRLF、克隆出来是 LF；若按工作区
+    字节直接哈希，同一 commit 在两台机器上会给出不同清单 —— 那这份清单就失去了证明力。
+    归一化后二进制文件（npz/pth/png/pdf）仍按原字节哈希。
+    """
     h = hashlib.sha256()
     with open(path, "rb") as f:
+        head = f.read(8192)
+        f.seek(0)
+        is_text = normalize_text and b"\x00" not in head
+        tail = b""
         for block in iter(lambda: f.read(chunk), b""):
+            if is_text:
+                block = tail + block
+                if block.endswith(b"\r"):
+                    tail = b"\r"
+                    block = block[:-1]
+                else:
+                    tail = b""
+                block = block.replace(b"\r\n", b"\n")
             h.update(block)
+        if is_text and tail:
+            h.update(tail)
     return h.hexdigest()
 
 
@@ -71,7 +96,8 @@ def data_files(include: bool) -> list[Path]:
 
 def build(include_data: bool) -> int:
     # 1) 仓库内文件（克隆即可校验）
-    files = [p for p in tracked_files() if p.is_file() and p.name != MANIFEST.name]
+    files = [p for p in tracked_files()
+             if p.is_file() and p.relative_to(ROOT).as_posix() not in DERIVED]
     rows, lines = _write_manifest(files, MANIFEST, MANIFEST_CSV, "repo")
     total = sum(r["bytes"] for r in rows)
     print(f"写成 {MANIFEST.relative_to(ROOT)}：{len(rows)} 个文件，{total / 1e6:.1f} MB")
@@ -137,7 +163,7 @@ def verify() -> int:
     listed = set(want)
     for p in tracked_files():
         rel = p.relative_to(ROOT).as_posix()
-        if rel not in listed and p.is_file() and not p.name.startswith("MANIFEST"):
+        if rel not in listed and p.is_file() and rel not in DERIVED:
             extra.append(rel)
 
     for tag, items in (("改动", bad), ("缺失", missing), ("清单外新增", extra)):
