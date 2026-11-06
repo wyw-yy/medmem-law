@@ -1,0 +1,29 @@
+{
+  "title": "medmem-law: memorization control law for medical image diffusion models",
+  "upload_type": "software",
+  "description": "Experiment code and every measured artifact behind the control law M(N, E) for diffusion models trained on public medical image datasets: the calibrated memorization metric (whitened-feature nearest neighbour, tau anchored at FPR = 0.5%, plus an independent implementation of the pixel-space criterion of Bonnaire et al. 2025), six candidate laws with censoring-aware fitting, leave-one-N-out validation with a pooled R2, four stopping policies evaluated per run, and the full audit trail (one CSV row per measurement point, a SHA256 manifest of every controlled file, and an independent R re-implementation of the fit). The paper's central claim is deliberately negative about the control law and positive about the closed-loop controller; see docs/HANDOFF.md.",
+  "creators": [
+    {
+      "name": "yang, yu",
+      "affiliation": "medmem-law"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "memorization",
+    "diffusion models",
+    "medical imaging",
+    "privacy auditing",
+    "early stopping",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://github.com/wyw-yy/medmem-law",
+      "resource_type": "software"
+    }
+  ],
+  "notes": "Numbers in any manuscript citing this archive must match results/ at the tagged commit; docs/SUPPLEMENT.md maps every claim to the file and filter that produces it."
+}

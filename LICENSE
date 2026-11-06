@@ -1,0 +1,39 @@
+MIT License
+
+Copyright (c) 2026 yang yu (GitHub: wyw-yy)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Scope note (important for a paper supplement):
+
+* **Code** (`*.py`, `*.ps1`, `*.R`) — MIT, as above.
+* **Documents, figures and result tables** (`docs/`, `figs/`, `results/`),
+  i.e. the manuscript's supplementary material itself — **CC BY 4.0**
+  (https://creativecommons.org/licenses/by/4.0/). Reuse is allowed with
+  attribution to this repository and the commit hash.
+* **Datasets are NOT redistributed here.** MedMNIST v2 subsets are downloaded
+  at runtime from their public hosts (Hugging Face mirror `dz-osamu/MedMNIST`,
+  224px JPEG, converted locally to 64px). Their own licences apply
+  (MedMNIST v2: CC BY 4.0). `MANIFEST.data.sha256` records the hashes of the
+  exact files we trained on so a third party can prove they used the same ones.
+* **Model weights** produced by this repo are released under MIT together with
+  the code, except where a subset of them can be shown to reproduce a training
+  image (see `docs/PRIVACY_AUDIT.md` — that is the whole point of the paper).

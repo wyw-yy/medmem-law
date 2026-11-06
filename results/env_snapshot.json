@@ -1,0 +1,39 @@
+{
+  "generated": "2026-11-06T19:55:59.2931439+08:00",
+  "os": "Windows 11 10.0.26200",
+  "machine": "AMD64",
+  "cpu_count": 24,
+  "python": "3.12.8",
+  "executable": "D:\\code\\codetest\\medmem-law\\.venv\\Scripts\\python.exe",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2",
+    "pillow": "13.0.0",
+    "tqdm": "4.70.1",
+    "medmnist": "3.0.2",
+    "packaging": "26.3"
+  },
+  "torch_cuda_capability": [
+    12,
+    0
+  ],
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "driver": "573.22",
+    "vram_mib": "8151",
+    "compute_cap": "12.0",
+    "torch_cuda": "12.8",
+    "cudnn": "91900",
+    "cuda_available": true
+  },
+  "r": "Rscript (R) version 4.6.1 (2026-06-24)",
+  "offline_weights": {
+    "dinov2_vits14_pretrain.pth": "88.3 MB sha256=b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+    "inception_v3_google-0cc3c7bd.pth": "108.9 MB sha256=0cc3c7bd75056d25e46cba549dc184522069b81e9787eff6df84f397bd52a5ef",
+    "resnet50-11ad3fa6.pth": "102.5 MB sha256=11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca"
+  }
+}

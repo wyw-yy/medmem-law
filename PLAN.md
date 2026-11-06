@@ -1,4 +1,4 @@
-# 医学影像扩散模型的记忆化控制律 —— 执行规划（新手版 v1）
+﻿# 医学影像扩散模型的记忆化控制律 —— 执行规划（新手版 v1）
 
 > 课题编号 K08「医学数据与隐私记忆化」· 建议投向 Medical Image Analysis / Nature MI
 > 本机：RTX 5070 Laptop 8 GB · Windows · Python 3.12 · torch 2.11.0+cu128（`datadiet-ehr/.venv` 已验证可用）
@@ -311,7 +311,7 @@ M(E|N) = M∞ · Φ( (E − τ_mem(N)) / w ),  τ_mem(N) = a · N^γ
 ### 8.1 建环境（照抄）
 
 ```powershell
-cd C:\Users\yang'yu\Desktop\codetest\medmem-law
+cd D:\code\codetest\medmem-law
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -U pip
 .\.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cu128
