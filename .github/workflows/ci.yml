@@ -1,0 +1,62 @@
+name: verify
+
+# 只跑"不需要 GPU、不需要数据集"的检查：任何人改了代码或结果，数字被动过就红。
+# 训练/采样/度量走 GPU，不在 CI 覆盖范围内（那是 REPRODUCE.md 的事）。
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: 数字与清单守门
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装最小依赖（不含 torch —— 这些检查都不碰模型）
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-ci.txt
+
+      - name: 守门检查
+        env:
+          PYTHONPATH: .
+          PYTHONIOENCODING: utf-8
+        run: python -m tools.ci_check --skip-r
+
+  r-recheck:
+    name: 独立语言复算（base R）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 R 与 Python
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq r-base-core
+          Rscript --version
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装最小依赖
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-ci.txt
+
+      - name: 用 R 重做拟合/留一/bootstrap，与 Python 逐项对照
+        env:
+          PYTHONPATH: .
+          PYTHONIOENCODING: utf-8
+        run: python -m tools.ci_check

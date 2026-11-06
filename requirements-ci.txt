@@ -1,0 +1,6 @@
+# CI 专用最小依赖：只够跑 tools/ci_check（审计、声明核对、律重拟合、清单校验）。
+# 这里故意用下限而不是精确锁版本：CI 要验证"今天的新环境还能复现同样的数字"，
+# 而精确的运行时版本记录在 requirements-lock.txt 与 docs/ENV.md 里。
+numpy>=2.0
+pandas>=2.2
+scipy>=1.11
