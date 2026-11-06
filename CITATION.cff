@@ -10,17 +10,18 @@ abstract: >-
   manifest, independent R re-implementation of the fit).
 type: software
 license: MIT
-version: "0.1.1"
+version: "0.1.2"
 date-released: "2026-11-06"
-doi: "10.5281/zenodo.24012027"
-# 概念 DOI（永远指向最新版本；引用具体版本时用上面的 doi）
+doi: "10.5281/zenodo.24012026"
+# 这里放的是【概念 DOI】：它永远解析到最新版本，因此不会因为发新版本而失效。
+# 需要钉死某一版时，用 identifiers 里标注了版本号的那一条。
 identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24012026"
+    description: "Concept DOI (always resolves to the latest archived version)"
   - type: doi
     value: "10.5281/zenodo.24012027"
     description: "Version-specific DOI for v0.1.1"
-  - type: doi
-    value: "10.5281/zenodo.24012026"
-    description: "Concept DOI (always resolves to the latest version)"
   - type: url
     value: "https://github.com/wyw-yy/medmem-law"
     description: "Source repository"
@@ -33,15 +34,16 @@ keywords:
   - early stopping
   - reproducibility
 authors:
-  - family-names: "yang"
-    given-names: "yu"
-    # 请把这里换成真实署名与 ORCID；目前按仓库所有者账户填写
+  - family-names: "Yang"
+    given-names: "Yu"
+    orcid: "https://orcid.org/0009-0002-6307-3373"
     alias: "wyw-yy"
 preferred-citation:
   type: article
   title: "Memorization control law for medical image diffusion models: data scale, training epochs, and memorization rate"
   authors:
-    - family-names: "yang"
-      given-names: "yu"
+    - family-names: "Yang"
+      given-names: "Yu"
+      orcid: "https://orcid.org/0009-0002-6307-3373"
   year: 2026
   note: "Manuscript in preparation. Numbers in the manuscript must match results/ at a tagged commit; see docs/SUPPLEMENT.md for the claim-to-file map."
