@@ -48,6 +48,8 @@
 1. **CSV（唯一真相）**：`results/metrics_long.csv` 一行一个检查点，含 `run/dataset/n/seed/epoch/M/tau/sim_*/n_gen/fid/encoder`。任何图与表都只能由它派生。
 2. **审计脚本**：`tools/audit.py` 检查 7 件事（重复点、run 内 encoder/τ 唯一、取值越界、n_gen 一致、点数下限、CSV 末轮 vs `runs/*.json`）。干预组（早停 run）豁免"点数下限"。
 3. **哈希**：`tools/manifest.py` 对全部受控文件与全部数据集分别生成清单；`--verify` 重算并报告改动/缺失/清单外新增。
+   实测（2026-11-06）：`git clone` 到一台干净目录后运行 `tools/manifest.py --verify` → **204 个文件哈希一致**，
+   即清单能在换机器、换换行符（Windows CRLF → 克隆后 LF）的情况下复现；文本文件在算哈希前会先做 CRLF→LF 归一。
 4. **独立语言复算**：`R/verify_in_R.R` 用 base R 重写模型、删失罚、优化、留一、bootstrap，与 Python 逐位对照。
 
 ## 4. 不随仓库分发的东西
