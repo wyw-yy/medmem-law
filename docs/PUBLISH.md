@@ -5,10 +5,14 @@
 | 项目 | 状态 |
 |---|---|
 | 仓库 | https://github.com/wyw-yy/medmem-law （**public**） |
-| 分支 / 标签 | `master` / `v0.1.0`（附注标签，指向发布时的提交） |
+| 分支 / 标签 | `master` / `v0.1.0`、`v0.1.1`（附注标签，指向发布时的提交） |
 | CI | `.github/workflows/ci.yml`：每次 push 跑「清单校验 + 审计 + 22 条声明核对 + 律重拟合 + base R 复算」 |
 | 归档元数据 | `.zenodo.json`（已就位）、`CITATION.cff` |
+| **DOI** | **`10.5281/zenodo.24012027`**（`v0.1.1`，2026-11-06 生成）／概念 DOI `10.5281/zenodo.24012026` |
 | 数据/权重 | 不进仓库，用 `MANIFEST.data.sha256` + `docs/ENV.md` 留证 |
+
+> **2026-11-06 完成记录**：Zenodo GitHub 集成在 `v0.1.0` 发布之后才打开，所以 `v0.1.0` 未被归档；
+> 用同一批实测产物另发 `v0.1.1` 触发归档，得到上面的版本 DOI。若日后改了数字，**发新版本**（`v0.1.2` …）而不是改记录。
 
 ## 2. 拿 DOI（需要你的 Zenodo 账号，二选一）
 
@@ -30,11 +34,13 @@ $env:ZENODO_TOKEN = "..."
 
 **C. 完全离线退路**：有些期刊接受 "code available at <commit hash>，永久镜像随投稿上传"，此时不需要 DOI；但审稿人会偏好 DOI。
 
-## 3. 拿到 DOI 后要改的三处（我会一起做）
+## 3. 拿到 DOI 后要改的三处（已完成，记录备查）
 
-1. `CITATION.cff`：加 `doi: 10.5281/zenodo.XXXXXX`；
-2. `README.md`：在标题下加 DOI badge（`[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXX)`）；
-3. `docs/SUPPLEMENT.md` §5：写明"论文数字绑定 `v0.1.0` / DOI"。
+1. `CITATION.cff`：加 `doi:` 与 `identifiers:` ✅（`10.5281/zenodo.24012027` + 概念 DOI）
+2. `README.md`：标题下加 DOI / CI / License 三个 badge ✅
+3. `docs/SUPPLEMENT.md` §5：写明"论文数字绑定 `v0.1.1` / 版本 DOI" ✅
+
+以后发新版本时重复这三步即可（tag → release → 等 Zenodo → 回填 → 重生成清单）。
 
 ## 4. 投稿前检查单
 

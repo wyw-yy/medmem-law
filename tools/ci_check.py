@@ -113,6 +113,13 @@ def main() -> int:
     ap.add_argument("--skip-r", action="store_true")
     a = ap.parse_args()
 
+    # 控制台编码兜底：Windows 的 GBK 代码页打不出 ✅/❌ 以外的字符时不至于整轮崩掉
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     checks = [check_manifest, check_audit, check_claims, check_law]
     if not a.skip_r:
         checks.append(check_r)
@@ -129,7 +136,8 @@ def main() -> int:
     width = max(len(r[0]) for r in rows)
     print("\n" + "=" * 74)
     for name, ok, detail in rows:
-        print(f"{'✅' if ok else '❌'} {name.ljust(width)}  {detail}")
+        # 纯 ASCII 标记：GBK 控制台 / 精简容器里都不会炸
+        print(("[PASS] " if ok else "[FAIL] ") + name.ljust(width) + "  " + detail)
     print("=" * 74)
     print("结论：" + ("全部通过" if ok_all else "有检查未通过 —— 数字或口径被动过，先查再提交"))
     return 0 if ok_all else 1

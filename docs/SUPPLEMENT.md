@@ -63,5 +63,8 @@
 ## 5. 版本与归档
 
 - 论文引用的每一个数字都应绑定一个 **git tag**（`v0.1.0` 起）；正文数字与 tag 不符即为错。
-- 归档到 Zenodo 时用 `.zenodo.json`（已就位），获得 DOI 后写回 `CITATION.cff` 的 `doi` 字段。
+- **已归档**：`v0.1.1` → Zenodo 记录 [`10.5281/zenodo.24012027`](https://doi.org/10.5281/zenodo.24012027)（版本 DOI）；
+  概念 DOI `10.5281/zenodo.24012026` 永远指向最新版本。
+  Zenodo 生成的是**源码 zip**（约 4 MB），不含数据集与训练产物 —— 那两类的哈希另见 `MANIFEST.data.sha256` 与 §4。
+- DOI 已写回 `CITATION.cff`（`doi` + `identifiers`）与 `README.md` 顶部徽章。
 - 提交信息前缀约定：`exp:` 跑批结果 / `law:` 拟合 / `docs:` 文档 / `fix:` 修 bug / `audit:` 审计与清单。任何"改变数字"的提交都必须在 `docs/PROTOCOL.md` 留下设计修订编号（R1…R16）。

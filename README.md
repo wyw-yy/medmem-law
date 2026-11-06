@@ -1,5 +1,9 @@
 # medmem-law
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24012027.svg)](https://doi.org/10.5281/zenodo.24012027)
+[![CI](https://github.com/wyw-yy/medmem-law/actions/workflows/ci.yml/badge.svg)](https://github.com/wyw-yy/medmem-law/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+
 **Memorization control law for medical image diffusion models — data scale, training epochs, and memorization rate.**
 
 一个可复现的实验仓库：在公开医学影像上扫描「数据规模 × 训练轮次」，测量合成样本对训练集近邻的复刻率，
