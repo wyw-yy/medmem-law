@@ -1,5 +1,5 @@
-# repo=medmem-law kind=repo commit=aefa5afeae2e9774fcbf6138b708240a88e866d2 branch=master generated=2026-11-06T21:03:54+0800
-# files=207
+# repo=medmem-law kind=repo commit=9bf030554e5f067c645704a803d4c6a2f7d702cc branch=master generated=2026-11-06T21:05:14+0800
+# files=208
 b66a7c939ca7536b4abe1b24b1b782cbc957dd830d43edb0dc094a79146a408d  .gitattributes
 f6d9604a8acc8d76e93dc1863db468acd3aaf02cef572abbfc8f1c6ec5b6ab35  .github/workflows/ci.yml
 6aa2cf6c5f9a466966597c2d9d015b863220636e6081358e0cb3925562a59dbf  .gitignore
@@ -74,6 +74,7 @@ aeff063d80f6d1666669ee4682724d6515ce9c3a149513ffceeb32604682d337  docs/HANDOFF.m
 7ccf262ff6a021d5f41a4a4bb7ec273d35f583ba774b51ea849b7afa6aa46d51  docs/OUTLINE.md
 3bdd3df3aca1fc8220f5cf1e241b478f8c5a73167217ffe8890ea1d4d26ad378  docs/PRIVACY_AUDIT.md
 99a3ee3798f05aae3001d10d1e46150b57ff0a9b6523877c10e8ec1e5bfcc06a  docs/PROTOCOL.md
+5a19924f9ee88072459649884646ecd035eb7c83975a340cdf64323221544f2d  docs/PUBLISH.md
 c889bdb63d8337685ef98e4fbbfc58fe436f0925fb07fa5aa2138f6df9dee99e  docs/RELATED_WORK.md
 d90e786e23c34dba7220541faca16f78b1de07a7580e746c8545112f7ade5062  docs/RESULTS_TEXT.md
 8ce1ecd5af015098ff1f65ccd6960721db0801f5f698bbeca8ea384eae30b333  docs/SUPPLEMENT.md
