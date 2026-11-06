@@ -1,6 +1,6 @@
 # medmem-law
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24012027.svg)](https://doi.org/10.5281/zenodo.24012027)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24012026.svg)](https://doi.org/10.5281/zenodo.24012026)
 [![CI](https://github.com/wyw-yy/medmem-law/actions/workflows/ci.yml/badge.svg)](https://github.com/wyw-yy/medmem-law/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 
