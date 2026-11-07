@@ -105,6 +105,26 @@ def load() -> dict:
             continue
         d["pilot224"][p.name] = dict(rows=len(df), M_last=float(df["M"].iloc[-1]),
                                     M_max=float(df["M"].max()))
+    # 下界探针：N<FIT_MIN_N 的两档（128/192）。它们不进主拟合（白化维数 k=N/2 与主网格不同、
+    # 只有 1 个 seed、检查点间隔 1250/825 轮），只用来回答"小数据是否也记忆化"和给出 onset 上界。
+    d["probe"] = []
+    ml = RES / "metrics_long.csv"
+    if ml.exists():
+        m = pd.read_csv(ml)
+        m = m[m["n"] < 250]
+        for run, g in m.groupby("run"):
+            g = g.sort_values("epoch")
+            steps_per_epoch = float(g["n"].iloc[0]) / 64.0
+            first = g.iloc[0]
+            d["probe"].append(dict(
+                run=run, n=int(g["n"].iloc[0]), seeds=int(g["seed"].nunique()),
+                points=len(g), tau=float(first["tau"]), k=int(max(32, min(384, int(g["n"].iloc[0]) // 2))),
+                M_max=float(g["M"].max()), epochs=int(first["epoch"]),
+                M_first=float(first["M"]), steps_first=int(round(first["epoch"] * steps_per_epoch)),
+                bound_steps=round(steps_per_epoch * int(first["epoch"]) / int(g["n"].iloc[0]), 1),
+            ))
+        d["probe"].sort(key=lambda r: r["n"])
+
     return d
 
 
@@ -197,14 +217,29 @@ def render(d: dict) -> str:
         for k, v in d["pilot224"].items():
             L.append(f"| {k} | {v['rows']} | {_fmt(v['M_last'])} | {_fmt(v['M_max'])} |")
         L.append("")
+    if d.get("probe"):
+        L.append("## 10. 下界探针 N=128/192（**不进主拟合**）")
+        L.append("")
+        L.append("| run | N | seed | 点 | k(白化维) | τ | M_max | 首个检查点 | 该点 M | 步数/N 上界 |")
+        L.append("|---|---|---|---|---|---|---|---|---|---|")
+        for r in d["probe"]:
+            L.append(f"| {r['run']} | {r['n']} | {r['seeds']} | {r['points']} | {r['k']} | "
+                     f"{_fmt(r['tau'])} | {_fmt(r['M_max'])} | e{r['epochs']} | "
+                     f"{_fmt(r['M_first'])} | ≤{r['bound_steps']} |")
+        L.append("")
+        L.append("- 两档都**会**记忆化（M_max 0.99 / 0.87，高于 N=250 的 0.68），方向与律一致。")
+        L.append("- 但它们的白化维数只有 64/96（主网格 125/384），τ 与 M 不与主网格同尺；"
+                 "且检查点间隔 1250/825 轮，首个检查点就已经越线 → 只能给 onset 的**上界**，"
+                 "无法确认或推翻「步数/N≈10」这个常数。故 `config.FIT_MIN_N=250` 把它们挡在主拟合之外。")
+        L.append("")
     if "verify_pass" in d:
-        L.append("## 10. 逐格核查")
+        L.append("## 11. 逐格核查")
         L.append("")
         L.append(f"- {d['verify_pass']} PASS / {d['verify_fail']} FAIL")
         for ppt, claim in d["verify_fails"]:
             L.append(f"  - {ppt}：{claim}")
         L.append("")
-    L.append("## 11. 改数字时要连带改哪里")
+    L.append("## 12. 改数字时要连带改哪里")
     L.append("")
     L.append("- 律参数/区间 → `docs/ALIGNMENT.md` 04 行、`docs/ABSTRACT.md`、`docs/OUTLINE.md` C1 行、`docs/RESULTS_TEXT.md` §5.2");
     L.append("- 停训策略/安全表 → `docs/ALIGNMENT.md` 补 1 行、`docs/OUTLINE.md` C2 行、`docs/RESULTS_TEXT.md` §5.4/§5.5、`README.md` 三条结论表");

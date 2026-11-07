@@ -407,6 +407,16 @@ def main(metrics_csv: str | None = None, out: str | None = None,
         df = df[df["dataset"].isin(datasets)].copy()
     if seeds:
         df = df[df["seed"].isin(seeds)].copy()
+    # N<250 的两档（128/192）只作"下界探针"：白化维数按 k=max(32,min(d,N/2)) 取，
+    # 在 N=128/192 时 k 只有 64/96（主网格是 125/384），τ 与 M 不在同一把尺子上；
+    # 而且各只有 1 个 seed、检查点间隔 1250/825 轮（onset 分辨率粗）。混进主拟合会
+    # 让 α/γ 悄悄变掉，所以显式排除，结果单独在 docs/NOTES.md §17 报。
+    if "n" in df.columns:
+        below = sorted(int(x) for x in df.loc[df["n"] < C.FIT_MIN_N, "n"].unique())
+        if below:
+            df = df[df["n"] >= C.FIT_MIN_N].copy()
+            print(f"[law] 排除 N<{C.FIT_MIN_N} 的下界探针（{below}）："
+                  f"白化维数与检查点分辨率都与主网格不同，不进主拟合")
     if not len(df):
         raise SystemExit("筛选后没有测量点 —— 检查 --dataset / --seed")
     n_runs = df["run"].nunique()

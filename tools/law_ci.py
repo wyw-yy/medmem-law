@@ -61,6 +61,8 @@ def main() -> int:
     df = L.load_metrics(Path(a.metrics) if a.metrics else None)
     if not a.all_datasets:
         df = df[df["dataset"] == a.dataset].copy()
+    # 与 law.main 保持一致：N<FIT_MIN_N 的下界探针（128/192）不进主拟合，也不该进 bootstrap
+    df = df[df["n"] >= C.FIT_MIN_N].copy()
     if not a.per_seed:
         df = L.collapse_seeds(df)
     print(f"[law_ci] 口径：dataset={a.dataset if not a.all_datasets else 'all'}，"
