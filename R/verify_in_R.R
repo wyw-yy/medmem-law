@@ -162,10 +162,29 @@ for (b in 1:B) {
 ci <- function(x) quantile(x, c(0.025, 0.975), na.rm = TRUE)
 # 两个 bootstrap 各自用不同的随机数流与优化器，端点只可能"落在蒙特卡洛噪声内"，
 # 不可能逐位相同：B=200 时 2.5%/97.5% 分位的标准误约 sd*sqrt(p(1-p)/B)/phi ≈ 0.01。
-add("E_ci", "alpha_lo", ci(boot[, "alpha"])[[1]], num("alpha_lo"), "bootstrap 分位（MC 噪声 ~0.01）", loose = 0.06)
-add("E_ci", "alpha_hi", ci(boot[, "alpha"])[[2]], num("alpha_hi"), "", loose = 0.06)
-add("E_ci", "gamma_lo", ci(boot[, "gamma"])[[1]], num("gamma_lo"), "", loose = 0.06)
-add("E_ci", "gamma_hi", ci(boot[, "gamma"])[[2]], num("gamma_hi"), "", loose = 0.06)
+# 所以判定标准不是"端点相等"，而是"两个区间实质重叠"——这也正是当初抓出 law_ci 口径 bug 的判据
+# （当时两边区间错开 0.12、宽度只有 ~0.05，重叠比 ≈0，一眼就能看出来）。
+overlap_ratio <- function(rv, pv) {
+  if (any(is.na(c(rv, pv)))) return(NA_real_)
+  ov <- min(rv[2], pv[2]) - max(rv[1], pv[1])
+  w <- min(rv[2] - rv[1], pv[2] - pv[1])
+  if (w <= 0) return(0)
+  max(0, ov) / w
+}
+add_band <- function(item, band, py_band) {
+  ratio <- overlap_ratio(band, py_band)
+  status <- if (is.na(ratio)) "CHECK" else if (ratio >= 0.5) "consistent" else "CHECK"
+  rows[[length(rows) + 1]] <<- data.frame(
+    check = "E_ci", item = item, r = round(band[1], 6), python = round(py_band[1], 6),
+    abs_diff = if (is.na(ratio)) NA_real_ else signif(ratio, 3), status = status,
+    note = "abs_diff 列对这两行是「重叠比」= 交叠长度 / 较窄区间长度（≥0.5 判 consistent）",
+    stringsAsFactors = FALSE)
+}
+add_band("alpha_band", ci(boot[, "alpha"]), c(num("alpha_lo"), num("alpha_hi")))
+add_band("gamma_band", ci(boot[, "gamma"]), c(num("gamma_lo"), num("gamma_hi")))
+add("E_ci", "alpha_lo_gap", ci(boot[, "alpha"])[[1]], num("alpha_lo"),
+    "端点差仅作参考（各自 MC 噪声 ~0.02，不作判定）", loose = 0.12)
+add("E_ci", "gamma_lo_gap", ci(boot[, "gamma"])[[1]], num("gamma_lo"), "", loose = 0.12)
 add("E_ci", "alpha_sd", sd(boot[, "alpha"], na.rm = TRUE), NA, "R 的 bootstrap 离散度")
 add("E_ci", "gamma_sd", sd(boot[, "gamma"], na.rm = TRUE), NA, "")
 

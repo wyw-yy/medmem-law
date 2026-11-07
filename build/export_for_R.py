@@ -30,6 +30,9 @@ def main() -> None:
     # 与 law.main(--dataset pathmnist) 完全同一条路径
     df = L.load_metrics()
     df = df[df["dataset"] == "pathmnist"].copy()
+    # 关键：用与 law.main 同一个过滤函数剔掉下界探针（N=128/192），否则 R 会在另一张表上拟合，
+    # 于是 R²/objective 全部对不上，而它看起来像"两个实现不一致"（实际是输入表不同）。
+    df = L.drop_probes(df)
     df = L.collapse_seeds(df)
     df = df.sort_values(["n", "epoch"]).reset_index(drop=True)
 
