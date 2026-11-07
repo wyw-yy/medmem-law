@@ -10,7 +10,7 @@ abstract: >-
   manifest, independent R re-implementation of the fit).
 type: software
 license: MIT
-version: "0.1.2"
+version: "0.1.3"
 date-released: "2026-11-06"
 doi: "10.5281/zenodo.24012026"
 # 这里放的是【概念 DOI】：它永远解析到最新版本，因此不会因为发新版本而失效。
@@ -20,8 +20,11 @@ identifiers:
     value: "10.5281/zenodo.24012026"
     description: "Concept DOI (always resolves to the latest archived version)"
   - type: doi
+    value: "10.5281/zenodo.24028919"
+    description: "Version-specific DOI for v0.1.3 (current; adds THIRD_PARTY_NOTICES.md and dataset attribution)"
+  - type: doi
     value: "10.5281/zenodo.24012549"
-    description: "Version-specific DOI for v0.1.2 (current, author metadata corrected)"
+    description: "Version-specific DOI for v0.1.2 (author metadata corrected)"
   - type: doi
     value: "10.5281/zenodo.24012027"
     description: "Version-specific DOI for v0.1.1 (superseded; identical code and numbers)"
