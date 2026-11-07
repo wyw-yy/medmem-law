@@ -152,8 +152,11 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
               stop_eps: float | None = None, amp: bool = True,
               sample_n: int = C.N_SAMPLE, device: str = C.DEVICE,
               ckpt_every: int = C.CKPT_EVERY,
-              stop_epoch: int | None = None, stop_rule: str = "") -> dict:
-    run = C.run_tag(dataset, n, seed)
+              stop_epoch: int | None = None, stop_rule: str = "",
+              tag: str = "") -> dict:
+    # tag 用来让"同一子集、同一预算、不同分辨率/batch"的实验各自有独立产物目录：
+    # 否则 224px 与 64px 共用 cache/samples/<run>/ 会把同名检查点的采样互相覆盖。
+    run = tag or C.run_tag(dataset, n, seed)
     log_path = C.BUILD / "logs" / f"{run}.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     torch.manual_seed(seed)
@@ -310,6 +313,10 @@ def main():
                          "可给 JSON 路径，默认 results/law_fit.json")
     ap.add_argument("--eps", type=float, default=C.EPS_MEM,
                     help="配合 --stop-law 的记忆率上限（默认 1%%）")
+    ap.add_argument("--tag", default="",
+                    help="自定义 run 标识（默认 <dataset>_n<N>_s<SEED>）。"
+                         "同一子集但要按不同分辨率/batch 各跑一遍时必须分开，"
+                         "否则 cache/samples/<run>/ 里同名检查点的采样会互相覆盖。")
     a = ap.parse_args()
 
     stop_epoch, stop_rule = None, ""
@@ -331,7 +338,8 @@ def main():
 
     try:
         train_run(a.dataset, a.n, a.seed, a.epochs, a.stop_eps, not a.no_amp, a.sample_n,
-                  ckpt_every=a.ckpt_every, stop_epoch=stop_epoch, stop_rule=stop_rule)
+                  ckpt_every=a.ckpt_every, stop_epoch=stop_epoch, stop_rule=stop_rule,
+                  tag=a.tag)
     except Exception:
         traceback.print_exc()
         raise

@@ -1,4 +1,4 @@
-"""build/ 目录索引：这 41 个脚本分别是干什么的、要不要复现、进不进论文。
+﻿"""build/ 目录索引：这 42 个脚本分别是干什么的、要不要复现、进不进论文。
 
 为什么保留它们：每个"结论"背后至少有一次"先怀疑、再测量"的过程。删掉脚本，那些判断
 （比如"必须用 EMA 采样""tau 不能跨编码器比""白化要截断"）就变成无从复核的口头经验。
@@ -58,6 +58,7 @@
 | `pilot224.py` | 224px pilot 的训练脚本（B9 用它跑出 inconclusive） | **P** | 是（PROTOCOL §20） |
 | `run_tonight.py` | 顺序跑多档训练+评分（224px 与 64px 各自独立进程 env；单实例锁 `build/tonight.lock`） | **P** | 是（§11） |
 | `wait_then_extend224.py` | 等今晚链条释放锁后，把 224px 那档续训到 `E=6400` 并重评分 | D | 按需 |
+| `wait_then_control_extend.py` | 链条结束后先补 64px **同 seed 同子集**对照（`--tag ..._s21_64`），再续训 224px | **P** | 是（NOTES §16.5） |
 | `check224.py` | 核对 224 npz 的切分尺寸与重复行（抓出过"训练集翻倍"） | **P** | 是（§5） |
 | `doc_numbers.py` | 从 `results/` 现算 `docs/NUMBERS.md`；`--check` 扫正文里与权威值不一致的 α/γ/β/A₀/R² | **P** | 是（CI 用） |
 | `resample.py` | 对已有 ckpt 统一重采样（换样本数） | D | 按需 |
