@@ -125,6 +125,19 @@ def load() -> dict:
             ))
         d["probe"].sort(key=lambda r: r["n"])
 
+    # 同子集、同 seed、按 epoch 对齐的 64px vs 224px 对照（控制变量：子集与种子相同）
+    d["res_cmp"] = []
+    p64 = RES / "pilot64_blood_n250_s21.csv"
+    p224 = RES / "pilot224_blood_n250.csv"
+    if p64.exists() and p224.exists():
+        a = pd.read_csv(p64).set_index("epoch")
+        b = pd.read_csv(p224).set_index("epoch")
+        d["tau224"] = float(b["tau"].iloc[0])
+        for ep in sorted(set(a.index) & set(b.index)):
+            d["res_cmp"].append(dict(epoch=int(ep),
+                                     m64=float(a.loc[ep, "M"]), m224=float(b.loc[ep, "M"]),
+                                     s64=float(a.loc[ep, "sim_max"]), s224=float(b.loc[ep, "sim_max"])))
+
     return d
 
 
@@ -217,6 +230,21 @@ def render(d: dict) -> str:
         for k, v in d["pilot224"].items():
             L.append(f"| {k} | {v['rows']} | {_fmt(v['M_last'])} | {_fmt(v['M_max'])} |")
         L.append("")
+        cmp = d.get("res_cmp") or []
+        if cmp:
+            L.append("**按 epoch 对齐的同子集对照**（bloodmnist N=250 seed=21；224px 受 batch=16 限制，"
+                     "同一步数对应的轮数少 3.2 倍，所以只能比轮）：")
+            L.append("")
+            L.append("| epoch | 64px M | 224px M | 64px sim_max | 224px sim_max |")
+            L.append("|---|---|---|---|---|")
+            for r in cmp:
+                L.append(f"| {r['epoch']} | {_fmt(r['m64'])} | {_fmt(r['m224'])} | "
+                         f"{_fmt(r['s64'])} | {_fmt(r['s224'])} |")
+            L.append("")
+            L.append("- 判定口径：只看两者**都测过**的 epoch；224px 的 sim_max 若始终低于 τ（"
+                     f"{_fmt(d.get('tau224', 0.0))}），说明它连「接近重复」的门都没摸到，"
+                     "这比「M=0」更接近事实。")
+            L.append("")
     if d.get("probe"):
         L.append("## 10. 下界探针 N=128/192（**不进主拟合**）")
         L.append("")
