@@ -40,6 +40,9 @@ STEPS = [
     ("main_figs", ["-m", "tools.make_main_figs"], False),
     ("audit", ["-m", "tools.audit"], False),
     ("report", ["-m", "tools.report"], False),
+    # 权威数字表（docs/NUMBERS.md）：从 results/ 现算，避免文档里的数字靠手抄漂移。
+    # 放在 report 之后，保证它读到的是本轮刚生成的那批产物。
+    ("doc_numbers", ["-m", "build.doc_numbers"], False),
 ]
 
 

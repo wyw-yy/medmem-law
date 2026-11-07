@@ -1,0 +1,283 @@
+"""把"权威数字"集中到 docs/NUMBERS.md，并检查各文档里是否还留着过期数字。
+
+为什么需要：这个项目里同一组数字（α/γ/R²/省轮%/违规率/平台值）出现在 8 份文档里，
+每跑一批新数据就要同步改 8 遍；漏改一处，读者看到的就是自相矛盾的两个版本。
+
+用法：
+  python -m build.doc_numbers            # 重新生成 docs/NUMBERS.md 并做一次过期扫描
+  python -m build.doc_numbers --check    # 只扫描，不写文件（CI 里跑这个）
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import re
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+ROOT = Path(__file__).resolve().parent.parent
+RES = ROOT / "results"
+OUT = ROOT / "docs" / "NUMBERS.md"
+
+SCAN = [
+    "README.md", "START_HERE.md", "docs/ABSTRACT.md", "docs/ALIGNMENT.md",
+    "docs/OUTLINE.md", "docs/HANDOFF.md", "docs/RESULTS_TEXT.md",
+    "docs/COMPARISON.md", "docs/METHODS.md",
+]
+# 这些文件里合法地会出现"历史值"（改了也说明改过），扫描时给出提示而不是错误
+HISTORY_OK = {"docs/PROTOCOL.md", "docs/NOTES.md", "docs/NUMBERS.md"}
+
+
+def _fmt(x: float, nd: int = 4) -> str:
+    return f"{x:.{nd}f}"
+
+
+def load() -> dict:
+    d: dict = {}
+    fit = json.loads((RES / "law_fit.json").read_text(encoding="utf-8"))
+    best = fit["best"]
+    f = fit["fits"][best]
+    d["law_name"] = best
+    d["params"] = [float(v) for v in f["params"]]
+    d["r2_log"] = float(f["r2_log"])
+    d["r2_lin"] = float(f.get("r2_lin", float("nan")))
+    loo = f.get("loo", {}) or {}
+    d["loo"] = float(loo.get("r2_pooled", float("nan")))
+    d["aicc"] = float(f.get("aicc", float("nan")))
+
+    boot = json.loads((RES / "law_bootstrap.json").read_text(encoding="utf-8"))
+    d["ci"] = {k: (float(v["lo"]), float(v["hi"])) for k, v in boot["ci"].items()}
+
+    ml = pd.read_csv(RES / "metrics_long.csv")
+    d["n_rows"] = int(len(ml))
+    d["n_runs"] = int(ml["run"].nunique())
+    d["n_datasets"] = int(ml["dataset"].nunique()) if "dataset" in ml else 0
+    if "M" in ml:
+        d["n_measurable"] = int((ml["M"] >= 0.02).sum())
+
+    gs = pd.read_csv(RES / "grid_summary.csv")
+    plat = gs.groupby("n")["M_max"].agg(["mean", "count"]).reset_index()
+    d["plateau"] = [(int(r.n), float(r["mean"]), int(r["count"])) for _, r in plat.iterrows()]
+
+    sp = pd.read_csv(RES / "stop_policy_summary.csv")
+    d["policy"] = {
+        r["policy"]: dict(epochs=float(r["epochs"]), saving=float(r["saving"]),
+                          M_stop=float(r["M_stop"]), viol=float(r["violation_rate"]),
+                          n=int(r["n"]))
+        for _, r in sp.iterrows()
+    }
+
+    se = pd.read_csv(RES / "safe_early_stop.csv")
+    d["safe_rows"] = int(len(se))
+    for col in ("ok", "ok_emp", "ok_quality", "recommended"):
+        if col in se:
+            d[f"safe_{col}"] = int(se[col].astype(bool).sum())
+
+    sm = pd.read_csv(RES / "seed_margin.csv")
+    d["seed_margin"] = sm
+
+    enc = RES / "encoder_summary.csv"
+    if enc.exists():
+        d["encoder"] = pd.read_csv(enc)
+
+    fpr = RES / "fpr_sensitivity.csv"
+    if fpr.exists():
+        d["fpr"] = pd.read_csv(fpr)
+
+    vc = RES / "verify_claims.csv"
+    if vc.exists():
+        v = pd.read_csv(vc)
+        d["verify_pass"] = int((v["status"] == "PASS").sum())
+        d["verify_fail"] = int((v["status"] != "PASS").sum())
+        d["verify_fails"] = v[v["status"] != "PASS"][["ppt", "claim"]].values.tolist()
+
+    d["pilot224"] = {}
+    for p in sorted(RES.glob("pilot224_*.csv")):
+        try:
+            df = pd.read_csv(p)
+        except Exception:  # noqa: BLE001
+            continue
+        if df.empty or "M" not in df:
+            continue
+        d["pilot224"][p.name] = dict(rows=len(df), M_last=float(df["M"].iloc[-1]),
+                                    M_max=float(df["M"].max()))
+    return d
+
+
+def render(d: dict) -> str:
+    A0, alpha, beta, E50, gamma = d["params"]
+    L: list[str] = []
+    L.append("# 权威数字（自动生成，别手改）")
+    L.append("")
+    L.append("> 本文件由 `python -m build.doc_numbers` 从 `results/` 现算生成。")
+    L.append("> 任何文档引用数字时，**以本文件为准**；数字对不上就是那份文档过期了。")
+    L.append("")
+    L.append("## 1. 数据规模")
+    L.append("")
+    L.append(f"- 测量点（`metrics_long.csv` 行数）：**{d['n_rows']}**")
+    L.append(f"- 训练 run 数：**{d['n_runs']}**；数据集：**{d['n_datasets']}**")
+    if "n_measurable" in d:
+        L.append(f"- 其中可测点（M ≥ 0.02）：**{d['n_measurable']}**")
+    L.append("")
+    L.append("## 2. 控制律")
+    L.append("")
+    L.append(f"- 选中模型：`{d['law_name']}`")
+    L.append(f"- 参数：A₀={_fmt(A0)}（在 N=250 处）、α={_fmt(alpha)}、β={_fmt(beta)}、"
+             f"E50={_fmt(E50, 1)}（在 N=250 处）、γ={_fmt(gamma)}")
+    ci = d["ci"]
+    L.append("- 95% CI：" + "；".join(
+        f"{k} [{_fmt(v[0])}, {_fmt(v[1])}]" for k, v in ci.items()))
+    L.append(f"- R²_log = **{_fmt(d['r2_log'])}**，R²_lin = {_fmt(d['r2_lin'])}，"
+             f"留一池化 R² = **{_fmt(d['loo'])}**，AICc = {_fmt(d['aicc'], 1)}")
+    L.append("")
+    L.append("## 3. 逐档平台（各 seed 的 M_max 均值）")
+    L.append("")
+    L.append("| N | 平台 M_max | run 数 |")
+    L.append("|---|---|---|")
+    for n, m, c in d["plateau"]:
+        L.append(f"| {n} | {_fmt(m)} | {c} |")
+    L.append("")
+    L.append("## 4. 停训策略（ε=0.01，所有 run 取最差）")
+    L.append("")
+    L.append("| 策略 | 平均轮次 | 省轮 | M_stop | 违规率 |")
+    L.append("|---|---|---|---|---|")
+    for k, v in d["policy"].items():
+        L.append(f"| {k} | {v['epochs']:.1f} | {v['saving']*100:.1f}% | "
+                 f"{_fmt(v['M_stop'])} | {v['viol']*100:.1f}% |")
+    L.append("")
+    L.append("## 5. 安全表")
+    L.append("")
+    parts = [f"共 {d['safe_rows']} 行"]
+    for col, label in (("ok", "隐私达标"), ("ok_emp", "经验达标"),
+                       ("ok_quality", "质量达标"), ("recommended", "四条件全过")):
+        if f"safe_{col}" in d:
+            parts.append(f"{label} {d[f'safe_{col}']} 行")
+    L.append("- " + "；".join(parts))
+    L.append("")
+    if "seed_margin" in d:
+        sm = d["seed_margin"]
+        L.append("## 6. 免测量的 2σ 开环形态（ε=0.01）")
+        L.append("")
+        L.append("| N | seed 数 | σ_log | E*_law | E*_safe | 省轮 | M@safe | FID 相对跑满 |")
+        L.append("|---|---|---|---|---|---|---|---|")
+        for _, r in sm.iterrows():
+            if int(r["n"]) > 1500:
+                continue
+            L.append(f"| {int(r['n'])} | {int(r['n_seeds'])} | {_fmt(r['sigma_log'])} | "
+                     f"{r['E_law']:.0f} | {r['E_safe']:.0f} | {r['saving_safe']*100:.0f}% | "
+                     f"{_fmt(r['M_safe'])} | {r['fid_rel_safe']:.2f}× |")
+        L.append("")
+    if "encoder" in d:
+        e = d["encoder"]
+        L.append("## 7. 换编码器的稳健性（DINOv2 → ResNet50）")
+        L.append("")
+        L.append("| run | Spearman | 末点差 | 平台 DINO | 平台 RN50 |")
+        L.append("|---|---|---|---|---|")
+        for _, r in e.iterrows():
+            L.append(f"| {r['run']} | {r['spearman']:.3f} | {_fmt(float(r['max_abs_diff']))} | "
+                     f"{_fmt(float(r['plat_dino']))} | {_fmt(float(r['plat_rn50']))} |")
+        L.append("")
+    if "fpr" in d:
+        L.append("## 8. FPR 敏感性")
+        L.append("")
+        L.append("| FPR | τ | M |")
+        L.append("|---|---|---|")
+        for _, r in d["fpr"].iterrows():
+            L.append(f"| {r['fpr']} | {_fmt(float(r['tau']))} | {_fmt(float(r['M']))} |")
+        L.append("")
+    if d.get("pilot224"):
+        L.append("## 9. 224px 决定性档")
+        L.append("")
+        L.append("| 文件 | 行数 | 末点 M | M_max |")
+        L.append("|---|---|---|---|")
+        for k, v in d["pilot224"].items():
+            L.append(f"| {k} | {v['rows']} | {_fmt(v['M_last'])} | {_fmt(v['M_max'])} |")
+        L.append("")
+    if "verify_pass" in d:
+        L.append("## 10. 逐格核查")
+        L.append("")
+        L.append(f"- {d['verify_pass']} PASS / {d['verify_fail']} FAIL")
+        for ppt, claim in d["verify_fails"]:
+            L.append(f"  - {ppt}：{claim}")
+        L.append("")
+    L.append("## 11. 改数字时要连带改哪里")
+    L.append("")
+    L.append("- 律参数/区间 → `docs/ALIGNMENT.md` 04 行、`docs/ABSTRACT.md`、`docs/OUTLINE.md` C1 行、`docs/RESULTS_TEXT.md` §5.2");
+    L.append("- 停训策略/安全表 → `docs/ALIGNMENT.md` 补 1 行、`docs/OUTLINE.md` C2 行、`docs/RESULTS_TEXT.md` §5.4/§5.5、`README.md` 三条结论表");
+    L.append("- 平台与 N → `figs/fig1_triptych.png`（跑 `tools.make_main_figs`）与 `docs/COMPARISON.md`");
+    L.append("- 全部重生成：`python -m build.finalize --skip-score`，然后 `python -m build.doc_numbers`，最后 `python -m tools.manifest`");
+    L.append("")
+    return "\n".join(L)
+
+
+NUM_RE = re.compile(r"(?<![\d.])(\d+\.\d{2,4})(?![\d])")
+
+# 只扫"紧挨着我们自己的符号"的数字，避免把文献里的数字（COMPARISON.md 大量引用别人的
+# τ_mem/n、α 等）误判成过期。每个模式给出 (正则, 期望值 key)。
+TARGETS: list[tuple[str, str]] = [
+    (r"α\s*[=＝≈]\s*([0-9]\.[0-9]{2,4})", "alpha"),
+    (r"γ\s*[=＝≈]\s*[−-]?\s*([0-9]\.[0-9]{2,4})", "gamma_abs"),
+    (r"β\s*[=＝≈]\s*([0-9]\.[0-9]{2,4})", "beta"),
+    (r"A₀\s*[=＝≈]\s*([0-9]\.[0-9]{2,4})", "A0"),
+    (r"R²_log\s*[=＝≈]?\s*([0-9]\.[0-9]{2,4})", "r2_log"),
+    (r"R²_lin\s*[=＝≈]?\s*([0-9]\.[0-9]{2,4})", "r2_lin"),
+    (r"留一池化\s*(?:R²)?\s*[=＝≈]?\s*([0-9]\.[0-9]{2,4})", "loo"),
+]
+
+
+def _expected(d: dict) -> dict[str, float]:
+    A0, alpha, beta, _E50, gamma = d["params"]
+    return {"alpha": alpha, "gamma_abs": abs(gamma), "beta": beta, "A0": A0,
+            "r2_log": d["r2_log"], "r2_lin": d["r2_lin"], "loo": d["loo"]}
+
+
+def check(d: dict) -> int:
+    """只检查"α=1.97"这种带我们自己的符号的数字；差 >0.5% 视为不一致。"""
+    exp = _expected(d)
+    hits = 0
+    for rel in SCAN:
+        p = ROOT / rel
+        if not p.exists():
+            continue
+        for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            if line.strip().startswith(">"):
+                continue
+            # "自由拟合" 指跨数据集单独拟合的 R²（另一个量），不是主律的 R²，跳过
+            if "自由拟合" in line:
+                continue
+            # "逐 run 口径" 指不折 seed 的拟合（另一组参数），与主律（seed 均值）不同源，跳过
+            if "逐 run" in line:
+                continue
+            for pat, key in TARGETS:
+                for m in re.finditer(pat, line):
+                    val = float(m.group(1))
+                    want = exp[key]
+                    if abs(val - want) <= max(1e-3, abs(want) * 0.005):
+                        continue
+                    print(f"[过期] {rel}:{i}  {key}={m.group(1)}（当前 {want:.4f}）")
+                    hits += 1
+    if hits:
+        print(f"\n共 {hits} 处过期数字。历史值只应留在 docs/PROTOCOL.md 与 docs/NOTES.md；"
+              f"正文/README 里请改成 docs/NUMBERS.md 的当前值。")
+    else:
+        print("扫描通过：正文里没有与权威值不一致的 α/γ/β/A₀/R²/留一。")
+    return 0 if hits == 0 else 1
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--check", action="store_true")
+    a = ap.parse_args()
+    d = load()
+    if not a.check:
+        OUT.write_text(render(d), encoding="utf-8")
+        print(f"写出 {OUT.relative_to(ROOT)}（{len(render(d))} 字符）")
+    return check(d)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

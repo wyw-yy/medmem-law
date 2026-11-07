@@ -8,11 +8,12 @@ data/subsets/*
 cache/*
 !cache/.keep
 
-# 构建产物（日志、wheel 缓存、队列状态不进 git；但复现脚本要进）
+# 构建产物（日志、wheel 缓存、队列状态不进 git；但复现脚本与索引要进）
 build/*
 !build/.keep
 !build/*.py
 !build/*.ps1
+!build/*.md
 .venv/
 *.egg-info/
 __pycache__/

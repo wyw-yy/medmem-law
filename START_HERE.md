@@ -151,7 +151,7 @@ epoch 数按 N 反比缩放（250→5125 轮，4000→325 轮）。于是横轴 
 | `torch.hub.load` 即使有缓存也要联网，偶发 RemoteDisconnected | hub 先查 github | `metric._load_dinov2_offline` 直接从本地 hub 目录 import + 读权重 |
 | 采样出"低对比度紫块"，M 从 0.88 掉到 0.09 | 用最后 epoch 的原始权重采样 | **必须用 EMA 权重采样**（`WeightEMA`, decay 0.999） |
 | 时钟从 2 GHz 掉到 200 MHz | 笔记本功耗墙 93 W | 所有时间估算以实测 s/epoch 为准 |
-| PowerShell 里 `"C:\Users\yang'yu\..."` 报"字符串缺少终止符" | 路径里的单引号 | 用相对路径（工作目录已在该目录） |
+| PowerShell 里带单引号的绝对路径（旧位置是 `C:\Users\yang'yu\...`）报"字符串缺少终止符" | 路径里的单引号被当成字符串边界 | 用相对路径；项目现在在 `D:\code\codetest\medmem-law`，同类坑对含空格/中文的路径照样成立 |
 | `Set-Content -Encoding utf8` 给 .py 加 BOM | PS 5.1 行为 | 别用它写 py；写 .ps1 要带 BOM，否则中文乱码 |
 
 ---

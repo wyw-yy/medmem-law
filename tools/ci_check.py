@@ -70,6 +70,13 @@ def check_claims() -> tuple[str, bool, str]:
     return "verify_claims", ok, detail
 
 
+def check_numbers() -> tuple[str, bool, str]:
+    """文档里的数字必须与 results/ 现算值一致（防手抄漂移）。"""
+    rc, out = _run("build.doc_numbers", "--check")
+    tail = [ln for ln in out.strip().splitlines() if ln.strip()]
+    return "numbers", rc == 0, (tail[-1] if tail else "")
+
+
 def check_law() -> tuple[str, bool, str]:
     import law
 
@@ -120,7 +127,7 @@ def main() -> int:
         except (AttributeError, ValueError):
             pass
 
-    checks = [check_manifest, check_audit, check_claims, check_law]
+    checks = [check_manifest, check_audit, check_claims, check_numbers, check_law]
     if not a.skip_r:
         checks.append(check_r)
 
