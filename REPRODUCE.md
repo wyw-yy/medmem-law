@@ -96,7 +96,7 @@ Zenodo 在本机不可达（`getaddrinfo failed` / 403），HF 官方站超时�
 .\ .venv\Scripts\python.exe -m tools.night_queue --plan ctl_online  # 在线闭环（ε=0.02, seed 7）
 ```
 
-## 7 一条龙汇总（13 步，约 2 min，不用 GPU）
+## 7 一条龙汇总（14 步，约 3 min，不用 GPU）
 
 ```powershell
 .\ .venv\Scripts\python.exe build\finalize.py --skip-score

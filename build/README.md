@@ -1,4 +1,4 @@
-"""build/ 目录索引：这 39 个脚本分别是干什么的、要不要复现、进不进论文。
+"""build/ 目录索引：这 41 个脚本分别是干什么的、要不要复现、进不进论文。
 
 为什么保留它们：每个"结论"背后至少有一次"先怀疑、再测量"的过程。删掉脚本，那些判断
 （比如"必须用 EMA 采样""tau 不能跨编码器比""白化要截断"）就变成无从复核的口头经验。
@@ -51,11 +51,15 @@
 | `rescore_encoder.py` | 复用缓存样本、换编码器重算 M（写独立 CSV，绝不覆盖主表） | **P** | 是（RESULTS §3.6） |
 | `license_audit.py` | 扫 `.venv` 的 dist-info 生成依赖许可表 | **P** | 是（THIRD_PARTY_NOTICES） |
 | **流程与运维** | | | |
-| `finalize.py` | 一条龙 13 步汇总（law → … → report） | **P** | 是（§7） |
+| `finalize.py` | 一条龙 14 步汇总（law → … → report → doc_numbers） | **P** | 是（§7） |
 | `run_tonight.py` | 今晚跑批的顺序驱动（单实例锁，按分辨率分组避免抢显存） | **P** | 按需 |
 | `night_queue.py`（在 `tools/`） | 队列：按 plan 跑训练+评分，断点续跑 | **P** | 是（§5/§6） |
 | `wait_gpu.py` | 对称显存守卫（两边都等对方跑完再抢卡） | D | 按需 |
 | `pilot224.py` | 224px pilot 的训练脚本（B9 用它跑出 inconclusive） | **P** | 是（PROTOCOL §20） |
+| `run_tonight.py` | 顺序跑多档训练+评分（224px 与 64px 各自独立进程 env；单实例锁 `build/tonight.lock`） | **P** | 是（§11） |
+| `wait_then_extend224.py` | 等今晚链条释放锁后，把 224px 那档续训到 `E=6400` 并重评分 | D | 按需 |
+| `check224.py` | 核对 224 npz 的切分尺寸与重复行（抓出过"训练集翻倍"） | **P** | 是（§5） |
+| `doc_numbers.py` | 从 `results/` 现算 `docs/NUMBERS.md`；`--check` 扫正文里与权威值不一致的 α/γ/β/A₀/R² | **P** | 是（CI 用） |
 | `resample.py` | 对已有 ckpt 统一重采样（换样本数） | D | 按需 |
 | `reset_runs.py` | 清某个 run 的全部产物与队列状态 | D | 按需 |
 

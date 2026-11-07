@@ -568,7 +568,30 @@ def section_appendix():
         L.append("`results/pilot224_metrics.csv` 不存在 —— `python -m build.pilot224` 生成（约 1.6 h）。")
     L.append("")
 
-    L.append("### 8.3 记忆化类型学：被复刻的是哪一类训练样本（`build/typology.py`）")
+    L.append("### 8.3 224px 决定性档：同 N 同 seed 的 64px / 224px 对照（`build/run_tonight.py`）")
+    L.append("")
+    pb = _read_csv(C.RESULTS / "pilot224_blood_n250.csv")
+    if pb is not None and len(pb):
+        pb = pb.sort_values("epoch")
+        L.append("bloodmnist、N=250、seed=21、batch=16、1600 epoch（25,000 步）、8 个测量点 × 128 张。")
+        L.append("")
+        L.append("| 轮次 | M | τ | sim_max | FID |")
+        L.append("|---|---|---|---|---|")
+        for r in pb.itertuples():
+            fid = "—" if r.fid != r.fid else f"{r.fid:.1f}"
+            L.append(f"| {int(r.epoch)} | {r.M:.4f} | {r.tau:.4f} | {r.sim_max:.4f} | {fid} |")
+        L.append("")
+        L.append("- **口径必须先对齐 epoch，不是步数**：224px 只能跑 batch 16，25,000 步只有 1,600 轮；"
+                 "64px 主网格 20,000 步是 5,125 轮 —— 同样步数下 224px 的「每张图被看几遍」少了 3.2 倍。")
+        L.append("- 按 epoch 对齐后的读法：64px 在 `E=1600` 已 `M=0.375`（`sim_max` 0.787），"
+                 "224px 到 `E=1600` 仍为 0（`sim_max` 0.315–0.365，FID 仍从 371 稳降到 209）→ "
+                 "**分辨率把 onset 至少推到 1,600 轮之后**；224px 自己的平台仍未测到。")
+        L.append("- 所以本文只写「64px 的定量系数不跨分辨率推广」，**不写「分辨率不改变结论」**。")
+    else:
+        L.append("`results/pilot224_blood_n250.csv` 不存在 —— `python -m build.run_tonight` 生成。")
+    L.append("")
+
+    L.append("### 8.4 记忆化类型学：被复刻的是哪一类训练样本（`build/typology.py`）")
     L.append("")
     ty = _read_csv(C.RESULTS / "typology.csv")
     if ty is not None and len(ty):
@@ -587,7 +610,7 @@ def section_appendix():
         L.append("`results/typology.csv` 不存在 —— `python -m build.typology` 生成。")
     L.append("")
 
-    L.append("### 8.4 逐格核查表（`build/verify_claims.py`）")
+    L.append("### 8.5 逐格核查表（`build/verify_claims.py`）")
     L.append("")
     vc = _read_csv(C.RESULTS / "verify_claims.csv")
     if vc is not None and len(vc):

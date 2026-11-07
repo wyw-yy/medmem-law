@@ -1,4 +1,4 @@
-# results/ 索引：每个文件是谁生成的、里面是什么、文档里哪一节在引用它
+﻿# results/ 索引：每个文件是谁生成的、里面是什么、文档里哪一节在引用它
 
 整理原则：`results/` 里**只留能被脚本重新生成的东西**。任何一个文件都应该能回答三个问题：
 ① 它是哪条命令生成的；② 它承载哪个结论；③ 如果数字变了，谁要跟着改。
@@ -57,11 +57,11 @@
 | `grid_summary.csv` | `python -m tools.grid_summary` | 逐 (dataset, N, seed) 的末点 M、平台、onset 轮次/步数、FID | fig1(a)(b)；NOTES §8/§10/§11 |
 | `parity_by_run.csv` | `python -m build.parity_by_run` | 逐 run 的拟合优度与 bias（哪些 run 真的"拟合失败"） | NOTES §10 |
 | `parity_decompose.csv` | `python -m build.parity_decompose` | 误差分解：只放时间轴 vs 只放幅度（79% 在幅度） | NOTES §10 |
-| `typology.csv` / `typology_targets.csv` / `typology_classes.csv` | `python -m build.typology` | 三个假说的检验结果、被命中训练图清单、类别分布 | RESULTS §8.2 |
+| `typology.csv` / `typology_targets.csv` / `typology_classes.csv` | `python -m build.typology` | 三个假说的检验结果、被命中训练图清单、类别分布 | RESULTS §8.4 |
 | `leak_report.json` | `python -m tools.check_leak` | 数据集内部近重复自查（bloodmnist 5 对完全重复等） | PRIVACY_AUDIT §2；PUBLISH 的 Ethics 段 |
 | `poscontrol_64.csv` / `poscontrol_64_deep.csv` / `poscontrol_224.csv` | `python -m build.poscontrol` | 阳性对照的三次尝试（64px 短/长、224px） | PROTOCOL §22–24 |
-| `pilot224_metrics.csv` | `python -m build.pilot224` | B9 的 224px pilot 结果（M=0，**判 inconclusive**） | PROTOCOL §20；RESULTS §8.1 |
-| `pilot224_blood_n250.csv` / `pilot224_blood_n1000.csv` | `python -m build.run_tonight` 里的 `tools.score_run --out` | 224px 决定性档：bloodmnist N=250 / N=1000，与 64px 同 N 对照 | PROTOCOL R17（待写） |
+| `pilot224_metrics.csv` | `python -m build.pilot224` | B9 的 224px pilot 结果（M=0，**判 inconclusive**） | PROTOCOL §20；RESULTS §8.2 |
+| `pilot224_blood_n250.csv` / `pilot224_blood_n1000.csv` | `python -m build.run_tonight` 里的 `tools.score_run --out` | 224px 决定性档：bloodmnist N=250 / N=1000，与 64px 同 N 对照 | PROTOCOL §24.5 R17；RESULTS §8.3 |
 | `verify_claims.csv` | `python -m build.verify_claims` | PPT 逐格核查：20 条断言的 PASS/FAIL 与证据行号 | RESULTS §8.3；CI 的 `gate` job |
 
 ## 六、元信息（发布与可复现）
