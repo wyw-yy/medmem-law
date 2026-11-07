@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 yang yu (GitHub: wyw-yy)
+Copyright (c) 2026 Yu Yang (杨宇), ORCID 0009-0002-6307-3373, GitHub: wyw-yy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,3 +37,8 @@ Scope note (important for a paper supplement):
 * **Model weights** produced by this repo are released under MIT together with
   the code, except where a subset of them can be shown to reproduce a training
   image (see `docs/PRIVACY_AUDIT.md` — that is the whole point of the paper).
+
+Third-party components (dependencies, pretrained encoder weights, datasets) are
+**not** covered by the above and keep their own licences: see
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). No third-party source code is
+vendored in this repository.

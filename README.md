@@ -64,3 +64,18 @@ python -m venv .venv ; .\.venv\Scripts\python.exe -m build.get_wheels ...
 ## 引用
 
 见 [`CITATION.cff`](CITATION.cff)。代码 MIT，文档与图 CC BY 4.0（可改，见 `LICENSE`）。
+
+概念 DOI：**`10.5281/zenodo.24012026`**（永远指向最新归档版）。
+
+## 许可与署名
+
+| 内容 | 许可 |
+|---|---|
+| 代码（`*.py` / `*.R` / `*.ps1`） | **MIT** — 见 [`LICENSE`](LICENSE) |
+| 文档、图、结果表（`docs/`、`figs/`、`results/`） | **CC BY 4.0** |
+| 数据集（MedMNIST v2 三子集） | **CC BY 4.0**，**不随本仓库分发**，只给哈希清单 `MANIFEST.data.sha256` |
+| 第三方依赖与预训练权重 | 各自许可（BSD-3 / Apache-2.0 / MIT / PSF-2.0），明细见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) |
+
+本仓库**不 vendor 任何第三方源码**。图中医学图像来自 MedMNIST v2，复用这些图时须同时署名数据集与本仓库：
+
+> MedMNIST v2 — Yang, J., Shi, R., Ni, B. *MedMNIST Classification Decathlon* (ISBI 2021) / *MedMNIST v2* (Scientific Data 2023)，CC BY 4.0（https://medmnist.com/）。本仓库做了 224px→64px 转换与子集抽样，未修改图像内容。

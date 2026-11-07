@@ -40,3 +40,13 @@
 - MedMNIST 是 28/64px 的降采样版本，不是原始 DICOM；记忆化强度与分辨率相关，绝对数值不能直接外推到临床分辨率。
 - 生成模型只有 13M 参数（8 GB 显存的约束），容量小于文献里的 Stable Diffusion 级模型；本课题的结论是**控制律的形状与参数**，不是某个具体模型的绝对记忆率。
 - 患者级去重、伦理审批、去标识化流程在公开数据上无法验证，只能写成院内数据接入的清单。
+
+## 5. 数据来源与许可（引用本文件时请一并转引）
+
+数据集为 **MedMNIST v2** 的三个 2D 子集（`pathmnist` / `bloodmnist` / `pneumoniamnist`），以 **CC BY 4.0** 发布（https://medmnist.com/）。
+本仓库**不分发图像**，只发布由数据派生的表格/图与哈希清单 `MANIFEST.data.sha256`；`figs/` 中的样本图属 CC BY 4.0 的衍生使用，复用须署名：
+
+> MedMNIST v2 — Yang, J., Shi, R., Ni, B. *MedMNIST Classification Decathlon: A Lightweight AutoML Benchmark for Medical Image Analysis* (ISBI 2021);
+> *MedMNIST v2: A Large-Scale Lightweight Benchmark for 2D and 3D Biomedical Image Classification* (Scientific Data, 2023). CC BY 4.0.
+
+第三方依赖与预训练权重的许可明细见 [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md)。
