@@ -19,7 +19,7 @@
 |---|---|---|
 | N=128 / N=192 下界探针 | M_max 0.990 / 0.873（都高于 N=250 的 0.68）→ "越少越危险"成立到 128 张 | `NUMBERS.md` §10、`NOTES.md` §17、`PROTOCOL.md` R18 |
 | 224px · bloodmnist N=1000 | M 全程 0，`sim_max` 0.206–0.256（τ=0.320） | `RESULTS_TEXT.md` §5.6 |
-| 224px · bloodmnist N=250 | 同 E=1600 下 64px 已 M=0.375、224px 仍 0 → 需按 epoch 对齐 | `PROTOCOL.md` R17、`NOTES.md` §16 |
+| 224px · bloodmnist N=250 | 同子集同 seed 对照：64px 在 E=800 越线、E=1600 达 0.453；224px 续训到 **E=6,400 仍为 0**（`sim_max` 最高 0.446 < τ=0.479）→ onset 至少推后 8 倍 | `PROTOCOL.md` R17/R19、`NOTES.md` §16/§18 |
 | ResNet50 全档重算 | `encoder_resnet50.csv` 170 行，排序一致、斜率 −2.46 vs −1.13 | `NOTES.md` §12 |
 | 数字防漂移 | `build/doc_numbers.py` → `NUMBERS.md` + `--check`（CI 与 finalize 都会跑） | `tools/ci_check.py` |
 | 项目整理 | 删 18 个一次性脚本、`results/INDEX.md`、`build/README.md` 重写 | 见 git 提交 `7a8545e` |

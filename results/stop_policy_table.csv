@@ -44,6 +44,11 @@ pathmnist_n1000_s9,pathmnist,1000,9,B_fid_plateau,2175,0.09375,0.08984375,192.10
 pathmnist_n1000_s9,pathmnist,1000,9,C_open_loop,407,0.8304166666666667,0.0,255.51657175459889,False,True
 pathmnist_n1000_s9,pathmnist,1000,9,D_closed_loop,900,0.625,0.005859375,248.93256013930923,True,True
 pathmnist_n1000_s9,pathmnist,1000,9,Dp_closed_predict,900,0.625,0.005859375,248.93256013930923,True,True
+pathmnist_n128_s1,pathmnist,128,1,A_fixed_max,10000,0.0,0.986328125,150.88990814440683,True,False
+pathmnist_n128_s1,pathmnist,128,1,B_fid_plateau,10000,0.0,0.986328125,150.88990814440683,True,False
+pathmnist_n128_s1,pathmnist,128,1,C_open_loop,10000,0.0,0.986328125,150.88990814440683,True,False
+pathmnist_n128_s1,pathmnist,128,1,D_closed_loop,1250,0.875,0.07421875,187.56460935426105,False,False
+pathmnist_n128_s1,pathmnist,128,1,Dp_closed_predict,1250,0.875,0.07421875,187.56460935426105,False,False
 pathmnist_n1500_s1,pathmnist,1500,1,A_fixed_max,3400,0.0,0.0078125,242.2957493529476,True,True
 pathmnist_n1500_s1,pathmnist,1500,1,B_fid_plateau,525,0.8455882352941176,0.0,197.1349274013264,False,True
 pathmnist_n1500_s1,pathmnist,1500,1,C_open_loop,453,0.8667647058823529,0.0,203.33489148381503,True,True
@@ -54,6 +59,11 @@ pathmnist_n1500_s2,pathmnist,1500,2,B_fid_plateau,625,0.8161764705882353,0.01367
 pathmnist_n1500_s2,pathmnist,1500,2,C_open_loop,453,0.8667647058823529,0.0078125,219.2085897197433,True,True
 pathmnist_n1500_s2,pathmnist,1500,2,D_closed_loop,525,0.8455882352941176,0.005859375,214.6668931298892,False,True
 pathmnist_n1500_s2,pathmnist,1500,2,Dp_closed_predict,525,0.8455882352941176,0.005859375,214.6668931298892,False,True
+pathmnist_n192_s1,pathmnist,192,1,A_fixed_max,6675,0.0,0.857421875,135.93981572959856,False,False
+pathmnist_n192_s1,pathmnist,192,1,B_fid_plateau,6675,0.0,0.857421875,135.93981572959856,False,False
+pathmnist_n192_s1,pathmnist,192,1,C_open_loop,6675,0.0,0.857421875,135.93981572959856,False,False
+pathmnist_n192_s1,pathmnist,192,1,D_closed_loop,825,0.8764044943820225,0.017578125,226.8722429200468,False,False
+pathmnist_n192_s1,pathmnist,192,1,Dp_closed_predict,825,0.8764044943820225,0.017578125,226.8722429200468,False,False
 pathmnist_n2000_s1,pathmnist,2000,1,A_fixed_max,2900,0.0,0.0,228.10010427210327,True,True
 pathmnist_n2000_s1,pathmnist,2000,1,B_fid_plateau,500,0.8275862068965517,0.0,179.10361475301477,False,True
 pathmnist_n2000_s1,pathmnist,2000,1,C_open_loop,2900,0.0,0.0,228.10010427210327,True,True
