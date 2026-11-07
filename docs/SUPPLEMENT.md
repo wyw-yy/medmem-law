@@ -12,7 +12,7 @@
 
 | # | 论文声明 | 数字（最终） | 出处（文件 / 筛选） | 命令 |
 |---|---|---|---|---|
-| 1 | 数据规模 7 档、每档 5–9 seed，共 38 个 run、1265 个测量点 | 250/500/1000/1500/2000/3000/4000 | `results/metrics_long.csv`（逐行 = 一个检查点） | `python -m tools.grid_summary` |
+| 1 | 数据规模 7 档、每档 5–9 seed，共 40 个 run、1282 个测量点 | 250/500/1000/1500/2000/3000/4000 | `results/metrics_long.csv`（逐行 = 一个检查点） | `python -m tools.grid_summary` |
 | 2 | 记忆率 M = 近邻相似度超阈值的生成样本占比 | 每行都有 `M` 与 `tau` | 同上；τ 逐 run 校准（FPR=0.5%） | `python -m tools.audit` |
 | 3 | 平台高度随数据量下降：平台 ∝ N^−1.90 | α = 1.896 [1.810, 1.980] | `results/law_fit.json` → `fits.L4_amp_decay.params[1]` | `python -m law --dataset pathmnist` |
 | 4 | 双时间尺度分离（γ 的 95% CI 不含 0） | γ = −0.8308 [−0.8991, −0.7337] | `results/law_bootstrap.json` | `python -m tools.law_ci --n-boot 200` |
