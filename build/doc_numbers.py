@@ -306,8 +306,19 @@ def check(d: dict) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--verify", action="store_true",
+                    help="不改文件，只比对 docs/NUMBERS.md 是否与当前 results 一致（CI 用）")
     a = ap.parse_args()
     d = load()
+    if a.verify:
+        want = render(d)
+        have = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
+        if want.replace("\r\n", "\n") != have.replace("\r\n", "\n"):
+            print(f"[STALE] {OUT.relative_to(ROOT)} 与 results 不一致；"
+                  f"请跑 `python -m build.doc_numbers` 重新生成")
+            return 1
+        print(f"{OUT.relative_to(ROOT)} 与 results 一致（{len(want)} 字符）")
+        return 0
     if not a.check:
         OUT.write_text(render(d), encoding="utf-8")
         print(f"写出 {OUT.relative_to(ROOT)}（{len(render(d))} 字符）")

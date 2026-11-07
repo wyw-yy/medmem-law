@@ -73,8 +73,9 @@ def check_claims() -> tuple[str, bool, str]:
 def check_numbers() -> tuple[str, bool, str]:
     """文档里的数字必须与 results/ 现算值一致（防手抄漂移）。"""
     rc, out = _run("build.doc_numbers", "--check")
-    tail = [ln for ln in out.strip().splitlines() if ln.strip()]
-    return "numbers", rc == 0, (tail[-1] if tail else "")
+    rc2, out2 = _run("build.doc_numbers", "--verify")
+    tail = [ln for ln in (out + "\n" + out2).splitlines() if ln.strip()]
+    return "numbers", rc == 0 and rc2 == 0, (tail[-1] if tail else "")
 
 
 def check_law() -> tuple[str, bool, str]:
