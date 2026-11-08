@@ -377,7 +377,10 @@ def load_metrics(path: Path | None = None, drop_stopped: bool = True) -> pd.Data
             n0 = len(df)
             df = df[~df["run"].isin(bad)].copy()
             print(f"[law] 排除 {len(bad)} 个被早停干预的 run（{n0} → {len(df)} 点）")
-    return df
+    # 下界探针（N<FIT_MIN_N）在这里统一剔除，而不是只在 law.main 里剔：
+    # controller / safety / doc_numbers 都走这个入口，否则探针会混进"停训策略的违规率"
+    # 与"安全表最差 seed"——2026-11-08 真发生过（D 的违规从 0 变成 2/45，两条全是探针）。
+    return drop_probes(df)
 
 
 def collapse_seeds(df: pd.DataFrame) -> pd.DataFrame:

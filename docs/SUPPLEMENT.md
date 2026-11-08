@@ -14,16 +14,16 @@
 |---|---|---|---|---|
 | 1 | 数据规模 7 档、每档 5–9 seed，共 40 个 run、1282 个测量点 | 250/500/1000/1500/2000/3000/4000 | `results/metrics_long.csv`（逐行 = 一个检查点） | `python -m tools.grid_summary` |
 | 2 | 记忆率 M = 近邻相似度超阈值的生成样本占比 | 每行都有 `M` 与 `tau` | 同上；τ 逐 run 校准（FPR=0.5%） | `python -m tools.audit` |
-| 3 | 平台高度随数据量下降：平台 ∝ N^−1.90 | α = 1.896 [1.810, 1.980] | `results/law_fit.json` → `fits.L4_amp_decay.params[1]` | `python -m law --dataset pathmnist` |
+| 3 | 平台高度随数据量下降：平台 ∝ N^−1.90 | α = 1.890 [1.803, 1.978] | `results/law_fit.json` → `fits.L4_amp_decay.params[1]` | `python -m law --dataset pathmnist` |
 | 4 | 双时间尺度分离（γ 的 95% CI 不含 0） | γ = −0.8308 [−0.8991, −0.7337] | `results/law_bootstrap.json` | `python -m tools.law_ci --n-boot 200` |
-| 5 | 控制律拟合优度 | R²_lin 0.7098 / R²_log 0.6824 / 可测区间 0.5568 / 0.4431 | `results/law_fit.json` | 同 #3 |
-| 6 | 律的外推能力（留一 N） | 留一池化 R² 0.464 | `results/law_fit.json` → `fits.L4_amp_decay.loo.r2_pooled` | 同 #3 |
+| 5 | 控制律拟合优度 | R²_lin 0.7097 / R²_log 0.6834 / 可测区间 0.5568 / 0.4431 | `results/law_fit.json` | 同 #3 |
+| 6 | 律的外推能力（留一 N） | 留一池化 R² 0.467 | `results/law_fit.json` → `fits.L4_amp_decay.loo.r2_pooled` | 同 #3 |
 | 7 | 拟合与区间可被独立语言复现 | 残差平方和 50.669525（差 3e-9） | `results/r_verify.csv`（状态 exact/match/consistent） | `python -m tools.r_verify` |
 | 8 | 与 Bonnaire et al. 2025 的定量对齐 | onset/N ≈ 10.4–11.1（N=250–1000）；原文 τ_mem/n ≈ 300 | `docs/COMPARISON.md`、`results/fid_onset_vs_n.csv` | `python -m build.comparison_numbers` |
 | 9 | 像素判据（原文 Eq.6）独立复算 | 例如 N=250 末点 f_mem 0.412 vs 我们 M 0.805 | `results/eq6.csv` | `python -m build.eq6 --runs ...` |
-| 10 | 闭环停训 0 违规、省 66.6% | 683.5 / 2728.7 轮，违规 0/34 | `results/stop_policy_summary.csv`（列 `violation_rate`） | `python -m controller --dataset pathmnist` |
-| 11 | FID 早停不可靠 | 违规 79.4%（省 27.7%） | 同上（`policy=B_fid_plateau`） | 同上 |
-| 12 | 开环律只给期望：省 64.8%，违规 11.8% | 682.1 轮 | 同上（`policy=C_open_loop`） | 同上 |
+| 10 | 闭环停训 0 违规、省 69.6% | 660.7 / 2860.5 轮，违规 0/43 | `results/stop_policy_summary.csv`（列 `violation_rate`） | `python -m controller --dataset pathmnist` |
+| 11 | FID 早停不可靠 | 违规 83.7%（省 22.9%） | 同上（`policy=B_fid_plateau`） | 同上 |
+| 12 | 开环律只给期望：省 68.8%，违规 11.6% | 682.1 轮 | 同上（`policy=C_open_loop`） | 同上 |
 | 13 | 2σ 余量形态：省 88–94%、违规 0、FID 1.55–2.54× | 见表 | `results/seed_margin.csv` | `python -m build.seed_margin` |
 | 14 | 严格四条件安全表：0/28 行全过（**未达标项**） | ok 22 / ok_emp 28 / ok_quality 5 / recommended 0 | `results/safe_early_stop.csv` | `python -m tools.safety` |
 | 15 | 度量对白化维数稳健（k 不变性） | M 0.789→0.730（τ 0.748→0.128） | `docs/NOTES.md` §4 表 | `python -m build.probe_kdim` |
@@ -39,7 +39,7 @@
 
 | 声明 | 现状 | 为什么没有被"修好" |
 |---|---|---|
-| 控制律 R² ≥ 0.9 | 0.7098 / 0.6824 | 数据所能支撑的 N 范围只到 ≈1000（N≥2000 全部低于检出限）；改用更花哨的律在留一上更差（六候选 + 两个探索性候选全部记录在 `PROTOCOL.md` §14/§19） |
+| 控制律 R² ≥ 0.9 | 0.7097 / 0.6834 | 数据所能支撑的 N 范围只到 ≈1000（N≥2000 全部低于检出限）；改用更花哨的律在留一上更差（六候选 + 两个探索性候选全部记录在 `PROTOCOL.md` §14/§19） |
 | 同上（PPT 第二个措辞） | 同上 | 同一件事，两种写法 |
 | 安全早停点表 ≥1 行可交付 | 0/28 | 四条件（最差 seed ≤ ε、经验停点不违约、FID ≤ 1.5×、ε > 2×FPR）同时成立的组合在当前模型容量与 64px 下不存在；放宽任一条就能"有结果"，用户明确要求不放宽（m03226） |
 

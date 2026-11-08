@@ -516,8 +516,27 @@ def section_safe():
                  "全部 seed 合规且省 88–94%，代价是 FID 为跑满的 1.55–2.54 倍。")
         L.append("- **σ_log 随 N 变大**（250/500 约 0.05，N=1000 达 0.34）：数据越多平台越低，但「什么时候发作」更飘，"
                  "所以固定时刻表的可信区间反而更宽。")
-        L.append("- 帕累托阶梯：闭环（省 64%、0 违规、质量 1.1–1.3×）> 开环+2σ（省 88–94%、0 违规、质量 1.5–2.5×）"
-                 "> 开环无余量（省 61%、10.7% 违规）> FID 早停（省 28%、75% 违规）。")
+        # 这一行以前是手写常量，补数据后就过期了（2026-11-09 踩过）——改成现算：
+        # 策略数字取自 stop_policy_summary.csv，2σ 形态的省轮区间取自 seed_margin.csv。
+        sp = C.RESULTS / "stop_policy_summary.csv"
+        mg = C.RESULTS / "seed_margin.csv"
+        if sp.exists():
+            sd = pd.read_csv(sp).set_index("policy")
+
+            def _pp(k: str) -> str:
+                r = sd.loc[k]
+                return f"省 {r['saving'] * 100:.0f}%、{r['violation_rate'] * 100:.0f}% 违规"
+
+            band = "省 88–94%"
+            if mg.exists():
+                md = pd.read_csv(mg)
+                md = md[(md["eps"] == 0.01) & md["saving_safe"].notna() & (md["n"] <= 1000)]
+                if len(md):
+                    band = f"省 {md['saving_safe'].min() * 100:.0f}–{md['saving_safe'].max() * 100:.0f}%"
+            L.append(f"- 帕累托阶梯：闭环（{_pp('D_closed_loop')}；质量 1.1–1.3×）> "
+                     f"开环+2σ（{band}、0 违规；质量 1.5–2.5×）> "
+                     f"开环无余量（{_pp('C_open_loop')}）> "
+                     f"FID 早停（{_pp('B_fid_plateau')}）。")
         L.append("")
     return L
 

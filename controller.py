@@ -161,6 +161,11 @@ def main():
     a = ap.parse_args()
 
     df = pd.read_csv(a.metrics)
+    # 与主拟合同一把尺子：先剔掉 N<FIT_MIN_N 的下界探针（它们首个检查点就已越线，
+    # 任何策略都不可能"合规地停下"，混进来只会把违规率抬高、把省轮比例算错）。
+    import law as L
+
+    df = L.drop_probes(df)
     if a.dataset:
         df = df[df["dataset"] == a.dataset].copy()
     if a.seed:
