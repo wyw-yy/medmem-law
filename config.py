@@ -46,6 +46,14 @@ IMAGE_SIZE = int(os.environ.get("MEDMEM_IMAGE_SIZE", 64))
 BATCH = int(os.environ.get("MEDMEM_BATCH", 64))   # 大分辨率必须调小（224px 建议 16）
 CHANNELS = 3             # 统一升到 3 通道，UNet 不用改
 
+# 梯度累积：把 N 个 micro-batch 的梯度加起来再走一步，等效 batch = BATCH * ACCUM。
+# 为什么需要它：224px 在 8 GB 卡上只能 batch 16，而 64px 主网格用 64；直接比较时
+# "每张图被看多少遍"差了 4 倍，分辨率的效应和 batch 的效应混在一起（见 NOTES §18）。
+# 用 ACCUM=4 就能在 224px 上做等效 batch 64，把两个变量解耦。
+# 注意：ACCUM>1 时 optimizer.step() 的次数是原来的 1/ACCUM，所以 E（epoch）不变、
+# 每个 epoch 的"优化步"变少 —— 这正是"等 epoch"口径要求的。
+ACCUM = int(os.environ.get("MEDMEM_ACCUM", 1))
+
 # ---------------------------------------------------------------- 数据规模网格
 N_GRID = [250, 500, 1000, 2000, 4000]   # 几何级数，log 轴等距
 SEEDS = [1, 2, 3]

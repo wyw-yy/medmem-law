@@ -198,6 +198,7 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
         scorer = (MT, enc, bank, cal["tau"])
 
     bs = min(C.BATCH, n)
+    accum = max(1, int(C.ACCUM))
     t_start = time.time()
     hist = []
     stopped_early = None
@@ -210,22 +211,33 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
         net.train()
         perm = torch.randperm(n)
         tot, cnt = 0.0, 0
+        n_micro = 0
+        opt.zero_grad(set_to_none=True)
         for i in range(0, n, bs):
             xb = x_all[perm[i : i + bs]].to(device, non_blocking=True)
             if len(xb) < 2:
                 continue
+            # 梯度累积：每个 micro-batch 的 loss 除以 accum，梯度才是真实 batch 的梯度；
+            # 记录 loss 时乘回来，日志里的 loss 仍是"每张图的平均损失"（可跨 accum 比较）。
             if amp:
                 with torch.autocast("cuda", dtype=torch.bfloat16):
-                    loss = diff.loss(net, xb)
+                    loss = diff.loss(net, xb) / accum
             else:
-                loss = diff.loss(net, xb)
-            opt.zero_grad(set_to_none=True)
+                loss = diff.loss(net, xb) / accum
             loss.backward()
+            n_micro += 1
+            tot += float(loss.detach()) * len(xb) * accum
+            cnt += len(xb)
+            if n_micro % accum == 0:
+                torch.nn.utils.clip_grad_norm_(net.parameters(), C.GRAD_CLIP)
+                opt.step()
+                ema.update(net)
+                opt.zero_grad(set_to_none=True)
+        if n_micro % accum != 0:   # 尾批不足 accum 个 micro-batch 也要走一步
             torch.nn.utils.clip_grad_norm_(net.parameters(), C.GRAD_CLIP)
             opt.step()
             ema.update(net)
-            tot += float(loss.detach()) * len(xb)
-            cnt += len(xb)
+            opt.zero_grad(set_to_none=True)
         hist.append({"epoch": epoch, "loss": tot / max(cnt, 1)})
 
         # 开环律早停（策略 C）：E* 由 results/law_fit.json 在训练开始前算好传进来，
@@ -283,6 +295,7 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
         "s_per_epoch": round(total / max(len(hist), 1), 2),
         "loss_curve": hist,
         "image_size": C.IMAGE_SIZE, "base_ch": C.BASE_CH, "batch": bs,
+        "accum": accum, "effective_batch": bs * accum,
         "lr": C.LR, "ddim_steps": C.DDIM_STEPS, "timesteps": C.TIMESTEPS,
         "ckpt_every": ckpt_every,
         "ema_decay": C.EMA_DECAY, "sample_from": "ema",

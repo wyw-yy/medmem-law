@@ -595,3 +595,38 @@ batch 从 64 降到 16 让 25k 步对应的 epoch 从 5,125 掉到 1,600（3.2×
   不能说"不记忆"；分辨率与 batch 不可解耦，必须进 limitation。
 - **新增验收条目**：跨分辨率/跨 batch 的对比必须同时报**分辨率、batch、每 epoch 步数**三个量；
   只报步数或只报轮数的对比一律视为口径不完整。
+
+### 24.8 R20 第三轮跑批：解耦"分辨率 vs batch"、补齐分辨率阶梯、seed 补到 12/档（预声明在启动前写定）
+
+- **触发**：R19 的结论（224px 6,400 轮内未达可检出复刻）还剩一个混淆——224px 在 8 GB 卡上只能
+  `batch 16`，而 64px 主网格是 `batch 64`，"每张图每 epoch 被看几遍"差 4 倍（而 R17 已经证明
+  **等步数**是不可比的口径）。同时分辨率梯度只有 64px 与 224px 两个点、最差 seed 安全表只靠
+  7–9 个 seed。三件事一次跑完。
+
+- **技术前提**：`train.py` 新增梯度累积（`config.ACCUM`，由 `MEDMEM_ACCUM` 覆盖），
+  `effective_batch = BATCH × ACCUM`，写进 `results/runs/*.json` 的 `accum` / `effective_batch` 字段。
+
+- **预声明（三组，全部在启动前写定）**
+
+  | 轮 | 配置 | 预算 | 判据 |
+  |---|---|---|---|
+  | A | 224px，`batch 16 × accum 4` → 等效 64 | bloodmnist N=250 seed 21，E=6400，每 200 轮一点 | **仍为 0** → 分辨率效应与 batch 无关，R19 升级为无混淆结论；**越线** → batch 才是主因，R19 必须改写 |
+  | B | 128px，`batch 32 × accum 2` → 等效 64 | 同上，E=6400，每 200 轮一点 | 报出 128px 的 onset（若越线）；与 64px（e800 越线）、224px（>6400）构成三点阶梯 |
+  | C | 64px 主网格配置，pathmnist N=250/500/1000 各补 seed 10/11/12 | 与主网格同预算（5125/2550/2400 轮） | 重拟合后报 α/γ 与 CI 的变化；重算 σ_log 与最差 seed 安全表 |
+
+- **判读规则（写在结果之前）**
+  1. 三组都属于"补数据/补对照"，**不改任何已发布的预声明验收线**；安全表仍是四条件严格口径，
+     不因为 seed 变多就放宽到"差不多都过"。
+  2. 若 C 组让 α 或 γ 的 CI 移动超过其自身宽度的一半，必须在 `NUMBERS.md`、
+     `ALIGNMENT.md`、`ABSTRACT.md` 三处同步更新并注明"因补 seed 而更新"。
+  3. A/B 两组的结论必须同时报**分辨率、batch、accum、等效 batch、每 epoch 步数、每图重复次数**，
+     缺一项即视为口径不完整（沿用 R19 的验收条目）。
+  4. 若 A 组显示"等效 batch 64 下 224px 仍为 0"，则 224px 的诚实表述从
+     "分辨率与 batch 不可解耦"升级为"在等效 batch 下，分辨率把 onset 推后至少 8 倍"，
+     并在 limitation 里删除该混淆，改为"未测到 224px 的平台"。
+
+- **新增验收条目**：凡用了梯度累积的实验，其结果 JSON 必须带 `accum` 与 `effective_batch`；
+  文档里出现"batch"的地方必须明确是 micro-batch 还是等效 batch。
+
+- **执行**：`build/run_campaign.py`（单实例锁 `build/campaign.lock`，轮间停机 12 min），
+  数据 `data/raw/bloodmnist_128.npz` 由 `build/make_blood128.py` 从 224px 源降采样。
