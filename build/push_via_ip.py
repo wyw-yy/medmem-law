@@ -22,14 +22,23 @@ REPO = "wyw-yy/medmem-law"
 
 
 def sh(cmd: list[str], env: dict | None = None, timeout: int = 180) -> tuple[int, str]:
-    r = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", timeout=timeout,
-                       env=env)
+    try:
+        r = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=timeout,
+                           env=env)
+    except subprocess.TimeoutExpired as e:
+        # 直连 github.com 常见结局：TCP 通但握手/推送挂住 → 当作失败，继续走 IP 方案
+        out = (e.stdout or b"") if isinstance(e.stdout, bytes) else (e.stdout or "")
+        err = (e.stderr or b"") if isinstance(e.stderr, bytes) else (e.stderr or "")
+        txt = (out + err)
+        if isinstance(txt, bytes):
+            txt = txt.decode("utf-8", "replace")
+        return 124, f"timeout after {timeout}s {txt.strip()}".strip()
     return r.returncode, (r.stdout + r.stderr).strip()
 
 
 def main() -> None:
-    rc, out = sh(["git", "push", "origin", "master"])
+    rc, out = sh(["git", "push", "origin", "master"], timeout=90)
     if rc == 0:
         print("正常 push 成功")
         return
