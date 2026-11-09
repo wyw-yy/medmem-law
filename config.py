@@ -83,7 +83,8 @@ def ckpt_every_for(epochs: int, points: int = MEASURE_POINTS, step: int = 5) -> 
     return max(step, int(round(epochs / points / step)) * step)
 
 # ---------------------------------------------------------------- 模型
-BASE_CH = 32             # UNet 基通道。8G 显存下 32 是甜点，48 会 OOM
+BASE_CH = int(os.environ.get("MEDMEM_BASE_CH", 32))   # UNet 基通道。8G 显存下 32 是甜点，48 会 OOM；
+# MEDMEM_BASE_CH=64 用来测"容量是否改变记忆化"（参数量约 4 倍，必须同时把 BATCH 调小）。
 # BATCH 在 §分辨率 那一段定义（可由 MEDMEM_BATCH 覆盖，供 224px 敏感性实验用）
 TIMESTEPS = 1000
 BETA_START = 1e-4
