@@ -74,9 +74,14 @@ def main() -> int:
         bool(leak))
 
     # ---------------------------------------------------------------- 03 模型
-    add("03①", "主模型 = 影像扩散生成模型", "DDPM UNet",
-        f"params={runs and next(iter(runs.values())).get('params_M', 'n/a')}",
-        all("params_M" in v for v in runs.values()) if runs else False)
+    # 注意：必须锚在**主网格基准 run**（base=32）上。11-12 这里拿的是
+    # `next(iter(runs.values()))`，而 R22 的 base=64 实验也写 runs/*.json
+    # （params≈52.0M）→ 03① 被错判 FAIL（"params=52.02"）。主网格是 13.02M。
+    ref = runs.get("pathmnist_n250_s1") or next(iter(runs.values()))
+    pm = ref.get("params_M")
+    add("03①", "主模型 = 影像扩散生成模型（主网格 base=32 → 13.02M）", "DDPM UNet",
+        f"主网格基准 run params={pm}M",
+        bool(pm) and 12.0 <= float(pm) <= 14.0)
     add("03②", "双时间尺度（规模-轮次分离）体现在 γ 上", "γ 的 95% CI 不含 0",
         f"γ={boot['ci']['gamma']['point']:.4f} "
         f"[{boot['ci']['gamma']['lo']:.4f}, {boot['ci']['gamma']['hi']:.4f}]",

@@ -1,15 +1,15 @@
 ppt,claim,expect,actual,status
-01①,主数据集 = pathmnist（公开、CC BY 4.0）,pathmnist 为主,"{'pathmnist': 1152, 'bloodmnist': 65, 'pneumoniamnist': 65}",PASS
+01①,主数据集 = pathmnist（公开、CC BY 4.0）,pathmnist 为主,"{'pathmnist': 1443, 'bloodmnist': 65, 'pneumoniamnist': 65}",PASS
 01③,记忆率 M = 近邻相似度超阈值的生成样本占比,每行都有 M 与 tau,M 列存在=True tau 列存在=True,PASS
 01③,数据规模档位 ≥3 档,≥3,"[np.int64(128), np.int64(192), np.int64(250), np.int64(500), np.int64(1000), np.int64(1500), np.int64(2000), np.int64(3000), np.int64(4000)]",PASS
-01④,控制律 R²≥0.9,R²_lin ≥ 0.9 且 R²_log ≥ 0.9,R²_lin=0.7098 R²_log=0.6824,FAIL
+01④,控制律 R²≥0.9,R²_lin ≥ 0.9 且 R²_log ≥ 0.9,R²_lin=0.7097 R²_log=0.6834,FAIL
 01④,安全早停点存在,E* 表非空,3 行,PASS
 02③,关键字段齐全（规模/轮次/生成样本/近邻距离/记忆率/质量）,"n, epoch, n_gen, sim_max, M, fid 全在","['M', 'epoch', 'fid', 'n', 'n_gen', 'sim_max']",PASS
 02②,训练轮次多档,每档 N 至少 2 个测量点,最少点数=8,PASS
 02④,公开数据集 + 隐私审计（数据侧泄漏检查）,三数据集都有报告,<class 'list'>,PASS
-03①,主模型 = 影像扩散生成模型,DDPM UNet,params=13.016739,PASS
-03②,双时间尺度（规模-轮次分离）体现在 γ 上,γ 的 95% CI 不含 0,"γ=-0.8308 [-0.8991, -0.7337]",PASS
-03③,基线 = 无早停控制的常规训练,策略 A 存在且跑满,A 轮次=3040,PASS
+03①,主模型 = 影像扩散生成模型（主网格 base=32 → 13.02M）,DDPM UNet,主网格基准 run params=13.016739M,PASS
+03②,双时间尺度（规模-轮次分离）体现在 γ 上,γ 的 95% CI 不含 0,"γ=-0.8362 [-0.9044, -0.7395]",PASS
+03③,基线 = 无早停控制的常规训练,策略 A 存在且跑满,A 轮次=2860,PASS
 03④,拟合优度 R²≥0.9（PPT 验收线）,同一行,见 01④,FAIL
 03④,跨数据集推广性,free_fit 与 transfer 都跑过,transfer.csv 行数=6,PASS
 04④,安全早停点（四条件全过）,≥1 行可交付（严格口径，用户已定保持严格）,0/28 行,FAIL
