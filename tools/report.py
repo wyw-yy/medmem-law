@@ -651,6 +651,36 @@ def section_appendix():
     else:
         L.append("`results/verify_claims.csv` 不存在 —— `python -m build.verify_claims` 生成。")
     L.append("")
+
+    L.append("### 8.6 R22：容量 / 隐私训练 / 224px 自身平台（`build/run_campaign2.py`）")
+    L.append("")
+    r22 = _read_csv(C.RESULTS / "r22_summary.csv")
+    if r22 is not None and len(r22):
+        L.append("三组都**不进主律拟合**：训练规则与主网格不同（DP-SGD / 双倍宽度 / 224px），"
+                 "各自写独立 CSV。")
+        L.append("")
+        L.append("| run | 点 | 末轮 | τ | M_max | sim_max 峰 | 首个 ≥1% | FID 首→末 | σ / ε 上界 |")
+        L.append("|---|---|---|---|---|---|---|---|---|")
+        for r in r22.itertuples():
+            e1 = "—" if r.first_1pct_epoch != r.first_1pct_epoch else f"e{int(r.first_1pct_epoch)}"
+            if r.sigma != r.sigma:
+                dp = "—"
+            else:
+                dp = f"σ={r.sigma:.1f} / ε≤{r.eps_ub_steps4800:.1f}"
+            L.append(f"| {r.run} | {r.points} | {r.epochs_max} | {r.tau:.4f} | {r.M_max:.4f} | "
+                     f"{r.sim_max_max:.4f} | {e1} | {r.fid_first:.0f} → {r.fid_last:.0f} | {dp} |")
+        L.append("")
+        L.append("- **容量**：base=32 → 64 把 N=250 的平台从 0.8203 抬到 0.8867、`E=640` 从 0.0020 抬到 "
+                 "0.1562（78×），N=1000 平台从 0.0664 抬到 0.248（3.7×），而 FID 更好（85 vs 123）"
+                 " → 记忆化与质量在同一根容量轴上同向变化，**「做大模型」不是安全方向**。")
+        L.append("- **DP-SGD**：σ=1.0（ε 上界 85.1）与 σ=8.0（10.6）下 M 全 0（15 点 × 1200 轮），"
+                 "但 FID 从 123 劣到 309–353 → 这两档只能写「噪声够大时记忆化消失、质量不可用」，"
+                 "不能写「DP-SGD 解决了记忆化」。")
+        L.append("- **224px**：续到 16,000 轮（56 点）仍 M=0，`sim_max` 落在 0.31–0.40 带状、无趋势"
+                 " → 分辨率结论是「≥20 倍 onset 延迟」；此前「sim_max 在缓慢上爬」的说法被这次延长否掉。")
+    else:
+        L.append("`results/r22_summary.csv` 不存在 —— `python -m build.summary_r22` 生成。")
+    L.append("")
     return L
 
 

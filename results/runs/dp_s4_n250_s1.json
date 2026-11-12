@@ -1,0 +1,4821 @@
+{
+  "run": "dp_s4_n250_s1",
+  "dataset": "pathmnist",
+  "n": 250,
+  "seed": 1,
+  "epochs_done": 1200,
+  "batch": 64,
+  "micro": 8,
+  "noise": 4.0,
+  "clip": 1.0,
+  "q": 0.256,
+  "steps": 4800,
+  "epsilon_ub": 21.276904144244607,
+  "delta": 1e-05,
+  "accounting": "strong composition (Abadi Thm.1), conservative upper bound",
+  "image_size": 64,
+  "base_ch": 32,
+  "s_per_epoch": 13.69623170554638,
+  "history": [
+    {
+      "epoch": 1,
+      "grad_norm_mean": 0.03254948616027832
+    },
+    {
+      "epoch": 2,
+      "grad_norm_mean": 0.023558340549468995
+    },
+    {
+      "epoch": 3,
+      "grad_norm_mean": 0.022086077213287352
+    },
+    {
+      "epoch": 4,
+      "grad_norm_mean": 0.02107249641418457
+    },
+    {
+      "epoch": 5,
+      "grad_norm_mean": 0.019663463592529296
+    },
+    {
+      "epoch": 6,
+      "grad_norm_mean": 0.017579855918884276
+    },
+    {
+      "epoch": 7,
+      "grad_norm_mean": 0.01743942642211914
+    },
+    {
+      "epoch": 8,
+      "grad_norm_mean": 0.01566621780395508
+    },
+    {
+      "epoch": 9,
+      "grad_norm_mean": 0.014584267854690552
+    },
+    {
+      "epoch": 10,
+      "grad_norm_mean": 0.01382165765762329
+    },
+    {
+      "epoch": 11,
+      "grad_norm_mean": 0.014069028615951539
+    },
+    {
+      "epoch": 12,
+      "grad_norm_mean": 0.012654491186141969
+    },
+    {
+      "epoch": 13,
+      "grad_norm_mean": 0.013196911096572877
+    },
+    {
+      "epoch": 14,
+      "grad_norm_mean": 0.012224321126937866
+    },
+    {
+      "epoch": 15,
+      "grad_norm_mean": 0.012501061677932739
+    },
+    {
+      "epoch": 16,
+      "grad_norm_mean": 0.011283685445785523
+    },
+    {
+      "epoch": 17,
+      "grad_norm_mean": 0.013534794569015502
+    },
+    {
+      "epoch": 18,
+      "grad_norm_mean": 0.011417283058166503
+    },
+    {
+      "epoch": 19,
+      "grad_norm_mean": 0.012670457124710084
+    },
+    {
+      "epoch": 20,
+      "grad_norm_mean": 0.011590749263763427
+    },
+    {
+      "epoch": 21,
+      "grad_norm_mean": 0.013066559791564942
+    },
+    {
+      "epoch": 22,
+      "grad_norm_mean": 0.013054011821746826
+    },
+    {
+      "epoch": 23,
+      "grad_norm_mean": 0.013623594284057617
+    },
+    {
+      "epoch": 24,
+      "grad_norm_mean": 0.012901511192321777
+    },
+    {
+      "epoch": 25,
+      "grad_norm_mean": 0.013023963689804078
+    },
+    {
+      "epoch": 26,
+      "grad_norm_mean": 0.01358960747718811
+    },
+    {
+      "epoch": 27,
+      "grad_norm_mean": 0.013478466510772705
+    },
+    {
+      "epoch": 28,
+      "grad_norm_mean": 0.013119999408721925
+    },
+    {
+      "epoch": 29,
+      "grad_norm_mean": 0.011971003770828248
+    },
+    {
+      "epoch": 30,
+      "grad_norm_mean": 0.013188926458358764
+    },
+    {
+      "epoch": 31,
+      "grad_norm_mean": 0.012806183099746704
+    },
+    {
+      "epoch": 32,
+      "grad_norm_mean": 0.01496501898765564
+    },
+    {
+      "epoch": 33,
+      "grad_norm_mean": 0.013204922914505006
+    },
+    {
+      "epoch": 34,
+      "grad_norm_mean": 0.013703869819641114
+    },
+    {
+      "epoch": 35,
+      "grad_norm_mean": 0.01084726119041443
+    },
+    {
+      "epoch": 36,
+      "grad_norm_mean": 0.012555377244949342
+    },
+    {
+      "epoch": 37,
+      "grad_norm_mean": 0.01313990306854248
+    },
+    {
+      "epoch": 38,
+      "grad_norm_mean": 0.012982951879501343
+    },
+    {
+      "epoch": 39,
+      "grad_norm_mean": 0.013499919176101684
+    },
+    {
+      "epoch": 40,
+      "grad_norm_mean": 0.01629867148399353
+    },
+    {
+      "epoch": 41,
+      "grad_norm_mean": 0.013836583137512208
+    },
+    {
+      "epoch": 42,
+      "grad_norm_mean": 0.015691879987716675
+    },
+    {
+      "epoch": 43,
+      "grad_norm_mean": 0.014710081815719605
+    },
+    {
+      "epoch": 44,
+      "grad_norm_mean": 0.017216926336288452
+    },
+    {
+      "epoch": 45,
+      "grad_norm_mean": 0.015066756963729859
+    },
+    {
+      "epoch": 46,
+      "grad_norm_mean": 0.014565366029739379
+    },
+    {
+      "epoch": 47,
+      "grad_norm_mean": 0.014284250020980835
+    },
+    {
+      "epoch": 48,
+      "grad_norm_mean": 0.013224528789520264
+    },
+    {
+      "epoch": 49,
+      "grad_norm_mean": 0.012971033573150634
+    },
+    {
+      "epoch": 50,
+      "grad_norm_mean": 0.01433404779434204
+    },
+    {
+      "epoch": 51,
+      "grad_norm_mean": 0.014776233434677124
+    },
+    {
+      "epoch": 52,
+      "grad_norm_mean": 0.013082372426986694
+    },
+    {
+      "epoch": 53,
+      "grad_norm_mean": 0.013939203023910522
+    },
+    {
+      "epoch": 54,
+      "grad_norm_mean": 0.012482159852981567
+    },
+    {
+      "epoch": 55,
+      "grad_norm_mean": 0.01221411919593811
+    },
+    {
+      "epoch": 56,
+      "grad_norm_mean": 0.015384527683258056
+    },
+    {
+      "epoch": 57,
+      "grad_norm_mean": 0.01351420521736145
+    },
+    {
+      "epoch": 58,
+      "grad_norm_mean": 0.015135742902755737
+    },
+    {
+      "epoch": 59,
+      "grad_norm_mean": 0.015241373062133788
+    },
+    {
+      "epoch": 60,
+      "grad_norm_mean": 0.014812859058380127
+    },
+    {
+      "epoch": 61,
+      "grad_norm_mean": 0.014168086767196655
+    },
+    {
+      "epoch": 62,
+      "grad_norm_mean": 0.013291456937789917
+    },
+    {
+      "epoch": 63,
+      "grad_norm_mean": 0.01265238094329834
+    },
+    {
+      "epoch": 64,
+      "grad_norm_mean": 0.011890671730041503
+    },
+    {
+      "epoch": 65,
+      "grad_norm_mean": 0.010802631616592407
+    },
+    {
+      "epoch": 66,
+      "grad_norm_mean": 0.013153345346450806
+    },
+    {
+      "epoch": 67,
+      "grad_norm_mean": 0.012695263147354125
+    },
+    {
+      "epoch": 68,
+      "grad_norm_mean": 0.012716207265853883
+    },
+    {
+      "epoch": 69,
+      "grad_norm_mean": 0.013127036809921265
+    },
+    {
+      "epoch": 70,
+      "grad_norm_mean": 0.014969118356704713
+    },
+    {
+      "epoch": 71,
+      "grad_norm_mean": 0.015693549871444702
+    },
+    {
+      "epoch": 72,
+      "grad_norm_mean": 0.01256243395805359
+    },
+    {
+      "epoch": 73,
+      "grad_norm_mean": 0.014436814069747925
+    },
+    {
+      "epoch": 74,
+      "grad_norm_mean": 0.01355493974685669
+    },
+    {
+      "epoch": 75,
+      "grad_norm_mean": 0.013491134405136109
+    },
+    {
+      "epoch": 76,
+      "grad_norm_mean": 0.014592345952987671
+    },
+    {
+      "epoch": 77,
+      "grad_norm_mean": 0.012105193376541137
+    },
+    {
+      "epoch": 78,
+      "grad_norm_mean": 0.01721053147315979
+    },
+    {
+      "epoch": 79,
+      "grad_norm_mean": 0.014181442022323609
+    },
+    {
+      "epoch": 80,
+      "grad_norm_mean": 0.014164683818817138
+    },
+    {
+      "epoch": 81,
+      "grad_norm_mean": 0.012099832534790038
+    },
+    {
+      "epoch": 82,
+      "grad_norm_mean": 0.013040936708450317
+    },
+    {
+      "epoch": 83,
+      "grad_norm_mean": 0.013596401929855347
+    },
+    {
+      "epoch": 84,
+      "grad_norm_mean": 0.013887170314788819
+    },
+    {
+      "epoch": 85,
+      "grad_norm_mean": 0.012379550695419312
+    },
+    {
+      "epoch": 86,
+      "grad_norm_mean": 0.012355926752090454
+    },
+    {
+      "epoch": 87,
+      "grad_norm_mean": 0.012771634101867676
+    },
+    {
+      "epoch": 88,
+      "grad_norm_mean": 0.012478201389312745
+    },
+    {
+      "epoch": 89,
+      "grad_norm_mean": 0.014472696304321289
+    },
+    {
+      "epoch": 90,
+      "grad_norm_mean": 0.01381722354888916
+    },
+    {
+      "epoch": 91,
+      "grad_norm_mean": 0.012449936866760254
+    },
+    {
+      "epoch": 92,
+      "grad_norm_mean": 0.013666105747222901
+    },
+    {
+      "epoch": 93,
+      "grad_norm_mean": 0.01143360948562622
+    },
+    {
+      "epoch": 94,
+      "grad_norm_mean": 0.011946095466613769
+    },
+    {
+      "epoch": 95,
+      "grad_norm_mean": 0.013874584913253784
+    },
+    {
+      "epoch": 96,
+      "grad_norm_mean": 0.013743269681930542
+    },
+    {
+      "epoch": 97,
+      "grad_norm_mean": 0.013887684106826783
+    },
+    {
+      "epoch": 98,
+      "grad_norm_mean": 0.013568299770355225
+    },
+    {
+      "epoch": 99,
+      "grad_norm_mean": 0.014395476102828979
+    },
+    {
+      "epoch": 100,
+      "grad_norm_mean": 0.01266751217842102
+    },
+    {
+      "epoch": 101,
+      "grad_norm_mean": 0.014085404872894287
+    },
+    {
+      "epoch": 102,
+      "grad_norm_mean": 0.016247087478637696
+    },
+    {
+      "epoch": 103,
+      "grad_norm_mean": 0.015565582752227783
+    },
+    {
+      "epoch": 104,
+      "grad_norm_mean": 0.014314056634902953
+    },
+    {
+      "epoch": 105,
+      "grad_norm_mean": 0.014841899394989014
+    },
+    {
+      "epoch": 106,
+      "grad_norm_mean": 0.01352267599105835
+    },
+    {
+      "epoch": 107,
+      "grad_norm_mean": 0.015468145847320557
+    },
+    {
+      "epoch": 108,
+      "grad_norm_mean": 0.013565582752227783
+    },
+    {
+      "epoch": 109,
+      "grad_norm_mean": 0.013682621240615844
+    },
+    {
+      "epoch": 110,
+      "grad_norm_mean": 0.016473406314849854
+    },
+    {
+      "epoch": 111,
+      "grad_norm_mean": 0.013580230474472045
+    },
+    {
+      "epoch": 112,
+      "grad_norm_mean": 0.01678408646583557
+    },
+    {
+      "epoch": 113,
+      "grad_norm_mean": 0.014726625204086304
+    },
+    {
+      "epoch": 114,
+      "grad_norm_mean": 0.012666094541549683
+    },
+    {
+      "epoch": 115,
+      "grad_norm_mean": 0.015605773210525514
+    },
+    {
+      "epoch": 116,
+      "grad_norm_mean": 0.014752228021621704
+    },
+    {
+      "epoch": 117,
+      "grad_norm_mean": 0.01371087646484375
+    },
+    {
+      "epoch": 118,
+      "grad_norm_mean": 0.012344078302383424
+    },
+    {
+      "epoch": 119,
+      "grad_norm_mean": 0.01217392897605896
+    },
+    {
+      "epoch": 120,
+      "grad_norm_mean": 0.015449836492538453
+    },
+    {
+      "epoch": 121,
+      "grad_norm_mean": 0.014572575807571412
+    },
+    {
+      "epoch": 122,
+      "grad_norm_mean": 0.017183396339416505
+    },
+    {
+      "epoch": 123,
+      "grad_norm_mean": 0.012909231424331665
+    },
+    {
+      "epoch": 124,
+      "grad_norm_mean": 0.014227325201034546
+    },
+    {
+      "epoch": 125,
+      "grad_norm_mean": 0.01681807565689087
+    },
+    {
+      "epoch": 126,
+      "grad_norm_mean": 0.014029502630233765
+    },
+    {
+      "epoch": 127,
+      "grad_norm_mean": 0.017024021863937377
+    },
+    {
+      "epoch": 128,
+      "grad_norm_mean": 0.013761276721954346
+    },
+    {
+      "epoch": 129,
+      "grad_norm_mean": 0.015665098190307616
+    },
+    {
+      "epoch": 130,
+      "grad_norm_mean": 0.01174876093864441
+    },
+    {
+      "epoch": 131,
+      "grad_norm_mean": 0.012771743297576904
+    },
+    {
+      "epoch": 132,
+      "grad_norm_mean": 0.013518741607666016
+    },
+    {
+      "epoch": 133,
+      "grad_norm_mean": 0.012505398035049438
+    },
+    {
+      "epoch": 134,
+      "grad_norm_mean": 0.014976999759674071
+    },
+    {
+      "epoch": 135,
+      "grad_norm_mean": 0.0125804500579834
+    },
+    {
+      "epoch": 136,
+      "grad_norm_mean": 0.012270069599151612
+    },
+    {
+      "epoch": 137,
+      "grad_norm_mean": 0.01245607829093933
+    },
+    {
+      "epoch": 138,
+      "grad_norm_mean": 0.014635863542556762
+    },
+    {
+      "epoch": 139,
+      "grad_norm_mean": 0.012017357349395751
+    },
+    {
+      "epoch": 140,
+      "grad_norm_mean": 0.013877222537994385
+    },
+    {
+      "epoch": 141,
+      "grad_norm_mean": 0.013344078540802003
+    },
+    {
+      "epoch": 142,
+      "grad_norm_mean": 0.014152621984481811
+    },
+    {
+      "epoch": 143,
+      "grad_norm_mean": 0.01123462152481079
+    },
+    {
+      "epoch": 144,
+      "grad_norm_mean": 0.013557525396347046
+    },
+    {
+      "epoch": 145,
+      "grad_norm_mean": 0.011737367391586304
+    },
+    {
+      "epoch": 146,
+      "grad_norm_mean": 0.013598355054855347
+    },
+    {
+      "epoch": 147,
+      "grad_norm_mean": 0.013534309148788452
+    },
+    {
+      "epoch": 148,
+      "grad_norm_mean": 0.012931727170944214
+    },
+    {
+      "epoch": 149,
+      "grad_norm_mean": 0.013844151973724366
+    },
+    {
+      "epoch": 150,
+      "grad_norm_mean": 0.018172285079956055
+    },
+    {
+      "epoch": 151,
+      "grad_norm_mean": 0.014477274894714355
+    },
+    {
+      "epoch": 152,
+      "grad_norm_mean": 0.015960453987121582
+    },
+    {
+      "epoch": 153,
+      "grad_norm_mean": 0.01860091304779053
+    },
+    {
+      "epoch": 154,
+      "grad_norm_mean": 0.014244904518127441
+    },
+    {
+      "epoch": 155,
+      "grad_norm_mean": 0.013694338321685791
+    },
+    {
+      "epoch": 156,
+      "grad_norm_mean": 0.013230138778686524
+    },
+    {
+      "epoch": 157,
+      "grad_norm_mean": 0.0119546377658844
+    },
+    {
+      "epoch": 158,
+      "grad_norm_mean": 0.013210360288619995
+    },
+    {
+      "epoch": 159,
+      "grad_norm_mean": 0.012999191284179687
+    },
+    {
+      "epoch": 160,
+      "grad_norm_mean": 0.012308806657791138
+    },
+    {
+      "epoch": 161,
+      "grad_norm_mean": 0.012865240335464477
+    },
+    {
+      "epoch": 162,
+      "grad_norm_mean": 0.01448617696762085
+    },
+    {
+      "epoch": 163,
+      "grad_norm_mean": 0.013842948198318482
+    },
+    {
+      "epoch": 164,
+      "grad_norm_mean": 0.013338044166564941
+    },
+    {
+      "epoch": 165,
+      "grad_norm_mean": 0.014521601915359497
+    },
+    {
+      "epoch": 166,
+      "grad_norm_mean": 0.011200204849243164
+    },
+    {
+      "epoch": 167,
+      "grad_norm_mean": 0.01336213779449463
+    },
+    {
+      "epoch": 168,
+      "grad_norm_mean": 0.01422663402557373
+    },
+    {
+      "epoch": 169,
+      "grad_norm_mean": 0.013806214094161988
+    },
+    {
+      "epoch": 170,
+      "grad_norm_mean": 0.013325891733169556
+    },
+    {
+      "epoch": 171,
+      "grad_norm_mean": 0.012993300676345826
+    },
+    {
+      "epoch": 172,
+      "grad_norm_mean": 0.013205215454101563
+    },
+    {
+      "epoch": 173,
+      "grad_norm_mean": 0.0136510648727417
+    },
+    {
+      "epoch": 174,
+      "grad_norm_mean": 0.013357334136962891
+    },
+    {
+      "epoch": 175,
+      "grad_norm_mean": 0.013480867385864258
+    },
+    {
+      "epoch": 176,
+      "grad_norm_mean": 0.014012482643127442
+    },
+    {
+      "epoch": 177,
+      "grad_norm_mean": 0.011608916759490967
+    },
+    {
+      "epoch": 178,
+      "grad_norm_mean": 0.012992097854614257
+    },
+    {
+      "epoch": 179,
+      "grad_norm_mean": 0.011751121282577515
+    },
+    {
+      "epoch": 180,
+      "grad_norm_mean": 0.0125989031791687
+    },
+    {
+      "epoch": 181,
+      "grad_norm_mean": 0.013724528074264527
+    },
+    {
+      "epoch": 182,
+      "grad_norm_mean": 0.012326258182525635
+    },
+    {
+      "epoch": 183,
+      "grad_norm_mean": 0.012936727285385132
+    },
+    {
+      "epoch": 184,
+      "grad_norm_mean": 0.012007115840911865
+    },
+    {
+      "epoch": 185,
+      "grad_norm_mean": 0.012917935371398926
+    },
+    {
+      "epoch": 186,
+      "grad_norm_mean": 0.015006556749343872
+    },
+    {
+      "epoch": 187,
+      "grad_norm_mean": 0.013424183607101441
+    },
+    {
+      "epoch": 188,
+      "grad_norm_mean": 0.012506109714508057
+    },
+    {
+      "epoch": 189,
+      "grad_norm_mean": 0.011166083812713622
+    },
+    {
+      "epoch": 190,
+      "grad_norm_mean": 0.012005579233169555
+    },
+    {
+      "epoch": 191,
+      "grad_norm_mean": 0.011901615858078004
+    },
+    {
+      "epoch": 192,
+      "grad_norm_mean": 0.013202326774597168
+    },
+    {
+      "epoch": 193,
+      "grad_norm_mean": 0.011633104085922242
+    },
+    {
+      "epoch": 194,
+      "grad_norm_mean": 0.012884028911590576
+    },
+    {
+      "epoch": 195,
+      "grad_norm_mean": 0.014248881101608277
+    },
+    {
+      "epoch": 196,
+      "grad_norm_mean": 0.014732195854187011
+    },
+    {
+      "epoch": 197,
+      "grad_norm_mean": 0.01672403144836426
+    },
+    {
+      "epoch": 198,
+      "grad_norm_mean": 0.012373809576034546
+    },
+    {
+      "epoch": 199,
+      "grad_norm_mean": 0.012214649438858033
+    },
+    {
+      "epoch": 200,
+      "grad_norm_mean": 0.011693843841552734
+    },
+    {
+      "epoch": 201,
+      "grad_norm_mean": 0.012683219909667968
+    },
+    {
+      "epoch": 202,
+      "grad_norm_mean": 0.015207457065582275
+    },
+    {
+      "epoch": 203,
+      "grad_norm_mean": 0.012748638153076171
+    },
+    {
+      "epoch": 204,
+      "grad_norm_mean": 0.013954562187194824
+    },
+    {
+      "epoch": 205,
+      "grad_norm_mean": 0.015318011045455932
+    },
+    {
+      "epoch": 206,
+      "grad_norm_mean": 0.011221347332000732
+    },
+    {
+      "epoch": 207,
+      "grad_norm_mean": 0.01486523175239563
+    },
+    {
+      "epoch": 208,
+      "grad_norm_mean": 0.013780003070831298
+    },
+    {
+      "epoch": 209,
+      "grad_norm_mean": 0.012728275537490844
+    },
+    {
+      "epoch": 210,
+      "grad_norm_mean": 0.016411338806152344
+    },
+    {
+      "epoch": 211,
+      "grad_norm_mean": 0.011293465375900268
+    },
+    {
+      "epoch": 212,
+      "grad_norm_mean": 0.011898571014404297
+    },
+    {
+      "epoch": 213,
+      "grad_norm_mean": 0.012851543188095093
+    },
+    {
+      "epoch": 214,
+      "grad_norm_mean": 0.012611067414283753
+    },
+    {
+      "epoch": 215,
+      "grad_norm_mean": 0.01132729697227478
+    },
+    {
+      "epoch": 216,
+      "grad_norm_mean": 0.013303333044052124
+    },
+    {
+      "epoch": 217,
+      "grad_norm_mean": 0.013484649181365967
+    },
+    {
+      "epoch": 218,
+      "grad_norm_mean": 0.012616947889328003
+    },
+    {
+      "epoch": 219,
+      "grad_norm_mean": 0.012974868059158325
+    },
+    {
+      "epoch": 220,
+      "grad_norm_mean": 0.013409905433654785
+    },
+    {
+      "epoch": 221,
+      "grad_norm_mean": 0.013689489603042603
+    },
+    {
+      "epoch": 222,
+      "grad_norm_mean": 0.015558306932449341
+    },
+    {
+      "epoch": 223,
+      "grad_norm_mean": 0.012563947200775147
+    },
+    {
+      "epoch": 224,
+      "grad_norm_mean": 0.011007814884185792
+    },
+    {
+      "epoch": 225,
+      "grad_norm_mean": 0.014353999137878418
+    },
+    {
+      "epoch": 226,
+      "grad_norm_mean": 0.013925417423248291
+    },
+    {
+      "epoch": 227,
+      "grad_norm_mean": 0.014391013860702514
+    },
+    {
+      "epoch": 228,
+      "grad_norm_mean": 0.012101169347763062
+    },
+    {
+      "epoch": 229,
+      "grad_norm_mean": 0.013299283027648925
+    },
+    {
+      "epoch": 230,
+      "grad_norm_mean": 0.014554292917251587
+    },
+    {
+      "epoch": 231,
+      "grad_norm_mean": 0.012522149085998534
+    },
+    {
+      "epoch": 232,
+      "grad_norm_mean": 0.013601277589797973
+    },
+    {
+      "epoch": 233,
+      "grad_norm_mean": 0.012119058132171632
+    },
+    {
+      "epoch": 234,
+      "grad_norm_mean": 0.012966038703918457
+    },
+    {
+      "epoch": 235,
+      "grad_norm_mean": 0.012819638967514039
+    },
+    {
+      "epoch": 236,
+      "grad_norm_mean": 0.011258399724960327
+    },
+    {
+      "epoch": 237,
+      "grad_norm_mean": 0.013921247482299805
+    },
+    {
+      "epoch": 238,
+      "grad_norm_mean": 0.013792986154556274
+    },
+    {
+      "epoch": 239,
+      "grad_norm_mean": 0.013220929384231568
+    },
+    {
+      "epoch": 240,
+      "grad_norm_mean": 0.013830363273620605
+    },
+    {
+      "epoch": 241,
+      "grad_norm_mean": 0.013510596752166749
+    },
+    {
+      "epoch": 242,
+      "grad_norm_mean": 0.012903630018234254
+    },
+    {
+      "epoch": 243,
+      "grad_norm_mean": 0.014736433982849122
+    },
+    {
+      "epoch": 244,
+      "grad_norm_mean": 0.01512731385231018
+    },
+    {
+      "epoch": 245,
+      "grad_norm_mean": 0.013204557418823242
+    },
+    {
+      "epoch": 246,
+      "grad_norm_mean": 0.01217319679260254
+    },
+    {
+      "epoch": 247,
+      "grad_norm_mean": 0.014082794904708863
+    },
+    {
+      "epoch": 248,
+      "grad_norm_mean": 0.010628524780273438
+    },
+    {
+      "epoch": 249,
+      "grad_norm_mean": 0.01390059733390808
+    },
+    {
+      "epoch": 250,
+      "grad_norm_mean": 0.013597699880599976
+    },
+    {
+      "epoch": 251,
+      "grad_norm_mean": 0.014242015600204468
+    },
+    {
+      "epoch": 252,
+      "grad_norm_mean": 0.012307596921920776
+    },
+    {
+      "epoch": 253,
+      "grad_norm_mean": 0.013759512901306153
+    },
+    {
+      "epoch": 254,
+      "grad_norm_mean": 0.013433527708053589
+    },
+    {
+      "epoch": 255,
+      "grad_norm_mean": 0.010785857915878296
+    },
+    {
+      "epoch": 256,
+      "grad_norm_mean": 0.011170197367668153
+    },
+    {
+      "epoch": 257,
+      "grad_norm_mean": 0.01272781229019165
+    },
+    {
+      "epoch": 258,
+      "grad_norm_mean": 0.013170839548110961
+    },
+    {
+      "epoch": 259,
+      "grad_norm_mean": 0.015124148368835449
+    },
+    {
+      "epoch": 260,
+      "grad_norm_mean": 0.010717629671096802
+    },
+    {
+      "epoch": 261,
+      "grad_norm_mean": 0.012685500383377075
+    },
+    {
+      "epoch": 262,
+      "grad_norm_mean": 0.011319226264953613
+    },
+    {
+      "epoch": 263,
+      "grad_norm_mean": 0.01398380732536316
+    },
+    {
+      "epoch": 264,
+      "grad_norm_mean": 0.013117254495620727
+    },
+    {
+      "epoch": 265,
+      "grad_norm_mean": 0.012803598165512084
+    },
+    {
+      "epoch": 266,
+      "grad_norm_mean": 0.015911047220230103
+    },
+    {
+      "epoch": 267,
+      "grad_norm_mean": 0.014234512090682983
+    },
+    {
+      "epoch": 268,
+      "grad_norm_mean": 0.011790565252304076
+    },
+    {
+      "epoch": 269,
+      "grad_norm_mean": 0.014240527153015136
+    },
+    {
+      "epoch": 270,
+      "grad_norm_mean": 0.014620620012283325
+    },
+    {
+      "epoch": 271,
+      "grad_norm_mean": 0.012676124095916747
+    },
+    {
+      "epoch": 272,
+      "grad_norm_mean": 0.011607795715332032
+    },
+    {
+      "epoch": 273,
+      "grad_norm_mean": 0.012164191722869873
+    },
+    {
+      "epoch": 274,
+      "grad_norm_mean": 0.014258354902267456
+    },
+    {
+      "epoch": 275,
+      "grad_norm_mean": 0.012848386764526367
+    },
+    {
+      "epoch": 276,
+      "grad_norm_mean": 0.01092910885810852
+    },
+    {
+      "epoch": 277,
+      "grad_norm_mean": 0.013052645683288575
+    },
+    {
+      "epoch": 278,
+      "grad_norm_mean": 0.012962822675704956
+    },
+    {
+      "epoch": 279,
+      "grad_norm_mean": 0.0151466383934021
+    },
+    {
+      "epoch": 280,
+      "grad_norm_mean": 0.012283227682113648
+    },
+    {
+      "epoch": 281,
+      "grad_norm_mean": 0.011998586654663086
+    },
+    {
+      "epoch": 282,
+      "grad_norm_mean": 0.011710556030273437
+    },
+    {
+      "epoch": 283,
+      "grad_norm_mean": 0.012985511541366576
+    },
+    {
+      "epoch": 284,
+      "grad_norm_mean": 0.010166966438293457
+    },
+    {
+      "epoch": 285,
+      "grad_norm_mean": 0.01262535309791565
+    },
+    {
+      "epoch": 286,
+      "grad_norm_mean": 0.014166231155395509
+    },
+    {
+      "epoch": 287,
+      "grad_norm_mean": 0.013193111896514892
+    },
+    {
+      "epoch": 288,
+      "grad_norm_mean": 0.01374960446357727
+    },
+    {
+      "epoch": 289,
+      "grad_norm_mean": 0.012473048210144043
+    },
+    {
+      "epoch": 290,
+      "grad_norm_mean": 0.013375045776367188
+    },
+    {
+      "epoch": 291,
+      "grad_norm_mean": 0.013972329139709474
+    },
+    {
+      "epoch": 292,
+      "grad_norm_mean": 0.012213876247406006
+    },
+    {
+      "epoch": 293,
+      "grad_norm_mean": 0.013618161678314209
+    },
+    {
+      "epoch": 294,
+      "grad_norm_mean": 0.013249305486679077
+    },
+    {
+      "epoch": 295,
+      "grad_norm_mean": 0.012131397008895874
+    },
+    {
+      "epoch": 296,
+      "grad_norm_mean": 0.013380939722061157
+    },
+    {
+      "epoch": 297,
+      "grad_norm_mean": 0.013406543731689454
+    },
+    {
+      "epoch": 298,
+      "grad_norm_mean": 0.01132572603225708
+    },
+    {
+      "epoch": 299,
+      "grad_norm_mean": 0.012208196878433228
+    },
+    {
+      "epoch": 300,
+      "grad_norm_mean": 0.0136858389377594
+    },
+    {
+      "epoch": 301,
+      "grad_norm_mean": 0.009669436454772948
+    },
+    {
+      "epoch": 302,
+      "grad_norm_mean": 0.013996578931808471
+    },
+    {
+      "epoch": 303,
+      "grad_norm_mean": 0.015794142246246336
+    },
+    {
+      "epoch": 304,
+      "grad_norm_mean": 0.012846981048583984
+    },
+    {
+      "epoch": 305,
+      "grad_norm_mean": 0.0143109130859375
+    },
+    {
+      "epoch": 306,
+      "grad_norm_mean": 0.01229953408241272
+    },
+    {
+      "epoch": 307,
+      "grad_norm_mean": 0.01222313380241394
+    },
+    {
+      "epoch": 308,
+      "grad_norm_mean": 0.012692649602890014
+    },
+    {
+      "epoch": 309,
+      "grad_norm_mean": 0.013352775812149048
+    },
+    {
+      "epoch": 310,
+      "grad_norm_mean": 0.012536396265029908
+    },
+    {
+      "epoch": 311,
+      "grad_norm_mean": 0.012843564987182617
+    },
+    {
+      "epoch": 312,
+      "grad_norm_mean": 0.012102975368499755
+    },
+    {
+      "epoch": 313,
+      "grad_norm_mean": 0.013597140789031983
+    },
+    {
+      "epoch": 314,
+      "grad_norm_mean": 0.012966279506683349
+    },
+    {
+      "epoch": 315,
+      "grad_norm_mean": 0.01251557970046997
+    },
+    {
+      "epoch": 316,
+      "grad_norm_mean": 0.013690815210342407
+    },
+    {
+      "epoch": 317,
+      "grad_norm_mean": 0.011779897451400756
+    },
+    {
+      "epoch": 318,
+      "grad_norm_mean": 0.013649826049804687
+    },
+    {
+      "epoch": 319,
+      "grad_norm_mean": 0.01218639373779297
+    },
+    {
+      "epoch": 320,
+      "grad_norm_mean": 0.011170241117477418
+    },
+    {
+      "epoch": 321,
+      "grad_norm_mean": 0.014196300029754638
+    },
+    {
+      "epoch": 322,
+      "grad_norm_mean": 0.015364877939224243
+    },
+    {
+      "epoch": 323,
+      "grad_norm_mean": 0.012264928102493286
+    },
+    {
+      "epoch": 324,
+      "grad_norm_mean": 0.014439938306808472
+    },
+    {
+      "epoch": 325,
+      "grad_norm_mean": 0.013405280590057373
+    },
+    {
+      "epoch": 326,
+      "grad_norm_mean": 0.010812107801437378
+    },
+    {
+      "epoch": 327,
+      "grad_norm_mean": 0.014820266246795654
+    },
+    {
+      "epoch": 328,
+      "grad_norm_mean": 0.014657258987426758
+    },
+    {
+      "epoch": 329,
+      "grad_norm_mean": 0.012716047286987305
+    },
+    {
+      "epoch": 330,
+      "grad_norm_mean": 0.013990829944610596
+    },
+    {
+      "epoch": 331,
+      "grad_norm_mean": 0.012685240507125854
+    },
+    {
+      "epoch": 332,
+      "grad_norm_mean": 0.013003854513168335
+    },
+    {
+      "epoch": 333,
+      "grad_norm_mean": 0.011000605821609498
+    },
+    {
+      "epoch": 334,
+      "grad_norm_mean": 0.013275668621063233
+    },
+    {
+      "epoch": 335,
+      "grad_norm_mean": 0.013722049951553345
+    },
+    {
+      "epoch": 336,
+      "grad_norm_mean": 0.014011722803115845
+    },
+    {
+      "epoch": 337,
+      "grad_norm_mean": 0.01261168885231018
+    },
+    {
+      "epoch": 338,
+      "grad_norm_mean": 0.012262776851654052
+    },
+    {
+      "epoch": 339,
+      "grad_norm_mean": 0.014010310173034668
+    },
+    {
+      "epoch": 340,
+      "grad_norm_mean": 0.011289773941040039
+    },
+    {
+      "epoch": 341,
+      "grad_norm_mean": 0.012931268215179443
+    },
+    {
+      "epoch": 342,
+      "grad_norm_mean": 0.011898353338241578
+    },
+    {
+      "epoch": 343,
+      "grad_norm_mean": 0.013684996604919434
+    },
+    {
+      "epoch": 344,
+      "grad_norm_mean": 0.012526087284088135
+    },
+    {
+      "epoch": 345,
+      "grad_norm_mean": 0.012622668504714966
+    },
+    {
+      "epoch": 346,
+      "grad_norm_mean": 0.014186061143875122
+    },
+    {
+      "epoch": 347,
+      "grad_norm_mean": 0.012873662233352661
+    },
+    {
+      "epoch": 348,
+      "grad_norm_mean": 0.01221562123298645
+    },
+    {
+      "epoch": 349,
+      "grad_norm_mean": 0.015160336256027222
+    },
+    {
+      "epoch": 350,
+      "grad_norm_mean": 0.012323024153709412
+    },
+    {
+      "epoch": 351,
+      "grad_norm_mean": 0.011976942539215088
+    },
+    {
+      "epoch": 352,
+      "grad_norm_mean": 0.012137765169143677
+    },
+    {
+      "epoch": 353,
+      "grad_norm_mean": 0.012883087635040284
+    },
+    {
+      "epoch": 354,
+      "grad_norm_mean": 0.011469861268997192
+    },
+    {
+      "epoch": 355,
+      "grad_norm_mean": 0.013569318056106568
+    },
+    {
+      "epoch": 356,
+      "grad_norm_mean": 0.014665079355239868
+    },
+    {
+      "epoch": 357,
+      "grad_norm_mean": 0.014477833032608032
+    },
+    {
+      "epoch": 358,
+      "grad_norm_mean": 0.014276696920394898
+    },
+    {
+      "epoch": 359,
+      "grad_norm_mean": 0.012638914346694946
+    },
+    {
+      "epoch": 360,
+      "grad_norm_mean": 0.012983439683914185
+    },
+    {
+      "epoch": 361,
+      "grad_norm_mean": 0.012488904237747192
+    },
+    {
+      "epoch": 362,
+      "grad_norm_mean": 0.012911540508270264
+    },
+    {
+      "epoch": 363,
+      "grad_norm_mean": 0.013255955457687377
+    },
+    {
+      "epoch": 364,
+      "grad_norm_mean": 0.012209484815597534
+    },
+    {
+      "epoch": 365,
+      "grad_norm_mean": 0.012978623628616332
+    },
+    {
+      "epoch": 366,
+      "grad_norm_mean": 0.012864630460739136
+    },
+    {
+      "epoch": 367,
+      "grad_norm_mean": 0.012269851684570312
+    },
+    {
+      "epoch": 368,
+      "grad_norm_mean": 0.011375735759735108
+    },
+    {
+      "epoch": 369,
+      "grad_norm_mean": 0.013897774696350097
+    },
+    {
+      "epoch": 370,
+      "grad_norm_mean": 0.011667052030563355
+    },
+    {
+      "epoch": 371,
+      "grad_norm_mean": 0.012235021591186524
+    },
+    {
+      "epoch": 372,
+      "grad_norm_mean": 0.011789114475250244
+    },
+    {
+      "epoch": 373,
+      "grad_norm_mean": 0.010064006567001342
+    },
+    {
+      "epoch": 374,
+      "grad_norm_mean": 0.011645991086959838
+    },
+    {
+      "epoch": 375,
+      "grad_norm_mean": 0.01046461534500122
+    },
+    {
+      "epoch": 376,
+      "grad_norm_mean": 0.011240078449249267
+    },
+    {
+      "epoch": 377,
+      "grad_norm_mean": 0.011669391870498657
+    },
+    {
+      "epoch": 378,
+      "grad_norm_mean": 0.014864991664886475
+    },
+    {
+      "epoch": 379,
+      "grad_norm_mean": 0.012998293399810791
+    },
+    {
+      "epoch": 380,
+      "grad_norm_mean": 0.01591996192932129
+    },
+    {
+      "epoch": 381,
+      "grad_norm_mean": 0.012947496175765991
+    },
+    {
+      "epoch": 382,
+      "grad_norm_mean": 0.014451483964920044
+    },
+    {
+      "epoch": 383,
+      "grad_norm_mean": 0.01381579041481018
+    },
+    {
+      "epoch": 384,
+      "grad_norm_mean": 0.013921416282653809
+    },
+    {
+      "epoch": 385,
+      "grad_norm_mean": 0.014669173240661621
+    },
+    {
+      "epoch": 386,
+      "grad_norm_mean": 0.012257046699523926
+    },
+    {
+      "epoch": 387,
+      "grad_norm_mean": 0.013771031379699707
+    },
+    {
+      "epoch": 388,
+      "grad_norm_mean": 0.012059647798538208
+    },
+    {
+      "epoch": 389,
+      "grad_norm_mean": 0.01576002264022827
+    },
+    {
+      "epoch": 390,
+      "grad_norm_mean": 0.011942913293838502
+    },
+    {
+      "epoch": 391,
+      "grad_norm_mean": 0.012309932947158814
+    },
+    {
+      "epoch": 392,
+      "grad_norm_mean": 0.013002054929733277
+    },
+    {
+      "epoch": 393,
+      "grad_norm_mean": 0.010966911792755126
+    },
+    {
+      "epoch": 394,
+      "grad_norm_mean": 0.012506956100463868
+    },
+    {
+      "epoch": 395,
+      "grad_norm_mean": 0.01580369734764099
+    },
+    {
+      "epoch": 396,
+      "grad_norm_mean": 0.01274320411682129
+    },
+    {
+      "epoch": 397,
+      "grad_norm_mean": 0.012668976068496703
+    },
+    {
+      "epoch": 398,
+      "grad_norm_mean": 0.01395494818687439
+    },
+    {
+      "epoch": 399,
+      "grad_norm_mean": 0.014866037130355834
+    },
+    {
+      "epoch": 400,
+      "grad_norm_mean": 0.014278798818588257
+    },
+    {
+      "epoch": 401,
+      "grad_norm_mean": 0.016376601219177247
+    },
+    {
+      "epoch": 402,
+      "grad_norm_mean": 0.014601707935333252
+    },
+    {
+      "epoch": 403,
+      "grad_norm_mean": 0.013546084642410278
+    },
+    {
+      "epoch": 404,
+      "grad_norm_mean": 0.013274129390716552
+    },
+    {
+      "epoch": 405,
+      "grad_norm_mean": 0.011076916456222535
+    },
+    {
+      "epoch": 406,
+      "grad_norm_mean": 0.014424583435058595
+    },
+    {
+      "epoch": 407,
+      "grad_norm_mean": 0.015182004690170288
+    },
+    {
+      "epoch": 408,
+      "grad_norm_mean": 0.012081199169158936
+    },
+    {
+      "epoch": 409,
+      "grad_norm_mean": 0.012090698003768921
+    },
+    {
+      "epoch": 410,
+      "grad_norm_mean": 0.012829040765762328
+    },
+    {
+      "epoch": 411,
+      "grad_norm_mean": 0.015196412801742554
+    },
+    {
+      "epoch": 412,
+      "grad_norm_mean": 0.016457343101501466
+    },
+    {
+      "epoch": 413,
+      "grad_norm_mean": 0.013191700220108031
+    },
+    {
+      "epoch": 414,
+      "grad_norm_mean": 0.016686262130737303
+    },
+    {
+      "epoch": 415,
+      "grad_norm_mean": 0.015331247329711913
+    },
+    {
+      "epoch": 416,
+      "grad_norm_mean": 0.013333407402038575
+    },
+    {
+      "epoch": 417,
+      "grad_norm_mean": 0.013918851375579834
+    },
+    {
+      "epoch": 418,
+      "grad_norm_mean": 0.012292700290679932
+    },
+    {
+      "epoch": 419,
+      "grad_norm_mean": 0.012231384754180908
+    },
+    {
+      "epoch": 420,
+      "grad_norm_mean": 0.012571154117584228
+    },
+    {
+      "epoch": 421,
+      "grad_norm_mean": 0.011060044765472413
+    },
+    {
+      "epoch": 422,
+      "grad_norm_mean": 0.01237134063243866
+    },
+    {
+      "epoch": 423,
+      "grad_norm_mean": 0.01084613835811615
+    },
+    {
+      "epoch": 424,
+      "grad_norm_mean": 0.011242804050445556
+    },
+    {
+      "epoch": 425,
+      "grad_norm_mean": 0.012065211057662964
+    },
+    {
+      "epoch": 426,
+      "grad_norm_mean": 0.01099593710899353
+    },
+    {
+      "epoch": 427,
+      "grad_norm_mean": 0.013606004953384399
+    },
+    {
+      "epoch": 428,
+      "grad_norm_mean": 0.010825646877288818
+    },
+    {
+      "epoch": 429,
+      "grad_norm_mean": 0.012074752807617188
+    },
+    {
+      "epoch": 430,
+      "grad_norm_mean": 0.010895124673843383
+    },
+    {
+      "epoch": 431,
+      "grad_norm_mean": 0.010966040730476379
+    },
+    {
+      "epoch": 432,
+      "grad_norm_mean": 0.015038285493850709
+    },
+    {
+      "epoch": 433,
+      "grad_norm_mean": 0.011913884162902831
+    },
+    {
+      "epoch": 434,
+      "grad_norm_mean": 0.011895601034164429
+    },
+    {
+      "epoch": 435,
+      "grad_norm_mean": 0.011596141576766968
+    },
+    {
+      "epoch": 436,
+      "grad_norm_mean": 0.014222589492797852
+    },
+    {
+      "epoch": 437,
+      "grad_norm_mean": 0.00905906069278717
+    },
+    {
+      "epoch": 438,
+      "grad_norm_mean": 0.011016049981117248
+    },
+    {
+      "epoch": 439,
+      "grad_norm_mean": 0.010834809780120849
+    },
+    {
+      "epoch": 440,
+      "grad_norm_mean": 0.011497314929962157
+    },
+    {
+      "epoch": 441,
+      "grad_norm_mean": 0.013065921783447265
+    },
+    {
+      "epoch": 442,
+      "grad_norm_mean": 0.012790347099304199
+    },
+    {
+      "epoch": 443,
+      "grad_norm_mean": 0.011330121278762817
+    },
+    {
+      "epoch": 444,
+      "grad_norm_mean": 0.014970997810363769
+    },
+    {
+      "epoch": 445,
+      "grad_norm_mean": 0.012192829608917237
+    },
+    {
+      "epoch": 446,
+      "grad_norm_mean": 0.011032991409301758
+    },
+    {
+      "epoch": 447,
+      "grad_norm_mean": 0.013534154415130615
+    },
+    {
+      "epoch": 448,
+      "grad_norm_mean": 0.013627041578292847
+    },
+    {
+      "epoch": 449,
+      "grad_norm_mean": 0.01158932089805603
+    },
+    {
+      "epoch": 450,
+      "grad_norm_mean": 0.01059919810295105
+    },
+    {
+      "epoch": 451,
+      "grad_norm_mean": 0.010839225649833679
+    },
+    {
+      "epoch": 452,
+      "grad_norm_mean": 0.01529173469543457
+    },
+    {
+      "epoch": 453,
+      "grad_norm_mean": 0.010265235424041747
+    },
+    {
+      "epoch": 454,
+      "grad_norm_mean": 0.014729360103607177
+    },
+    {
+      "epoch": 455,
+      "grad_norm_mean": 0.013210662364959717
+    },
+    {
+      "epoch": 456,
+      "grad_norm_mean": 0.017084783792495728
+    },
+    {
+      "epoch": 457,
+      "grad_norm_mean": 0.012874865770339966
+    },
+    {
+      "epoch": 458,
+      "grad_norm_mean": 0.013455488920211792
+    },
+    {
+      "epoch": 459,
+      "grad_norm_mean": 0.012600040435791016
+    },
+    {
+      "epoch": 460,
+      "grad_norm_mean": 0.01093504285812378
+    },
+    {
+      "epoch": 461,
+      "grad_norm_mean": 0.011938411235809326
+    },
+    {
+      "epoch": 462,
+      "grad_norm_mean": 0.011141826629638672
+    },
+    {
+      "epoch": 463,
+      "grad_norm_mean": 0.013247867822647095
+    },
+    {
+      "epoch": 464,
+      "grad_norm_mean": 0.012758498668670654
+    },
+    {
+      "epoch": 465,
+      "grad_norm_mean": 0.01012708842754364
+    },
+    {
+      "epoch": 466,
+      "grad_norm_mean": 0.013539748191833496
+    },
+    {
+      "epoch": 467,
+      "grad_norm_mean": 0.01140868616104126
+    },
+    {
+      "epoch": 468,
+      "grad_norm_mean": 0.013812388896942139
+    },
+    {
+      "epoch": 469,
+      "grad_norm_mean": 0.01491767430305481
+    },
+    {
+      "epoch": 470,
+      "grad_norm_mean": 0.01366475772857666
+    },
+    {
+      "epoch": 471,
+      "grad_norm_mean": 0.011737118482589721
+    },
+    {
+      "epoch": 472,
+      "grad_norm_mean": 0.012960731506347656
+    },
+    {
+      "epoch": 473,
+      "grad_norm_mean": 0.012380832195281983
+    },
+    {
+      "epoch": 474,
+      "grad_norm_mean": 0.01286109745502472
+    },
+    {
+      "epoch": 475,
+      "grad_norm_mean": 0.011673631906509399
+    },
+    {
+      "epoch": 476,
+      "grad_norm_mean": 0.012182275295257568
+    },
+    {
+      "epoch": 477,
+      "grad_norm_mean": 0.012112887859344482
+    },
+    {
+      "epoch": 478,
+      "grad_norm_mean": 0.01140241265296936
+    },
+    {
+      "epoch": 479,
+      "grad_norm_mean": 0.012456896781921387
+    },
+    {
+      "epoch": 480,
+      "grad_norm_mean": 0.009782057285308838
+    },
+    {
+      "epoch": 481,
+      "grad_norm_mean": 0.01717822551727295
+    },
+    {
+      "epoch": 482,
+      "grad_norm_mean": 0.012602099657058715
+    },
+    {
+      "epoch": 483,
+      "grad_norm_mean": 0.01152203905582428
+    },
+    {
+      "epoch": 484,
+      "grad_norm_mean": 0.013895855903625489
+    },
+    {
+      "epoch": 485,
+      "grad_norm_mean": 0.015749125242233278
+    },
+    {
+      "epoch": 486,
+      "grad_norm_mean": 0.012639332771301269
+    },
+    {
+      "epoch": 487,
+      "grad_norm_mean": 0.011566706895828248
+    },
+    {
+      "epoch": 488,
+      "grad_norm_mean": 0.012554070472717286
+    },
+    {
+      "epoch": 489,
+      "grad_norm_mean": 0.012479225635528564
+    },
+    {
+      "epoch": 490,
+      "grad_norm_mean": 0.011100582838058471
+    },
+    {
+      "epoch": 491,
+      "grad_norm_mean": 0.014113859415054322
+    },
+    {
+      "epoch": 492,
+      "grad_norm_mean": 0.012163718938827514
+    },
+    {
+      "epoch": 493,
+      "grad_norm_mean": 0.012245694875717163
+    },
+    {
+      "epoch": 494,
+      "grad_norm_mean": 0.0127673499584198
+    },
+    {
+      "epoch": 495,
+      "grad_norm_mean": 0.016399196147918703
+    },
+    {
+      "epoch": 496,
+      "grad_norm_mean": 0.01473624849319458
+    },
+    {
+      "epoch": 497,
+      "grad_norm_mean": 0.012181567668914794
+    },
+    {
+      "epoch": 498,
+      "grad_norm_mean": 0.013186349630355835
+    },
+    {
+      "epoch": 499,
+      "grad_norm_mean": 0.014196413516998291
+    },
+    {
+      "epoch": 500,
+      "grad_norm_mean": 0.012622726917266845
+    },
+    {
+      "epoch": 501,
+      "grad_norm_mean": 0.013067768573760987
+    },
+    {
+      "epoch": 502,
+      "grad_norm_mean": 0.012660765409469605
+    },
+    {
+      "epoch": 503,
+      "grad_norm_mean": 0.012233947038650512
+    },
+    {
+      "epoch": 504,
+      "grad_norm_mean": 0.014093108415603638
+    },
+    {
+      "epoch": 505,
+      "grad_norm_mean": 0.012656777143478393
+    },
+    {
+      "epoch": 506,
+      "grad_norm_mean": 0.009971122980117798
+    },
+    {
+      "epoch": 507,
+      "grad_norm_mean": 0.009463870048522949
+    },
+    {
+      "epoch": 508,
+      "grad_norm_mean": 0.012129653215408326
+    },
+    {
+      "epoch": 509,
+      "grad_norm_mean": 0.012095170497894287
+    },
+    {
+      "epoch": 510,
+      "grad_norm_mean": 0.01203300166130066
+    },
+    {
+      "epoch": 511,
+      "grad_norm_mean": 0.011313154935836792
+    },
+    {
+      "epoch": 512,
+      "grad_norm_mean": 0.011502678394317628
+    },
+    {
+      "epoch": 513,
+      "grad_norm_mean": 0.012100842237472533
+    },
+    {
+      "epoch": 514,
+      "grad_norm_mean": 0.009060917973518372
+    },
+    {
+      "epoch": 515,
+      "grad_norm_mean": 0.012782907485961914
+    },
+    {
+      "epoch": 516,
+      "grad_norm_mean": 0.013386235475540161
+    },
+    {
+      "epoch": 517,
+      "grad_norm_mean": 0.011633118152618409
+    },
+    {
+      "epoch": 518,
+      "grad_norm_mean": 0.015621707677841186
+    },
+    {
+      "epoch": 519,
+      "grad_norm_mean": 0.013061790943145753
+    },
+    {
+      "epoch": 520,
+      "grad_norm_mean": 0.015221849203109742
+    },
+    {
+      "epoch": 521,
+      "grad_norm_mean": 0.011966610670089722
+    },
+    {
+      "epoch": 522,
+      "grad_norm_mean": 0.009933053731918336
+    },
+    {
+      "epoch": 523,
+      "grad_norm_mean": 0.011042691707611085
+    },
+    {
+      "epoch": 524,
+      "grad_norm_mean": 0.013497496604919433
+    },
+    {
+      "epoch": 525,
+      "grad_norm_mean": 0.012713933229446412
+    },
+    {
+      "epoch": 526,
+      "grad_norm_mean": 0.013278217315673828
+    },
+    {
+      "epoch": 527,
+      "grad_norm_mean": 0.01405613875389099
+    },
+    {
+      "epoch": 528,
+      "grad_norm_mean": 0.014619612216949462
+    },
+    {
+      "epoch": 529,
+      "grad_norm_mean": 0.012247033834457398
+    },
+    {
+      "epoch": 530,
+      "grad_norm_mean": 0.013103214263916016
+    },
+    {
+      "epoch": 531,
+      "grad_norm_mean": 0.012972635507583619
+    },
+    {
+      "epoch": 532,
+      "grad_norm_mean": 0.012110970020294189
+    },
+    {
+      "epoch": 533,
+      "grad_norm_mean": 0.012741011142730713
+    },
+    {
+      "epoch": 534,
+      "grad_norm_mean": 0.013073816776275634
+    },
+    {
+      "epoch": 535,
+      "grad_norm_mean": 0.01226350998878479
+    },
+    {
+      "epoch": 536,
+      "grad_norm_mean": 0.014046426773071288
+    },
+    {
+      "epoch": 537,
+      "grad_norm_mean": 0.012311183214187622
+    },
+    {
+      "epoch": 538,
+      "grad_norm_mean": 0.011831318855285645
+    },
+    {
+      "epoch": 539,
+      "grad_norm_mean": 0.01318354868888855
+    },
+    {
+      "epoch": 540,
+      "grad_norm_mean": 0.014808631896972657
+    },
+    {
+      "epoch": 541,
+      "grad_norm_mean": 0.013502079486846924
+    },
+    {
+      "epoch": 542,
+      "grad_norm_mean": 0.011900356769561768
+    },
+    {
+      "epoch": 543,
+      "grad_norm_mean": 0.013516395092010499
+    },
+    {
+      "epoch": 544,
+      "grad_norm_mean": 0.012182788372039795
+    },
+    {
+      "epoch": 545,
+      "grad_norm_mean": 0.010762839317321778
+    },
+    {
+      "epoch": 546,
+      "grad_norm_mean": 0.01406313967704773
+    },
+    {
+      "epoch": 547,
+      "grad_norm_mean": 0.013295439720153809
+    },
+    {
+      "epoch": 548,
+      "grad_norm_mean": 0.01188136649131775
+    },
+    {
+      "epoch": 549,
+      "grad_norm_mean": 0.011340047955513001
+    },
+    {
+      "epoch": 550,
+      "grad_norm_mean": 0.011058955430984497
+    },
+    {
+      "epoch": 551,
+      "grad_norm_mean": 0.013101941108703613
+    },
+    {
+      "epoch": 552,
+      "grad_norm_mean": 0.012724642038345337
+    },
+    {
+      "epoch": 553,
+      "grad_norm_mean": 0.013766560792922974
+    },
+    {
+      "epoch": 554,
+      "grad_norm_mean": 0.011508731126785278
+    },
+    {
+      "epoch": 555,
+      "grad_norm_mean": 0.012268862962722778
+    },
+    {
+      "epoch": 556,
+      "grad_norm_mean": 0.011317543745040893
+    },
+    {
+      "epoch": 557,
+      "grad_norm_mean": 0.012586937189102173
+    },
+    {
+      "epoch": 558,
+      "grad_norm_mean": 0.013256498336791992
+    },
+    {
+      "epoch": 559,
+      "grad_norm_mean": 0.01271308422088623
+    },
+    {
+      "epoch": 560,
+      "grad_norm_mean": 0.01429482126235962
+    },
+    {
+      "epoch": 561,
+      "grad_norm_mean": 0.013134519338607788
+    },
+    {
+      "epoch": 562,
+      "grad_norm_mean": 0.012970413446426392
+    },
+    {
+      "epoch": 563,
+      "grad_norm_mean": 0.011002413988113403
+    },
+    {
+      "epoch": 564,
+      "grad_norm_mean": 0.010915093183517455
+    },
+    {
+      "epoch": 565,
+      "grad_norm_mean": 0.012086922883987427
+    },
+    {
+      "epoch": 566,
+      "grad_norm_mean": 0.011125887155532838
+    },
+    {
+      "epoch": 567,
+      "grad_norm_mean": 0.014821080446243286
+    },
+    {
+      "epoch": 568,
+      "grad_norm_mean": 0.011444377899169921
+    },
+    {
+      "epoch": 569,
+      "grad_norm_mean": 0.015834242820739745
+    },
+    {
+      "epoch": 570,
+      "grad_norm_mean": 0.01196298360824585
+    },
+    {
+      "epoch": 571,
+      "grad_norm_mean": 0.010808587074279785
+    },
+    {
+      "epoch": 572,
+      "grad_norm_mean": 0.012470785975456238
+    },
+    {
+      "epoch": 573,
+      "grad_norm_mean": 0.013371068716049194
+    },
+    {
+      "epoch": 574,
+      "grad_norm_mean": 0.013253097772598267
+    },
+    {
+      "epoch": 575,
+      "grad_norm_mean": 0.011571451902389526
+    },
+    {
+      "epoch": 576,
+      "grad_norm_mean": 0.01241996955871582
+    },
+    {
+      "epoch": 577,
+      "grad_norm_mean": 0.011897445678710938
+    },
+    {
+      "epoch": 578,
+      "grad_norm_mean": 0.013276739358901977
+    },
+    {
+      "epoch": 579,
+      "grad_norm_mean": 0.010536209106445312
+    },
+    {
+      "epoch": 580,
+      "grad_norm_mean": 0.013345340490341187
+    },
+    {
+      "epoch": 581,
+      "grad_norm_mean": 0.011986809492111205
+    },
+    {
+      "epoch": 582,
+      "grad_norm_mean": 0.014833796262741089
+    },
+    {
+      "epoch": 583,
+      "grad_norm_mean": 0.012732411861419678
+    },
+    {
+      "epoch": 584,
+      "grad_norm_mean": 0.014788665771484376
+    },
+    {
+      "epoch": 585,
+      "grad_norm_mean": 0.010517832517623902
+    },
+    {
+      "epoch": 586,
+      "grad_norm_mean": 0.012073221445083618
+    },
+    {
+      "epoch": 587,
+      "grad_norm_mean": 0.010828885555267334
+    },
+    {
+      "epoch": 588,
+      "grad_norm_mean": 0.009895781755447388
+    },
+    {
+      "epoch": 589,
+      "grad_norm_mean": 0.010969337701797486
+    },
+    {
+      "epoch": 590,
+      "grad_norm_mean": 0.011568685293197632
+    },
+    {
+      "epoch": 591,
+      "grad_norm_mean": 0.013428832769393922
+    },
+    {
+      "epoch": 592,
+      "grad_norm_mean": 0.011226667165756226
+    },
+    {
+      "epoch": 593,
+      "grad_norm_mean": 0.011322247505187987
+    },
+    {
+      "epoch": 594,
+      "grad_norm_mean": 0.01169034767150879
+    },
+    {
+      "epoch": 595,
+      "grad_norm_mean": 0.012331101894378662
+    },
+    {
+      "epoch": 596,
+      "grad_norm_mean": 0.01274752926826477
+    },
+    {
+      "epoch": 597,
+      "grad_norm_mean": 0.01341199016571045
+    },
+    {
+      "epoch": 598,
+      "grad_norm_mean": 0.011694249868392945
+    },
+    {
+      "epoch": 599,
+      "grad_norm_mean": 0.009160959720611572
+    },
+    {
+      "epoch": 600,
+      "grad_norm_mean": 0.012161270976066589
+    },
+    {
+      "epoch": 601,
+      "grad_norm_mean": 0.013084184646606446
+    },
+    {
+      "epoch": 602,
+      "grad_norm_mean": 0.010956658124923706
+    },
+    {
+      "epoch": 603,
+      "grad_norm_mean": 0.012766970634460448
+    },
+    {
+      "epoch": 604,
+      "grad_norm_mean": 0.010853957653045655
+    },
+    {
+      "epoch": 605,
+      "grad_norm_mean": 0.01262894320487976
+    },
+    {
+      "epoch": 606,
+      "grad_norm_mean": 0.014417014360427857
+    },
+    {
+      "epoch": 607,
+      "grad_norm_mean": 0.011694050312042237
+    },
+    {
+      "epoch": 608,
+      "grad_norm_mean": 0.013263936042785645
+    },
+    {
+      "epoch": 609,
+      "grad_norm_mean": 0.011766386985778808
+    },
+    {
+      "epoch": 610,
+      "grad_norm_mean": 0.012157228231430053
+    },
+    {
+      "epoch": 611,
+      "grad_norm_mean": 0.013461722373962402
+    },
+    {
+      "epoch": 612,
+      "grad_norm_mean": 0.010860981941223145
+    },
+    {
+      "epoch": 613,
+      "grad_norm_mean": 0.009815953731536865
+    },
+    {
+      "epoch": 614,
+      "grad_norm_mean": 0.008394372820854187
+    },
+    {
+      "epoch": 615,
+      "grad_norm_mean": 0.009031280517578125
+    },
+    {
+      "epoch": 616,
+      "grad_norm_mean": 0.010137641191482544
+    },
+    {
+      "epoch": 617,
+      "grad_norm_mean": 0.011836426258087158
+    },
+    {
+      "epoch": 618,
+      "grad_norm_mean": 0.0152659432888031
+    },
+    {
+      "epoch": 619,
+      "grad_norm_mean": 0.012853203773498535
+    },
+    {
+      "epoch": 620,
+      "grad_norm_mean": 0.013427648067474365
+    },
+    {
+      "epoch": 621,
+      "grad_norm_mean": 0.014010192394256592
+    },
+    {
+      "epoch": 622,
+      "grad_norm_mean": 0.011250187397003173
+    },
+    {
+      "epoch": 623,
+      "grad_norm_mean": 0.01146640682220459
+    },
+    {
+      "epoch": 624,
+      "grad_norm_mean": 0.011765659570693969
+    },
+    {
+      "epoch": 625,
+      "grad_norm_mean": 0.011646605730056762
+    },
+    {
+      "epoch": 626,
+      "grad_norm_mean": 0.011480749607086182
+    },
+    {
+      "epoch": 627,
+      "grad_norm_mean": 0.010860546827316284
+    },
+    {
+      "epoch": 628,
+      "grad_norm_mean": 0.01041837739944458
+    },
+    {
+      "epoch": 629,
+      "grad_norm_mean": 0.011712668657302857
+    },
+    {
+      "epoch": 630,
+      "grad_norm_mean": 0.011505565643310546
+    },
+    {
+      "epoch": 631,
+      "grad_norm_mean": 0.010809902667999267
+    },
+    {
+      "epoch": 632,
+      "grad_norm_mean": 0.012081512928009033
+    },
+    {
+      "epoch": 633,
+      "grad_norm_mean": 0.01268029260635376
+    },
+    {
+      "epoch": 634,
+      "grad_norm_mean": 0.012427574157714843
+    },
+    {
+      "epoch": 635,
+      "grad_norm_mean": 0.011183998346328735
+    },
+    {
+      "epoch": 636,
+      "grad_norm_mean": 0.011512084245681762
+    },
+    {
+      "epoch": 637,
+      "grad_norm_mean": 0.012069889307022096
+    },
+    {
+      "epoch": 638,
+      "grad_norm_mean": 0.013398499011993407
+    },
+    {
+      "epoch": 639,
+      "grad_norm_mean": 0.011008100271224976
+    },
+    {
+      "epoch": 640,
+      "grad_norm_mean": 0.01401706099510193
+    },
+    {
+      "epoch": 641,
+      "grad_norm_mean": 0.013576184511184692
+    },
+    {
+      "epoch": 642,
+      "grad_norm_mean": 0.009832587957382202
+    },
+    {
+      "epoch": 643,
+      "grad_norm_mean": 0.013019839763641357
+    },
+    {
+      "epoch": 644,
+      "grad_norm_mean": 0.015479870796203613
+    },
+    {
+      "epoch": 645,
+      "grad_norm_mean": 0.014976558446884156
+    },
+    {
+      "epoch": 646,
+      "grad_norm_mean": 0.01059085202217102
+    },
+    {
+      "epoch": 647,
+      "grad_norm_mean": 0.011977860450744629
+    },
+    {
+      "epoch": 648,
+      "grad_norm_mean": 0.014356809139251709
+    },
+    {
+      "epoch": 649,
+      "grad_norm_mean": 0.014170697212219238
+    },
+    {
+      "epoch": 650,
+      "grad_norm_mean": 0.013431270122528077
+    },
+    {
+      "epoch": 651,
+      "grad_norm_mean": 0.010930399775505067
+    },
+    {
+      "epoch": 652,
+      "grad_norm_mean": 0.01171335005760193
+    },
+    {
+      "epoch": 653,
+      "grad_norm_mean": 0.013861951589584351
+    },
+    {
+      "epoch": 654,
+      "grad_norm_mean": 0.009334259033203125
+    },
+    {
+      "epoch": 655,
+      "grad_norm_mean": 0.012931578397750854
+    },
+    {
+      "epoch": 656,
+      "grad_norm_mean": 0.011752556324005127
+    },
+    {
+      "epoch": 657,
+      "grad_norm_mean": 0.012658214569091797
+    },
+    {
+      "epoch": 658,
+      "grad_norm_mean": 0.01429186201095581
+    },
+    {
+      "epoch": 659,
+      "grad_norm_mean": 0.012066327571868896
+    },
+    {
+      "epoch": 660,
+      "grad_norm_mean": 0.014336461067199708
+    },
+    {
+      "epoch": 661,
+      "grad_norm_mean": 0.01251647138595581
+    },
+    {
+      "epoch": 662,
+      "grad_norm_mean": 0.015359984874725343
+    },
+    {
+      "epoch": 663,
+      "grad_norm_mean": 0.012540915608406067
+    },
+    {
+      "epoch": 664,
+      "grad_norm_mean": 0.01570594072341919
+    },
+    {
+      "epoch": 665,
+      "grad_norm_mean": 0.01568804407119751
+    },
+    {
+      "epoch": 666,
+      "grad_norm_mean": 0.010515822172164917
+    },
+    {
+      "epoch": 667,
+      "grad_norm_mean": 0.011802480936050415
+    },
+    {
+      "epoch": 668,
+      "grad_norm_mean": 0.012110278129577637
+    },
+    {
+      "epoch": 669,
+      "grad_norm_mean": 0.011893150329589843
+    },
+    {
+      "epoch": 670,
+      "grad_norm_mean": 0.01271324610710144
+    },
+    {
+      "epoch": 671,
+      "grad_norm_mean": 0.010874946117401123
+    },
+    {
+      "epoch": 672,
+      "grad_norm_mean": 0.011125401020050048
+    },
+    {
+      "epoch": 673,
+      "grad_norm_mean": 0.013002403259277344
+    },
+    {
+      "epoch": 674,
+      "grad_norm_mean": 0.014326923608779907
+    },
+    {
+      "epoch": 675,
+      "grad_norm_mean": 0.010421835422515869
+    },
+    {
+      "epoch": 676,
+      "grad_norm_mean": 0.009058303236961364
+    },
+    {
+      "epoch": 677,
+      "grad_norm_mean": 0.011377660989761352
+    },
+    {
+      "epoch": 678,
+      "grad_norm_mean": 0.011107006072998048
+    },
+    {
+      "epoch": 679,
+      "grad_norm_mean": 0.013117924690246582
+    },
+    {
+      "epoch": 680,
+      "grad_norm_mean": 0.01105804443359375
+    },
+    {
+      "epoch": 681,
+      "grad_norm_mean": 0.011814627647399902
+    },
+    {
+      "epoch": 682,
+      "grad_norm_mean": 0.014463187217712403
+    },
+    {
+      "epoch": 683,
+      "grad_norm_mean": 0.013138561248779297
+    },
+    {
+      "epoch": 684,
+      "grad_norm_mean": 0.014844993829727173
+    },
+    {
+      "epoch": 685,
+      "grad_norm_mean": 0.01302864646911621
+    },
+    {
+      "epoch": 686,
+      "grad_norm_mean": 0.01344809341430664
+    },
+    {
+      "epoch": 687,
+      "grad_norm_mean": 0.016280644178390504
+    },
+    {
+      "epoch": 688,
+      "grad_norm_mean": 0.01497732973098755
+    },
+    {
+      "epoch": 689,
+      "grad_norm_mean": 0.014251970052719116
+    },
+    {
+      "epoch": 690,
+      "grad_norm_mean": 0.01567040205001831
+    },
+    {
+      "epoch": 691,
+      "grad_norm_mean": 0.014149798631668091
+    },
+    {
+      "epoch": 692,
+      "grad_norm_mean": 0.012499644994735718
+    },
+    {
+      "epoch": 693,
+      "grad_norm_mean": 0.014736135005950928
+    },
+    {
+      "epoch": 694,
+      "grad_norm_mean": 0.011202908039093018
+    },
+    {
+      "epoch": 695,
+      "grad_norm_mean": 0.010391999483108521
+    },
+    {
+      "epoch": 696,
+      "grad_norm_mean": 0.0115006844997406
+    },
+    {
+      "epoch": 697,
+      "grad_norm_mean": 0.01407738709449768
+    },
+    {
+      "epoch": 698,
+      "grad_norm_mean": 0.012111567735671997
+    },
+    {
+      "epoch": 699,
+      "grad_norm_mean": 0.011674802303314209
+    },
+    {
+      "epoch": 700,
+      "grad_norm_mean": 0.013019347190856933
+    },
+    {
+      "epoch": 701,
+      "grad_norm_mean": 0.014036413669586181
+    },
+    {
+      "epoch": 702,
+      "grad_norm_mean": 0.012284744143486024
+    },
+    {
+      "epoch": 703,
+      "grad_norm_mean": 0.013579190731048584
+    },
+    {
+      "epoch": 704,
+      "grad_norm_mean": 0.012013696670532226
+    },
+    {
+      "epoch": 705,
+      "grad_norm_mean": 0.014679217576980591
+    },
+    {
+      "epoch": 706,
+      "grad_norm_mean": 0.013817203283309936
+    },
+    {
+      "epoch": 707,
+      "grad_norm_mean": 0.01159105658531189
+    },
+    {
+      "epoch": 708,
+      "grad_norm_mean": 0.011546361446380615
+    },
+    {
+      "epoch": 709,
+      "grad_norm_mean": 0.013299927949905395
+    },
+    {
+      "epoch": 710,
+      "grad_norm_mean": 0.012179903507232666
+    },
+    {
+      "epoch": 711,
+      "grad_norm_mean": 0.01391653871536255
+    },
+    {
+      "epoch": 712,
+      "grad_norm_mean": 0.013991976022720337
+    },
+    {
+      "epoch": 713,
+      "grad_norm_mean": 0.012271830797195434
+    },
+    {
+      "epoch": 714,
+      "grad_norm_mean": 0.011289584040641785
+    },
+    {
+      "epoch": 715,
+      "grad_norm_mean": 0.013784682273864746
+    },
+    {
+      "epoch": 716,
+      "grad_norm_mean": 0.012044035196304322
+    },
+    {
+      "epoch": 717,
+      "grad_norm_mean": 0.010985409021377563
+    },
+    {
+      "epoch": 718,
+      "grad_norm_mean": 0.012445432662963867
+    },
+    {
+      "epoch": 719,
+      "grad_norm_mean": 0.011779839515686036
+    },
+    {
+      "epoch": 720,
+      "grad_norm_mean": 0.014150640010833741
+    },
+    {
+      "epoch": 721,
+      "grad_norm_mean": 0.01193342900276184
+    },
+    {
+      "epoch": 722,
+      "grad_norm_mean": 0.010991376876831055
+    },
+    {
+      "epoch": 723,
+      "grad_norm_mean": 0.011917956590652467
+    },
+    {
+      "epoch": 724,
+      "grad_norm_mean": 0.013943578481674195
+    },
+    {
+      "epoch": 725,
+      "grad_norm_mean": 0.013338769912719727
+    },
+    {
+      "epoch": 726,
+      "grad_norm_mean": 0.013169100999832154
+    },
+    {
+      "epoch": 727,
+      "grad_norm_mean": 0.010224342584609985
+    },
+    {
+      "epoch": 728,
+      "grad_norm_mean": 0.013739864587783814
+    },
+    {
+      "epoch": 729,
+      "grad_norm_mean": 0.011022184371948242
+    },
+    {
+      "epoch": 730,
+      "grad_norm_mean": 0.011788692712783813
+    },
+    {
+      "epoch": 731,
+      "grad_norm_mean": 0.015265565633773804
+    },
+    {
+      "epoch": 732,
+      "grad_norm_mean": 0.012001917481422424
+    },
+    {
+      "epoch": 733,
+      "grad_norm_mean": 0.010833440780639648
+    },
+    {
+      "epoch": 734,
+      "grad_norm_mean": 0.01059859824180603
+    },
+    {
+      "epoch": 735,
+      "grad_norm_mean": 0.010609933137893678
+    },
+    {
+      "epoch": 736,
+      "grad_norm_mean": 0.011127933502197266
+    },
+    {
+      "epoch": 737,
+      "grad_norm_mean": 0.01201936149597168
+    },
+    {
+      "epoch": 738,
+      "grad_norm_mean": 0.015465280055999757
+    },
+    {
+      "epoch": 739,
+      "grad_norm_mean": 0.014193583488464355
+    },
+    {
+      "epoch": 740,
+      "grad_norm_mean": 0.010948410272598267
+    },
+    {
+      "epoch": 741,
+      "grad_norm_mean": 0.009918671607971191
+    },
+    {
+      "epoch": 742,
+      "grad_norm_mean": 0.010162562251091004
+    },
+    {
+      "epoch": 743,
+      "grad_norm_mean": 0.013077002048492431
+    },
+    {
+      "epoch": 744,
+      "grad_norm_mean": 0.015250374794006347
+    },
+    {
+      "epoch": 745,
+      "grad_norm_mean": 0.010525317192077636
+    },
+    {
+      "epoch": 746,
+      "grad_norm_mean": 0.011023809909820556
+    },
+    {
+      "epoch": 747,
+      "grad_norm_mean": 0.014651046752929688
+    },
+    {
+      "epoch": 748,
+      "grad_norm_mean": 0.009449215173721314
+    },
+    {
+      "epoch": 749,
+      "grad_norm_mean": 0.011619834661483764
+    },
+    {
+      "epoch": 750,
+      "grad_norm_mean": 0.011184850692749023
+    },
+    {
+      "epoch": 751,
+      "grad_norm_mean": 0.01238273787498474
+    },
+    {
+      "epoch": 752,
+      "grad_norm_mean": 0.01284018325805664
+    },
+    {
+      "epoch": 753,
+      "grad_norm_mean": 0.011380759000778198
+    },
+    {
+      "epoch": 754,
+      "grad_norm_mean": 0.01212942361831665
+    },
+    {
+      "epoch": 755,
+      "grad_norm_mean": 0.012373169898986817
+    },
+    {
+      "epoch": 756,
+      "grad_norm_mean": 0.014063663244247437
+    },
+    {
+      "epoch": 757,
+      "grad_norm_mean": 0.010418280839920043
+    },
+    {
+      "epoch": 758,
+      "grad_norm_mean": 0.011585745334625244
+    },
+    {
+      "epoch": 759,
+      "grad_norm_mean": 0.014562161207199097
+    },
+    {
+      "epoch": 760,
+      "grad_norm_mean": 0.012497392177581787
+    },
+    {
+      "epoch": 761,
+      "grad_norm_mean": 0.011364825487136842
+    },
+    {
+      "epoch": 762,
+      "grad_norm_mean": 0.01127916955947876
+    },
+    {
+      "epoch": 763,
+      "grad_norm_mean": 0.013838154792785645
+    },
+    {
+      "epoch": 764,
+      "grad_norm_mean": 0.014293434143066407
+    },
+    {
+      "epoch": 765,
+      "grad_norm_mean": 0.014133978843688964
+    },
+    {
+      "epoch": 766,
+      "grad_norm_mean": 0.01054551362991333
+    },
+    {
+      "epoch": 767,
+      "grad_norm_mean": 0.012144920825958251
+    },
+    {
+      "epoch": 768,
+      "grad_norm_mean": 0.009865936636924744
+    },
+    {
+      "epoch": 769,
+      "grad_norm_mean": 0.011028673410415649
+    },
+    {
+      "epoch": 770,
+      "grad_norm_mean": 0.012207732915878296
+    },
+    {
+      "epoch": 771,
+      "grad_norm_mean": 0.015166724920272828
+    },
+    {
+      "epoch": 772,
+      "grad_norm_mean": 0.01198145842552185
+    },
+    {
+      "epoch": 773,
+      "grad_norm_mean": 0.010049620628356933
+    },
+    {
+      "epoch": 774,
+      "grad_norm_mean": 0.011237629175186158
+    },
+    {
+      "epoch": 775,
+      "grad_norm_mean": 0.01318228578567505
+    },
+    {
+      "epoch": 776,
+      "grad_norm_mean": 0.011778553247451782
+    },
+    {
+      "epoch": 777,
+      "grad_norm_mean": 0.016856000423431397
+    },
+    {
+      "epoch": 778,
+      "grad_norm_mean": 0.012291385650634765
+    },
+    {
+      "epoch": 779,
+      "grad_norm_mean": 0.01308436369895935
+    },
+    {
+      "epoch": 780,
+      "grad_norm_mean": 0.014081383228302002
+    },
+    {
+      "epoch": 781,
+      "grad_norm_mean": 0.012291052818298339
+    },
+    {
+      "epoch": 782,
+      "grad_norm_mean": 0.01174101996421814
+    },
+    {
+      "epoch": 783,
+      "grad_norm_mean": 0.0162253577709198
+    },
+    {
+      "epoch": 784,
+      "grad_norm_mean": 0.012531585454940796
+    },
+    {
+      "epoch": 785,
+      "grad_norm_mean": 0.011323460578918457
+    },
+    {
+      "epoch": 786,
+      "grad_norm_mean": 0.010450738787651062
+    },
+    {
+      "epoch": 787,
+      "grad_norm_mean": 0.013590280294418335
+    },
+    {
+      "epoch": 788,
+      "grad_norm_mean": 0.013891447067260742
+    },
+    {
+      "epoch": 789,
+      "grad_norm_mean": 0.013347253799438477
+    },
+    {
+      "epoch": 790,
+      "grad_norm_mean": 0.012142162561416626
+    },
+    {
+      "epoch": 791,
+      "grad_norm_mean": 0.013041619062423706
+    },
+    {
+      "epoch": 792,
+      "grad_norm_mean": 0.014587512969970703
+    },
+    {
+      "epoch": 793,
+      "grad_norm_mean": 0.017972749948501586
+    },
+    {
+      "epoch": 794,
+      "grad_norm_mean": 0.01139241623878479
+    },
+    {
+      "epoch": 795,
+      "grad_norm_mean": 0.010937228441238404
+    },
+    {
+      "epoch": 796,
+      "grad_norm_mean": 0.011665478467941285
+    },
+    {
+      "epoch": 797,
+      "grad_norm_mean": 0.00987924301624298
+    },
+    {
+      "epoch": 798,
+      "grad_norm_mean": 0.011228075504302978
+    },
+    {
+      "epoch": 799,
+      "grad_norm_mean": 0.01074061405658722
+    },
+    {
+      "epoch": 800,
+      "grad_norm_mean": 0.012007912158966065
+    },
+    {
+      "epoch": 801,
+      "grad_norm_mean": 0.009382869958877563
+    },
+    {
+      "epoch": 802,
+      "grad_norm_mean": 0.0120000958442688
+    },
+    {
+      "epoch": 803,
+      "grad_norm_mean": 0.012715310335159302
+    },
+    {
+      "epoch": 804,
+      "grad_norm_mean": 0.013040982484817505
+    },
+    {
+      "epoch": 805,
+      "grad_norm_mean": 0.010892077445983887
+    },
+    {
+      "epoch": 806,
+      "grad_norm_mean": 0.011721237659454346
+    },
+    {
+      "epoch": 807,
+      "grad_norm_mean": 0.01690458393096924
+    },
+    {
+      "epoch": 808,
+      "grad_norm_mean": 0.013530964374542237
+    },
+    {
+      "epoch": 809,
+      "grad_norm_mean": 0.011872544527053833
+    },
+    {
+      "epoch": 810,
+      "grad_norm_mean": 0.011717056035995483
+    },
+    {
+      "epoch": 811,
+      "grad_norm_mean": 0.01181655502319336
+    },
+    {
+      "epoch": 812,
+      "grad_norm_mean": 0.011856966733932495
+    },
+    {
+      "epoch": 813,
+      "grad_norm_mean": 0.014511706352233887
+    },
+    {
+      "epoch": 814,
+      "grad_norm_mean": 0.014953268527984618
+    },
+    {
+      "epoch": 815,
+      "grad_norm_mean": 0.012856234550476074
+    },
+    {
+      "epoch": 816,
+      "grad_norm_mean": 0.011303654432296754
+    },
+    {
+      "epoch": 817,
+      "grad_norm_mean": 0.015484730005264282
+    },
+    {
+      "epoch": 818,
+      "grad_norm_mean": 0.009565354585647582
+    },
+    {
+      "epoch": 819,
+      "grad_norm_mean": 0.012417487859725952
+    },
+    {
+      "epoch": 820,
+      "grad_norm_mean": 0.013125772953033448
+    },
+    {
+      "epoch": 821,
+      "grad_norm_mean": 0.013747717380523682
+    },
+    {
+      "epoch": 822,
+      "grad_norm_mean": 0.011682792663574219
+    },
+    {
+      "epoch": 823,
+      "grad_norm_mean": 0.01223999309539795
+    },
+    {
+      "epoch": 824,
+      "grad_norm_mean": 0.011518150329589845
+    },
+    {
+      "epoch": 825,
+      "grad_norm_mean": 0.011532471895217895
+    },
+    {
+      "epoch": 826,
+      "grad_norm_mean": 0.012852319717407227
+    },
+    {
+      "epoch": 827,
+      "grad_norm_mean": 0.01120372486114502
+    },
+    {
+      "epoch": 828,
+      "grad_norm_mean": 0.011013559579849242
+    },
+    {
+      "epoch": 829,
+      "grad_norm_mean": 0.010455530405044556
+    },
+    {
+      "epoch": 830,
+      "grad_norm_mean": 0.010780260205268859
+    },
+    {
+      "epoch": 831,
+      "grad_norm_mean": 0.011560062646865845
+    },
+    {
+      "epoch": 832,
+      "grad_norm_mean": 0.012028714418411255
+    },
+    {
+      "epoch": 833,
+      "grad_norm_mean": 0.01159075689315796
+    },
+    {
+      "epoch": 834,
+      "grad_norm_mean": 0.011643160820007324
+    },
+    {
+      "epoch": 835,
+      "grad_norm_mean": 0.01109762167930603
+    },
+    {
+      "epoch": 836,
+      "grad_norm_mean": 0.013842711448669434
+    },
+    {
+      "epoch": 837,
+      "grad_norm_mean": 0.013111139059066773
+    },
+    {
+      "epoch": 838,
+      "grad_norm_mean": 0.014584635972976684
+    },
+    {
+      "epoch": 839,
+      "grad_norm_mean": 0.012041326999664306
+    },
+    {
+      "epoch": 840,
+      "grad_norm_mean": 0.012203303575515747
+    },
+    {
+      "epoch": 841,
+      "grad_norm_mean": 0.013081628561019897
+    },
+    {
+      "epoch": 842,
+      "grad_norm_mean": 0.011274470090866089
+    },
+    {
+      "epoch": 843,
+      "grad_norm_mean": 0.01268230938911438
+    },
+    {
+      "epoch": 844,
+      "grad_norm_mean": 0.013573623895645141
+    },
+    {
+      "epoch": 845,
+      "grad_norm_mean": 0.01010918939113617
+    },
+    {
+      "epoch": 846,
+      "grad_norm_mean": 0.013453061103820801
+    },
+    {
+      "epoch": 847,
+      "grad_norm_mean": 0.01510803198814392
+    },
+    {
+      "epoch": 848,
+      "grad_norm_mean": 0.012781413793563843
+    },
+    {
+      "epoch": 849,
+      "grad_norm_mean": 0.012151371240615844
+    },
+    {
+      "epoch": 850,
+      "grad_norm_mean": 0.012362712860107422
+    },
+    {
+      "epoch": 851,
+      "grad_norm_mean": 0.011597432613372803
+    },
+    {
+      "epoch": 852,
+      "grad_norm_mean": 0.011488336086273193
+    },
+    {
+      "epoch": 853,
+      "grad_norm_mean": 0.010416381120681762
+    },
+    {
+      "epoch": 854,
+      "grad_norm_mean": 0.013173468947410583
+    },
+    {
+      "epoch": 855,
+      "grad_norm_mean": 0.011974438667297364
+    },
+    {
+      "epoch": 856,
+      "grad_norm_mean": 0.011760904550552368
+    },
+    {
+      "epoch": 857,
+      "grad_norm_mean": 0.013290987372398377
+    },
+    {
+      "epoch": 858,
+      "grad_norm_mean": 0.012848858118057251
+    },
+    {
+      "epoch": 859,
+      "grad_norm_mean": 0.011920522689819336
+    },
+    {
+      "epoch": 860,
+      "grad_norm_mean": 0.011453410387039184
+    },
+    {
+      "epoch": 861,
+      "grad_norm_mean": 0.012891536235809326
+    },
+    {
+      "epoch": 862,
+      "grad_norm_mean": 0.009880549907684326
+    },
+    {
+      "epoch": 863,
+      "grad_norm_mean": 0.011208648204803467
+    },
+    {
+      "epoch": 864,
+      "grad_norm_mean": 0.012749221324920654
+    },
+    {
+      "epoch": 865,
+      "grad_norm_mean": 0.012419945240020751
+    },
+    {
+      "epoch": 866,
+      "grad_norm_mean": 0.010118296146392822
+    },
+    {
+      "epoch": 867,
+      "grad_norm_mean": 0.013827008962631225
+    },
+    {
+      "epoch": 868,
+      "grad_norm_mean": 0.010247052192687988
+    },
+    {
+      "epoch": 869,
+      "grad_norm_mean": 0.01288185977935791
+    },
+    {
+      "epoch": 870,
+      "grad_norm_mean": 0.012916919946670533
+    },
+    {
+      "epoch": 871,
+      "grad_norm_mean": 0.011596246242523194
+    },
+    {
+      "epoch": 872,
+      "grad_norm_mean": 0.01231821870803833
+    },
+    {
+      "epoch": 873,
+      "grad_norm_mean": 0.011865798950195312
+    },
+    {
+      "epoch": 874,
+      "grad_norm_mean": 0.012574341297149658
+    },
+    {
+      "epoch": 875,
+      "grad_norm_mean": 0.013468128919601441
+    },
+    {
+      "epoch": 876,
+      "grad_norm_mean": 0.011054761648178101
+    },
+    {
+      "epoch": 877,
+      "grad_norm_mean": 0.012588810205459594
+    },
+    {
+      "epoch": 878,
+      "grad_norm_mean": 0.014295498847961425
+    },
+    {
+      "epoch": 879,
+      "grad_norm_mean": 0.012067195415496825
+    },
+    {
+      "epoch": 880,
+      "grad_norm_mean": 0.010775069713592529
+    },
+    {
+      "epoch": 881,
+      "grad_norm_mean": 0.012604886531829835
+    },
+    {
+      "epoch": 882,
+      "grad_norm_mean": 0.011389372825622558
+    },
+    {
+      "epoch": 883,
+      "grad_norm_mean": 0.014420444250106811
+    },
+    {
+      "epoch": 884,
+      "grad_norm_mean": 0.013960615634918213
+    },
+    {
+      "epoch": 885,
+      "grad_norm_mean": 0.01122635006904602
+    },
+    {
+      "epoch": 886,
+      "grad_norm_mean": 0.011755776166915893
+    },
+    {
+      "epoch": 887,
+      "grad_norm_mean": 0.009696683406829835
+    },
+    {
+      "epoch": 888,
+      "grad_norm_mean": 0.012316692590713501
+    },
+    {
+      "epoch": 889,
+      "grad_norm_mean": 0.011136031150817871
+    },
+    {
+      "epoch": 890,
+      "grad_norm_mean": 0.010630372524261475
+    },
+    {
+      "epoch": 891,
+      "grad_norm_mean": 0.010706046342849732
+    },
+    {
+      "epoch": 892,
+      "grad_norm_mean": 0.012657291889190674
+    },
+    {
+      "epoch": 893,
+      "grad_norm_mean": 0.015945586204528808
+    },
+    {
+      "epoch": 894,
+      "grad_norm_mean": 0.014344974756240844
+    },
+    {
+      "epoch": 895,
+      "grad_norm_mean": 0.013889204978942872
+    },
+    {
+      "epoch": 896,
+      "grad_norm_mean": 0.014979979515075684
+    },
+    {
+      "epoch": 897,
+      "grad_norm_mean": 0.013417781114578246
+    },
+    {
+      "epoch": 898,
+      "grad_norm_mean": 0.014747719049453736
+    },
+    {
+      "epoch": 899,
+      "grad_norm_mean": 0.016244333744049072
+    },
+    {
+      "epoch": 900,
+      "grad_norm_mean": 0.010166056394577027
+    },
+    {
+      "epoch": 901,
+      "grad_norm_mean": 0.011323690414428711
+    },
+    {
+      "epoch": 902,
+      "grad_norm_mean": 0.010088698148727418
+    },
+    {
+      "epoch": 903,
+      "grad_norm_mean": 0.010347859144210816
+    },
+    {
+      "epoch": 904,
+      "grad_norm_mean": 0.013058131217956542
+    },
+    {
+      "epoch": 905,
+      "grad_norm_mean": 0.01048396635055542
+    },
+    {
+      "epoch": 906,
+      "grad_norm_mean": 0.010002935647964478
+    },
+    {
+      "epoch": 907,
+      "grad_norm_mean": 0.010552592515945435
+    },
+    {
+      "epoch": 908,
+      "grad_norm_mean": 0.012418123722076416
+    },
+    {
+      "epoch": 909,
+      "grad_norm_mean": 0.012816115140914916
+    },
+    {
+      "epoch": 910,
+      "grad_norm_mean": 0.011901857256889343
+    },
+    {
+      "epoch": 911,
+      "grad_norm_mean": 0.011073349714279175
+    },
+    {
+      "epoch": 912,
+      "grad_norm_mean": 0.01067557716369629
+    },
+    {
+      "epoch": 913,
+      "grad_norm_mean": 0.012369293451309204
+    },
+    {
+      "epoch": 914,
+      "grad_norm_mean": 0.009536643624305724
+    },
+    {
+      "epoch": 915,
+      "grad_norm_mean": 0.012625876665115356
+    },
+    {
+      "epoch": 916,
+      "grad_norm_mean": 0.01120601797103882
+    },
+    {
+      "epoch": 917,
+      "grad_norm_mean": 0.013518828630447387
+    },
+    {
+      "epoch": 918,
+      "grad_norm_mean": 0.01215559196472168
+    },
+    {
+      "epoch": 919,
+      "grad_norm_mean": 0.01106456446647644
+    },
+    {
+      "epoch": 920,
+      "grad_norm_mean": 0.012244225025177002
+    },
+    {
+      "epoch": 921,
+      "grad_norm_mean": 0.012670588970184327
+    },
+    {
+      "epoch": 922,
+      "grad_norm_mean": 0.012991784811019898
+    },
+    {
+      "epoch": 923,
+      "grad_norm_mean": 0.012219361782073975
+    },
+    {
+      "epoch": 924,
+      "grad_norm_mean": 0.011659898519515991
+    },
+    {
+      "epoch": 925,
+      "grad_norm_mean": 0.012117136240005493
+    },
+    {
+      "epoch": 926,
+      "grad_norm_mean": 0.013032098531723022
+    },
+    {
+      "epoch": 927,
+      "grad_norm_mean": 0.010154076099395752
+    },
+    {
+      "epoch": 928,
+      "grad_norm_mean": 0.011904391765594482
+    },
+    {
+      "epoch": 929,
+      "grad_norm_mean": 0.013096449613571167
+    },
+    {
+      "epoch": 930,
+      "grad_norm_mean": 0.01240576982498169
+    },
+    {
+      "epoch": 931,
+      "grad_norm_mean": 0.012669566154479981
+    },
+    {
+      "epoch": 932,
+      "grad_norm_mean": 0.01319074821472168
+    },
+    {
+      "epoch": 933,
+      "grad_norm_mean": 0.012059144735336303
+    },
+    {
+      "epoch": 934,
+      "grad_norm_mean": 0.010417239189147949
+    },
+    {
+      "epoch": 935,
+      "grad_norm_mean": 0.012288572788238526
+    },
+    {
+      "epoch": 936,
+      "grad_norm_mean": 0.011488965272903443
+    },
+    {
+      "epoch": 937,
+      "grad_norm_mean": 0.01396222186088562
+    },
+    {
+      "epoch": 938,
+      "grad_norm_mean": 0.012373589038848876
+    },
+    {
+      "epoch": 939,
+      "grad_norm_mean": 0.01335919451713562
+    },
+    {
+      "epoch": 940,
+      "grad_norm_mean": 0.01311592721939087
+    },
+    {
+      "epoch": 941,
+      "grad_norm_mean": 0.010629341125488282
+    },
+    {
+      "epoch": 942,
+      "grad_norm_mean": 0.012615037679672241
+    },
+    {
+      "epoch": 943,
+      "grad_norm_mean": 0.012432372570037842
+    },
+    {
+      "epoch": 944,
+      "grad_norm_mean": 0.011072291135787964
+    },
+    {
+      "epoch": 945,
+      "grad_norm_mean": 0.01285525918006897
+    },
+    {
+      "epoch": 946,
+      "grad_norm_mean": 0.012255342006683349
+    },
+    {
+      "epoch": 947,
+      "grad_norm_mean": 0.012398274183273316
+    },
+    {
+      "epoch": 948,
+      "grad_norm_mean": 0.012624971389770508
+    },
+    {
+      "epoch": 949,
+      "grad_norm_mean": 0.009141150712966919
+    },
+    {
+      "epoch": 950,
+      "grad_norm_mean": 0.01092910623550415
+    },
+    {
+      "epoch": 951,
+      "grad_norm_mean": 0.01287166142463684
+    },
+    {
+      "epoch": 952,
+      "grad_norm_mean": 0.011644128084182739
+    },
+    {
+      "epoch": 953,
+      "grad_norm_mean": 0.015313749074935913
+    },
+    {
+      "epoch": 954,
+      "grad_norm_mean": 0.013047094821929933
+    },
+    {
+      "epoch": 955,
+      "grad_norm_mean": 0.01234700059890747
+    },
+    {
+      "epoch": 956,
+      "grad_norm_mean": 0.01096852421760559
+    },
+    {
+      "epoch": 957,
+      "grad_norm_mean": 0.013548807144165039
+    },
+    {
+      "epoch": 958,
+      "grad_norm_mean": 0.014748711347579956
+    },
+    {
+      "epoch": 959,
+      "grad_norm_mean": 0.011736558198928833
+    },
+    {
+      "epoch": 960,
+      "grad_norm_mean": 0.01529576086997986
+    },
+    {
+      "epoch": 961,
+      "grad_norm_mean": 0.015936296939849853
+    },
+    {
+      "epoch": 962,
+      "grad_norm_mean": 0.01231186032295227
+    },
+    {
+      "epoch": 963,
+      "grad_norm_mean": 0.017149627208709717
+    },
+    {
+      "epoch": 964,
+      "grad_norm_mean": 0.013148500204086304
+    },
+    {
+      "epoch": 965,
+      "grad_norm_mean": 0.011509473323822022
+    },
+    {
+      "epoch": 966,
+      "grad_norm_mean": 0.012180863857269287
+    },
+    {
+      "epoch": 967,
+      "grad_norm_mean": 0.013238812685012818
+    },
+    {
+      "epoch": 968,
+      "grad_norm_mean": 0.013125114917755127
+    },
+    {
+      "epoch": 969,
+      "grad_norm_mean": 0.00976250696182251
+    },
+    {
+      "epoch": 970,
+      "grad_norm_mean": 0.009926235556602478
+    },
+    {
+      "epoch": 971,
+      "grad_norm_mean": 0.011975494146347045
+    },
+    {
+      "epoch": 972,
+      "grad_norm_mean": 0.011549884557723999
+    },
+    {
+      "epoch": 973,
+      "grad_norm_mean": 0.013307002782821655
+    },
+    {
+      "epoch": 974,
+      "grad_norm_mean": 0.012472713470458984
+    },
+    {
+      "epoch": 975,
+      "grad_norm_mean": 0.011119466066360474
+    },
+    {
+      "epoch": 976,
+      "grad_norm_mean": 0.0116026451587677
+    },
+    {
+      "epoch": 977,
+      "grad_norm_mean": 0.012672337770462037
+    },
+    {
+      "epoch": 978,
+      "grad_norm_mean": 0.012221718788146973
+    },
+    {
+      "epoch": 979,
+      "grad_norm_mean": 0.012495941400527955
+    },
+    {
+      "epoch": 980,
+      "grad_norm_mean": 0.008825729727745056
+    },
+    {
+      "epoch": 981,
+      "grad_norm_mean": 0.010215335965156554
+    },
+    {
+      "epoch": 982,
+      "grad_norm_mean": 0.011479709386825562
+    },
+    {
+      "epoch": 983,
+      "grad_norm_mean": 0.010998598098754883
+    },
+    {
+      "epoch": 984,
+      "grad_norm_mean": 0.01223592185974121
+    },
+    {
+      "epoch": 985,
+      "grad_norm_mean": 0.012183478593826295
+    },
+    {
+      "epoch": 986,
+      "grad_norm_mean": 0.01118800950050354
+    },
+    {
+      "epoch": 987,
+      "grad_norm_mean": 0.013668084621429443
+    },
+    {
+      "epoch": 988,
+      "grad_norm_mean": 0.014342772483825683
+    },
+    {
+      "epoch": 989,
+      "grad_norm_mean": 0.012985804080963136
+    },
+    {
+      "epoch": 990,
+      "grad_norm_mean": 0.014302949666976929
+    },
+    {
+      "epoch": 991,
+      "grad_norm_mean": 0.011273733854293823
+    },
+    {
+      "epoch": 992,
+      "grad_norm_mean": 0.011014540672302247
+    },
+    {
+      "epoch": 993,
+      "grad_norm_mean": 0.010605275869369506
+    },
+    {
+      "epoch": 994,
+      "grad_norm_mean": 0.010306238651275635
+    },
+    {
+      "epoch": 995,
+      "grad_norm_mean": 0.013495198488235473
+    },
+    {
+      "epoch": 996,
+      "grad_norm_mean": 0.012601184368133544
+    },
+    {
+      "epoch": 997,
+      "grad_norm_mean": 0.014377474308013916
+    },
+    {
+      "epoch": 998,
+      "grad_norm_mean": 0.009955987453460694
+    },
+    {
+      "epoch": 999,
+      "grad_norm_mean": 0.013000430583953858
+    },
+    {
+      "epoch": 1000,
+      "grad_norm_mean": 0.012452264547348022
+    },
+    {
+      "epoch": 1001,
+      "grad_norm_mean": 0.01321263825893402
+    },
+    {
+      "epoch": 1002,
+      "grad_norm_mean": 0.014618297815322876
+    },
+    {
+      "epoch": 1003,
+      "grad_norm_mean": 0.010346088409423828
+    },
+    {
+      "epoch": 1004,
+      "grad_norm_mean": 0.01243205738067627
+    },
+    {
+      "epoch": 1005,
+      "grad_norm_mean": 0.012375751972198486
+    },
+    {
+      "epoch": 1006,
+      "grad_norm_mean": 0.007637119293212891
+    },
+    {
+      "epoch": 1007,
+      "grad_norm_mean": 0.01209457802772522
+    },
+    {
+      "epoch": 1008,
+      "grad_norm_mean": 0.011410395622253417
+    },
+    {
+      "epoch": 1009,
+      "grad_norm_mean": 0.012920215010643006
+    },
+    {
+      "epoch": 1010,
+      "grad_norm_mean": 0.014306211948394775
+    },
+    {
+      "epoch": 1011,
+      "grad_norm_mean": 0.014361754894256592
+    },
+    {
+      "epoch": 1012,
+      "grad_norm_mean": 0.010060982942581178
+    },
+    {
+      "epoch": 1013,
+      "grad_norm_mean": 0.010819705963134765
+    },
+    {
+      "epoch": 1014,
+      "grad_norm_mean": 0.012026859521865845
+    },
+    {
+      "epoch": 1015,
+      "grad_norm_mean": 0.010393542766571045
+    },
+    {
+      "epoch": 1016,
+      "grad_norm_mean": 0.009052938938140869
+    },
+    {
+      "epoch": 1017,
+      "grad_norm_mean": 0.011055373907089234
+    },
+    {
+      "epoch": 1018,
+      "grad_norm_mean": 0.012140277624130249
+    },
+    {
+      "epoch": 1019,
+      "grad_norm_mean": 0.010234267473220825
+    },
+    {
+      "epoch": 1020,
+      "grad_norm_mean": 0.011142818689346313
+    },
+    {
+      "epoch": 1021,
+      "grad_norm_mean": 0.01246247935295105
+    },
+    {
+      "epoch": 1022,
+      "grad_norm_mean": 0.012211947202682495
+    },
+    {
+      "epoch": 1023,
+      "grad_norm_mean": 0.010797761440277099
+    },
+    {
+      "epoch": 1024,
+      "grad_norm_mean": 0.012968642234802246
+    },
+    {
+      "epoch": 1025,
+      "grad_norm_mean": 0.009299867749214173
+    },
+    {
+      "epoch": 1026,
+      "grad_norm_mean": 0.014504066944122315
+    },
+    {
+      "epoch": 1027,
+      "grad_norm_mean": 0.011737019300460816
+    },
+    {
+      "epoch": 1028,
+      "grad_norm_mean": 0.01065244448184967
+    },
+    {
+      "epoch": 1029,
+      "grad_norm_mean": 0.014343332767486573
+    },
+    {
+      "epoch": 1030,
+      "grad_norm_mean": 0.011262335777282716
+    },
+    {
+      "epoch": 1031,
+      "grad_norm_mean": 0.013401687860488891
+    },
+    {
+      "epoch": 1032,
+      "grad_norm_mean": 0.013014656066894531
+    },
+    {
+      "epoch": 1033,
+      "grad_norm_mean": 0.014376042127609253
+    },
+    {
+      "epoch": 1034,
+      "grad_norm_mean": 0.014509594440460205
+    },
+    {
+      "epoch": 1035,
+      "grad_norm_mean": 0.013371251344680786
+    },
+    {
+      "epoch": 1036,
+      "grad_norm_mean": 0.01495280909538269
+    },
+    {
+      "epoch": 1037,
+      "grad_norm_mean": 0.012051489353179932
+    },
+    {
+      "epoch": 1038,
+      "grad_norm_mean": 0.01297364091873169
+    },
+    {
+      "epoch": 1039,
+      "grad_norm_mean": 0.016246981143951417
+    },
+    {
+      "epoch": 1040,
+      "grad_norm_mean": 0.009799139142036438
+    },
+    {
+      "epoch": 1041,
+      "grad_norm_mean": 0.011779451370239257
+    },
+    {
+      "epoch": 1042,
+      "grad_norm_mean": 0.010355861902236939
+    },
+    {
+      "epoch": 1043,
+      "grad_norm_mean": 0.012174553871154785
+    },
+    {
+      "epoch": 1044,
+      "grad_norm_mean": 0.013319771289825439
+    },
+    {
+      "epoch": 1045,
+      "grad_norm_mean": 0.012353737115859985
+    },
+    {
+      "epoch": 1046,
+      "grad_norm_mean": 0.01239307188987732
+    },
+    {
+      "epoch": 1047,
+      "grad_norm_mean": 0.012003366470336913
+    },
+    {
+      "epoch": 1048,
+      "grad_norm_mean": 0.013078000307083129
+    },
+    {
+      "epoch": 1049,
+      "grad_norm_mean": 0.010796215772628783
+    },
+    {
+      "epoch": 1050,
+      "grad_norm_mean": 0.011250964641571045
+    },
+    {
+      "epoch": 1051,
+      "grad_norm_mean": 0.010109250664710998
+    },
+    {
+      "epoch": 1052,
+      "grad_norm_mean": 0.013316898107528686
+    },
+    {
+      "epoch": 1053,
+      "grad_norm_mean": 0.011682764530181885
+    },
+    {
+      "epoch": 1054,
+      "grad_norm_mean": 0.0118966703414917
+    },
+    {
+      "epoch": 1055,
+      "grad_norm_mean": 0.01161392629146576
+    },
+    {
+      "epoch": 1056,
+      "grad_norm_mean": 0.010581342220306397
+    },
+    {
+      "epoch": 1057,
+      "grad_norm_mean": 0.009224166989326477
+    },
+    {
+      "epoch": 1058,
+      "grad_norm_mean": 0.011413259983062744
+    },
+    {
+      "epoch": 1059,
+      "grad_norm_mean": 0.012166378259658814
+    },
+    {
+      "epoch": 1060,
+      "grad_norm_mean": 0.0108758784532547
+    },
+    {
+      "epoch": 1061,
+      "grad_norm_mean": 0.012708784341812133
+    },
+    {
+      "epoch": 1062,
+      "grad_norm_mean": 0.010238053798675538
+    },
+    {
+      "epoch": 1063,
+      "grad_norm_mean": 0.011007795214653015
+    },
+    {
+      "epoch": 1064,
+      "grad_norm_mean": 0.012411063194274902
+    },
+    {
+      "epoch": 1065,
+      "grad_norm_mean": 0.012217451333999634
+    },
+    {
+      "epoch": 1066,
+      "grad_norm_mean": 0.014640737056732177
+    },
+    {
+      "epoch": 1067,
+      "grad_norm_mean": 0.013551689863204956
+    },
+    {
+      "epoch": 1068,
+      "grad_norm_mean": 0.014433278322219849
+    },
+    {
+      "epoch": 1069,
+      "grad_norm_mean": 0.011813990592956543
+    },
+    {
+      "epoch": 1070,
+      "grad_norm_mean": 0.011624395847320557
+    },
+    {
+      "epoch": 1071,
+      "grad_norm_mean": 0.012960161447525025
+    },
+    {
+      "epoch": 1072,
+      "grad_norm_mean": 0.011739382028579711
+    },
+    {
+      "epoch": 1073,
+      "grad_norm_mean": 0.00963755702972412
+    },
+    {
+      "epoch": 1074,
+      "grad_norm_mean": 0.010323805570602416
+    },
+    {
+      "epoch": 1075,
+      "grad_norm_mean": 0.01098513662815094
+    },
+    {
+      "epoch": 1076,
+      "grad_norm_mean": 0.012154162168502807
+    },
+    {
+      "epoch": 1077,
+      "grad_norm_mean": 0.01115164577960968
+    },
+    {
+      "epoch": 1078,
+      "grad_norm_mean": 0.012499958276748657
+    },
+    {
+      "epoch": 1079,
+      "grad_norm_mean": 0.015999902963638304
+    },
+    {
+      "epoch": 1080,
+      "grad_norm_mean": 0.014695921659469605
+    },
+    {
+      "epoch": 1081,
+      "grad_norm_mean": 0.012460468530654908
+    },
+    {
+      "epoch": 1082,
+      "grad_norm_mean": 0.011323769330978393
+    },
+    {
+      "epoch": 1083,
+      "grad_norm_mean": 0.012748806476593018
+    },
+    {
+      "epoch": 1084,
+      "grad_norm_mean": 0.010894235849380493
+    },
+    {
+      "epoch": 1085,
+      "grad_norm_mean": 0.012063907384872436
+    },
+    {
+      "epoch": 1086,
+      "grad_norm_mean": 0.01090473198890686
+    },
+    {
+      "epoch": 1087,
+      "grad_norm_mean": 0.012131635427474976
+    },
+    {
+      "epoch": 1088,
+      "grad_norm_mean": 0.012178239583969117
+    },
+    {
+      "epoch": 1089,
+      "grad_norm_mean": 0.011038521766662597
+    },
+    {
+      "epoch": 1090,
+      "grad_norm_mean": 0.012277178764343262
+    },
+    {
+      "epoch": 1091,
+      "grad_norm_mean": 0.013340911626815796
+    },
+    {
+      "epoch": 1092,
+      "grad_norm_mean": 0.01217384934425354
+    },
+    {
+      "epoch": 1093,
+      "grad_norm_mean": 0.012498420238494873
+    },
+    {
+      "epoch": 1094,
+      "grad_norm_mean": 0.010317656636238098
+    },
+    {
+      "epoch": 1095,
+      "grad_norm_mean": 0.010305858373641967
+    },
+    {
+      "epoch": 1096,
+      "grad_norm_mean": 0.009816326379776
+    },
+    {
+      "epoch": 1097,
+      "grad_norm_mean": 0.011784736394882202
+    },
+    {
+      "epoch": 1098,
+      "grad_norm_mean": 0.011180011749267579
+    },
+    {
+      "epoch": 1099,
+      "grad_norm_mean": 0.010425308227539062
+    },
+    {
+      "epoch": 1100,
+      "grad_norm_mean": 0.010322973251342774
+    },
+    {
+      "epoch": 1101,
+      "grad_norm_mean": 0.011899703025817871
+    },
+    {
+      "epoch": 1102,
+      "grad_norm_mean": 0.010297402620315551
+    },
+    {
+      "epoch": 1103,
+      "grad_norm_mean": 0.012621455907821655
+    },
+    {
+      "epoch": 1104,
+      "grad_norm_mean": 0.01025397539138794
+    },
+    {
+      "epoch": 1105,
+      "grad_norm_mean": 0.011134511232376099
+    },
+    {
+      "epoch": 1106,
+      "grad_norm_mean": 0.011273988008499146
+    },
+    {
+      "epoch": 1107,
+      "grad_norm_mean": 0.01111670470237732
+    },
+    {
+      "epoch": 1108,
+      "grad_norm_mean": 0.01311561632156372
+    },
+    {
+      "epoch": 1109,
+      "grad_norm_mean": 0.014533024549484254
+    },
+    {
+      "epoch": 1110,
+      "grad_norm_mean": 0.013695428848266602
+    },
+    {
+      "epoch": 1111,
+      "grad_norm_mean": 0.012229003190994263
+    },
+    {
+      "epoch": 1112,
+      "grad_norm_mean": 0.012535491466522216
+    },
+    {
+      "epoch": 1113,
+      "grad_norm_mean": 0.011916382789611817
+    },
+    {
+      "epoch": 1114,
+      "grad_norm_mean": 0.014097556352615356
+    },
+    {
+      "epoch": 1115,
+      "grad_norm_mean": 0.013431491613388061
+    },
+    {
+      "epoch": 1116,
+      "grad_norm_mean": 0.013948949337005615
+    },
+    {
+      "epoch": 1117,
+      "grad_norm_mean": 0.010571129083633423
+    },
+    {
+      "epoch": 1118,
+      "grad_norm_mean": 0.010223571062088013
+    },
+    {
+      "epoch": 1119,
+      "grad_norm_mean": 0.01065545892715454
+    },
+    {
+      "epoch": 1120,
+      "grad_norm_mean": 0.013254650592803955
+    },
+    {
+      "epoch": 1121,
+      "grad_norm_mean": 0.011431692361831666
+    },
+    {
+      "epoch": 1122,
+      "grad_norm_mean": 0.009725252866744995
+    },
+    {
+      "epoch": 1123,
+      "grad_norm_mean": 0.013871433019638061
+    },
+    {
+      "epoch": 1124,
+      "grad_norm_mean": 0.012226059913635253
+    },
+    {
+      "epoch": 1125,
+      "grad_norm_mean": 0.01294893765449524
+    },
+    {
+      "epoch": 1126,
+      "grad_norm_mean": 0.012886391878128052
+    },
+    {
+      "epoch": 1127,
+      "grad_norm_mean": 0.011621732473373413
+    },
+    {
+      "epoch": 1128,
+      "grad_norm_mean": 0.014398631811141968
+    },
+    {
+      "epoch": 1129,
+      "grad_norm_mean": 0.009992815256118774
+    },
+    {
+      "epoch": 1130,
+      "grad_norm_mean": 0.010818840622901917
+    },
+    {
+      "epoch": 1131,
+      "grad_norm_mean": 0.011672841548919679
+    },
+    {
+      "epoch": 1132,
+      "grad_norm_mean": 0.012711504459381103
+    },
+    {
+      "epoch": 1133,
+      "grad_norm_mean": 0.010692480564117432
+    },
+    {
+      "epoch": 1134,
+      "grad_norm_mean": 0.010882233619689942
+    },
+    {
+      "epoch": 1135,
+      "grad_norm_mean": 0.011878921270370484
+    },
+    {
+      "epoch": 1136,
+      "grad_norm_mean": 0.015365560293197631
+    },
+    {
+      "epoch": 1137,
+      "grad_norm_mean": 0.01199371886253357
+    },
+    {
+      "epoch": 1138,
+      "grad_norm_mean": 0.012907493829727173
+    },
+    {
+      "epoch": 1139,
+      "grad_norm_mean": 0.010667228698730468
+    },
+    {
+      "epoch": 1140,
+      "grad_norm_mean": 0.01166107988357544
+    },
+    {
+      "epoch": 1141,
+      "grad_norm_mean": 0.013439887762069702
+    },
+    {
+      "epoch": 1142,
+      "grad_norm_mean": 0.014075052738189698
+    },
+    {
+      "epoch": 1143,
+      "grad_norm_mean": 0.015738686323165895
+    },
+    {
+      "epoch": 1144,
+      "grad_norm_mean": 0.014993062019348144
+    },
+    {
+      "epoch": 1145,
+      "grad_norm_mean": 0.012648697853088378
+    },
+    {
+      "epoch": 1146,
+      "grad_norm_mean": 0.012913791060447693
+    },
+    {
+      "epoch": 1147,
+      "grad_norm_mean": 0.01193204402923584
+    },
+    {
+      "epoch": 1148,
+      "grad_norm_mean": 0.01325481629371643
+    },
+    {
+      "epoch": 1149,
+      "grad_norm_mean": 0.011039648294448853
+    },
+    {
+      "epoch": 1150,
+      "grad_norm_mean": 0.010306912183761596
+    },
+    {
+      "epoch": 1151,
+      "grad_norm_mean": 0.01017842674255371
+    },
+    {
+      "epoch": 1152,
+      "grad_norm_mean": 0.009645130515098571
+    },
+    {
+      "epoch": 1153,
+      "grad_norm_mean": 0.01000279688835144
+    },
+    {
+      "epoch": 1154,
+      "grad_norm_mean": 0.010353954076766968
+    },
+    {
+      "epoch": 1155,
+      "grad_norm_mean": 0.014910567998886109
+    },
+    {
+      "epoch": 1156,
+      "grad_norm_mean": 0.00970145571231842
+    },
+    {
+      "epoch": 1157,
+      "grad_norm_mean": 0.011629042863845826
+    },
+    {
+      "epoch": 1158,
+      "grad_norm_mean": 0.008601077079772949
+    },
+    {
+      "epoch": 1159,
+      "grad_norm_mean": 0.011724790573120118
+    },
+    {
+      "epoch": 1160,
+      "grad_norm_mean": 0.010786864042282105
+    },
+    {
+      "epoch": 1161,
+      "grad_norm_mean": 0.009605947732925415
+    },
+    {
+      "epoch": 1162,
+      "grad_norm_mean": 0.01146617841720581
+    },
+    {
+      "epoch": 1163,
+      "grad_norm_mean": 0.010450637102127075
+    },
+    {
+      "epoch": 1164,
+      "grad_norm_mean": 0.015054174423217773
+    },
+    {
+      "epoch": 1165,
+      "grad_norm_mean": 0.010477608442306519
+    },
+    {
+      "epoch": 1166,
+      "grad_norm_mean": 0.009536082983016968
+    },
+    {
+      "epoch": 1167,
+      "grad_norm_mean": 0.010739871501922607
+    },
+    {
+      "epoch": 1168,
+      "grad_norm_mean": 0.01163716959953308
+    },
+    {
+      "epoch": 1169,
+      "grad_norm_mean": 0.010704229831695557
+    },
+    {
+      "epoch": 1170,
+      "grad_norm_mean": 0.011041938304901123
+    },
+    {
+      "epoch": 1171,
+      "grad_norm_mean": 0.01262026286125183
+    },
+    {
+      "epoch": 1172,
+      "grad_norm_mean": 0.010759424090385437
+    },
+    {
+      "epoch": 1173,
+      "grad_norm_mean": 0.01186358666419983
+    },
+    {
+      "epoch": 1174,
+      "grad_norm_mean": 0.010249212265014648
+    },
+    {
+      "epoch": 1175,
+      "grad_norm_mean": 0.010119736433029174
+    },
+    {
+      "epoch": 1176,
+      "grad_norm_mean": 0.011258745193481445
+    },
+    {
+      "epoch": 1177,
+      "grad_norm_mean": 0.012739203929901122
+    },
+    {
+      "epoch": 1178,
+      "grad_norm_mean": 0.011590036392211914
+    },
+    {
+      "epoch": 1179,
+      "grad_norm_mean": 0.012289535760879516
+    },
+    {
+      "epoch": 1180,
+      "grad_norm_mean": 0.00946681785583496
+    },
+    {
+      "epoch": 1181,
+      "grad_norm_mean": 0.012244440793991089
+    },
+    {
+      "epoch": 1182,
+      "grad_norm_mean": 0.009065516233444215
+    },
+    {
+      "epoch": 1183,
+      "grad_norm_mean": 0.01093077850341797
+    },
+    {
+      "epoch": 1184,
+      "grad_norm_mean": 0.012152286529541015
+    },
+    {
+      "epoch": 1185,
+      "grad_norm_mean": 0.01203668761253357
+    },
+    {
+      "epoch": 1186,
+      "grad_norm_mean": 0.008316075444221497
+    },
+    {
+      "epoch": 1187,
+      "grad_norm_mean": 0.011270351767539977
+    },
+    {
+      "epoch": 1188,
+      "grad_norm_mean": 0.010512628078460694
+    },
+    {
+      "epoch": 1189,
+      "grad_norm_mean": 0.011811342239379883
+    },
+    {
+      "epoch": 1190,
+      "grad_norm_mean": 0.012414715766906738
+    },
+    {
+      "epoch": 1191,
+      "grad_norm_mean": 0.011877957105636596
+    },
+    {
+      "epoch": 1192,
+      "grad_norm_mean": 0.010510887742042542
+    },
+    {
+      "epoch": 1193,
+      "grad_norm_mean": 0.013415906667709351
+    },
+    {
+      "epoch": 1194,
+      "grad_norm_mean": 0.009494564056396485
+    },
+    {
+      "epoch": 1195,
+      "grad_norm_mean": 0.01183378791809082
+    },
+    {
+      "epoch": 1196,
+      "grad_norm_mean": 0.012678765535354615
+    },
+    {
+      "epoch": 1197,
+      "grad_norm_mean": 0.010600226640701293
+    },
+    {
+      "epoch": 1198,
+      "grad_norm_mean": 0.012702998638153076
+    },
+    {
+      "epoch": 1199,
+      "grad_norm_mean": 0.012292332410812378
+    },
+    {
+      "epoch": 1200,
+      "grad_norm_mean": 0.01309998607635498
+    }
+  ]
+}

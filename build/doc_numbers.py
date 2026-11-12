@@ -138,6 +138,25 @@ def load() -> dict:
                                      m64=float(a.loc[ep, "M"]), m224=float(b.loc[ep, "M"]),
                                      s64=float(a.loc[ep, "sim_max"]), s224=float(b.loc[ep, "sim_max"])))
 
+    # R22（容量 / 隐私训练 / 224px 自身平台）：训练规则与主网格不同，独立 CSV、不进主律拟合
+    d["r22"] = []
+    r22 = RES / "r22_summary.csv"
+    if r22.exists():
+        df = pd.read_csv(r22)
+        for _, r in df.iterrows():
+            row = dict(run=str(r["run"]), points=int(r["points"]), emax=int(r["epochs_max"]),
+                       tau=float(r["tau"]), M_max=float(r["M_max"]), sim=float(r["sim_max_max"]),
+                       e1=None if pd.isna(r["first_1pct_epoch"]) else int(r["first_1pct_epoch"]),
+                       fid0=float(r["fid_first"]), fid1=float(r["fid_last"]),
+                       eps=None if pd.isna(r["sigma"]) else float(r["eps_ub_steps4800"]),
+                       sigma=None if pd.isna(r["sigma"]) else float(r["sigma"]), pairs=[])
+            for ep in (160, 320, 480, 640, 800, 1600, 2400, 5125):
+                k, kr = f"M@{ep}", f"ref@{ep}"
+                if k in r and not pd.isna(r[k]):
+                    row["pairs"].append((ep, float(r[k]),
+                                         None if pd.isna(r.get(kr)) else float(r.get(kr))))
+            d["r22"].append(row)
+
     return d
 
 
@@ -267,7 +286,33 @@ def render(d: dict) -> str:
         for ppt, claim in d["verify_fails"]:
             L.append(f"  - {ppt}：{claim}")
         L.append("")
-    L.append("## 12. 改数字时要连带改哪里")
+    if d.get("r22"):
+        L.append("## 12. R22：容量 / 隐私训练 / 224px 自身平台（**均不进主拟合**）")
+        L.append("")
+        L.append("| run | 点 | 末轮 | τ | M_max | sim_max 峰 | 首个 ≥1% | FID 首→末 | σ / ε 上界 |")
+        L.append("|---|---|---|---|---|---|---|---|---|")
+        for r in d["r22"]:
+            e1 = "—" if r["e1"] is None else f"e{r['e1']}"
+            dp = "—" if r["sigma"] is None else f"σ={r['sigma']:.1f} / ε≤{r['eps']:.1f}"
+            L.append(f"| {r['run']} | {r['points']} | {r['emax']} | {_fmt(r['tau'])} | "
+                     f"{_fmt(r['M_max'])} | {_fmt(r['sim'])} | {e1} | "
+                     f"{r['fid0']:.0f} → {r['fid1']:.0f} | {dp} |")
+        L.append("")
+        for r in d["r22"]:
+            if not r["pairs"]:
+                continue
+            L.append(f"**{r['run']}** 与对照同 epoch（`{r['run']}` 的顺序即预声明顺序 A→E）：")
+            L.append("")
+            L.append("| epoch | 本 run M | 对照 M |")
+            L.append("|---|---|---|")
+            for ep, m, ref in r["pairs"]:
+                L.append(f"| {ep} | {_fmt(m)} | {'—' if ref is None else _fmt(ref)} |")
+            L.append("")
+        L.append("- ε 只报强组合保守上界（Abadi Thm.1，δ=1e-5，q=0.256，T=4800 步）；本实现没做矩账户。")
+        L.append("- DP 两组的 M 全 0 但 FID 从约 120 劣到 309–353 → 「记忆化消失」不等于「可以这样用」。")
+        L.append("- 容量档（base=64）平台与 onset 都比主网格高 → α 只能作「本数据 + 本模型」的条件指数。")
+        L.append("")
+    L.append("## 13. 改数字时要连带改哪里")
     L.append("")
     L.append("- 律参数/区间 → `docs/ALIGNMENT.md` 04 行、`docs/ABSTRACT.md`、`docs/OUTLINE.md` C1 行、`docs/RESULTS_TEXT.md` §5.2");
     L.append("- 停训策略/安全表 → `docs/ALIGNMENT.md` 补 1 行、`docs/OUTLINE.md` C2 行、`docs/RESULTS_TEXT.md` §5.4/§5.5、`README.md` 三条结论表");

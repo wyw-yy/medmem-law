@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import time
 from pathlib import Path
@@ -34,9 +35,18 @@ COLS = ["run", "dataset", "n", "seed", "epoch", "M", "tau", "sim_mean", "sim_p50
 
 
 def parse_tag(run: str) -> tuple[str, int, int]:
-    # pathmnist_n4000_s1
-    parts = run.split("_")
-    return parts[0], int(parts[1][1:]), int(parts[2][1:])
+    """从 run tag 里取 (dataset, n, seed)。
+
+    标准 tag 形如 `pathmnist_n4000_s1`；但同一份代码也跑过变体：
+    `dp_s1_n250_s1`（DP-SGD）、`b64_pathmnist_n250_s1`（容量档）。
+    所以用正则找"数据集名 + _n<数字> + _s<数字>"，而不是按 '_' 切前三段
+    ——后者会把 'dp' 当成数据集名，进而去找 dp_64.npz。
+    """
+    m = re.search(r"(pathmnist|bloodmnist|pneumoniamnist|dermamnist|octmnist)_n(\d+)_s(\d+)", run)
+    if not m:
+        raise SystemExit(f"[{run}] 无法从 tag 解析 dataset/n/seed；"
+                         f"请用 --dataset/--n/--seed 显式指定")
+    return m.group(1), int(m.group(2)), int(m.group(3))
 
 
 def load_csv() -> pd.DataFrame:
@@ -65,8 +75,9 @@ def real_fid_stats(dataset: str, enc_inception, device: str):
 
 
 def score_run(run: str, do_fid: bool, only_epochs: list[int] | None, device: str = C.DEVICE,
-              refill: bool = False, fid_stride: int = 1) -> int:
-    dataset, n, seed = parse_tag(run)
+              refill: bool = False, fid_stride: int = 1,
+              override: tuple[str, int, int] | None = None) -> int:
+    dataset, n, seed = override if override else parse_tag(run)
     ck_dir = C.CACHE / "samples" / run
     files = sorted(ck_dir.glob("e*.npy"))
     if not files:
@@ -179,6 +190,9 @@ def main():
     ap.add_argument("--epochs", default=None, help="逗号分隔，只评这些 epoch")
     ap.add_argument("--refill", action="store_true",
                     help="重算已有但缺 fid（或 M）的行；配合 --fid 可给旧行补 FID")
+    ap.add_argument("--dataset", default="", help="显式指定数据集（tag 不含数据集名时必填，如 dp_*/b64_*）")
+    ap.add_argument("--n", type=int, default=0, help="显式指定 N")
+    ap.add_argument("--seed", type=int, default=-1, help="显式指定 seed")
     ap.add_argument("--out", default="",
                     help="写到另一个 CSV（pilot 实验隔离用，默认 results/metrics_long.csv）")
     a = ap.parse_args()
@@ -202,9 +216,15 @@ def main():
         runs = a.run or []
     if not runs:
         raise SystemExit("给 --run <tag> 或 --all")
+    override = None
+    if a.dataset and a.n and a.seed >= 0:
+        override = (a.dataset, a.n, a.seed)
+        print(f"[score_run] 显式标签：dataset={a.dataset} n={a.n} seed={a.seed}")
+
     total = 0
     for r in runs:
-        total += score_run(r, a.fid, only, refill=a.refill, fid_stride=a.fid_stride)
+        total += score_run(r, a.fid, only, refill=a.refill, fid_stride=a.fid_stride,
+                           override=override)
     print(f"共追加 {total} 行")
 
 
