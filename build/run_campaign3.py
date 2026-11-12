@@ -216,6 +216,31 @@ def main() -> int:
         score(tag, "results/pilot64_blood_n1000.csv", "Q", dataset="bloodmnist", n=1000, seed=21)
         time.sleep(COOL)
 
+    # ---------------- R/S: 分辨率阶梯的第二个 seed（成对的 64 vs 128）
+    # 阶梯现在是"同一个 seed 21 的 64/128/224 配对"，倍数（5.75×）是对的，但只有
+    # 一个 seed。N=250 的 M_max 在种子间极差可达 33×，审稿人会问"倍数是不是这个
+    # seed 特有"。补 seed 22 的 64px 与 128px → 两对配对，倍数就有了重复。
+    if want("R") and not out_of_time():
+        tag = "bloodmnist_n250_s22_128"
+        run(["-m", "train", "--dataset", "bloodmnist", "--n", "250", "--seed", "22",
+             "--epochs", "6400", "--ckpt-every", "800", "--sample-n", "128", "--tag", tag],
+            env_extra={"MEDMEM_IMAGE_SIZE": "128", "MEDMEM_BATCH": "32", "MEDMEM_ACCUM": "2",
+                       "MEDMEM_SAMPLE_BATCH": "32"},
+            tag="R 128px N=250 seed=22 到 6400 轮")
+        score(tag, "results/pilot128_blood_n250_s22.csv", "R",
+              dataset="bloodmnist", n=250, seed=22)
+        time.sleep(COOL)
+
+    if want("S") and not out_of_time():
+        tag = "bloodmnist_n250_s22_64"
+        run(["-m", "train", "--dataset", "bloodmnist", "--n", "250", "--seed", "22",
+             "--epochs", "5125", "--ckpt-every", "160", "--sample-n", "128", "--tag", tag],
+            env_extra={"MEDMEM_SAMPLE_BATCH": "32"},
+            tag="S 64px N=250 seed=22 到 5125 轮")
+        score(tag, "results/pilot64_blood_n250_s22.csv", "S",
+              dataset="bloodmnist", n=250, seed=22)
+        time.sleep(COOL)
+
     if only:
         missing = {o for o in only if not any(o == k or o.startswith(k) or k.startswith(o)
                                               for k in seen)}

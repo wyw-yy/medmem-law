@@ -49,6 +49,8 @@ GROUPS: list[tuple[str, str, int, float]] = [
     ("O", "bloodmnist_n1000_s21_128", 800, 1.5),
     ("P", "b64_pathmnist_n250_s2", 160, 2.6),
     ("Q", "bloodmnist_n1000_s21_64", 100, 0.6),
+    ("R", "bloodmnist_n250_s22_128", 800, 1.5),
+    ("S", "bloodmnist_n250_s22_64", 160, 0.6),
 ]
 
 
@@ -213,6 +215,8 @@ def main() -> int:
     "O": "pilot128_blood_n1000.csv",
     "P": "b64_pathmnist_n250_s2.csv",
     "Q": "pilot64_blood_n1000.csv",
+    "R": "pilot128_blood_n250_s22.csv",
+    "S": "pilot64_blood_n250_s22.csv",
         "L": "dp_s2_n250_s1_long.csv", "M": "dp_s4_n250_s1_long.csv",
         "N": "dp_s1_n250_s1_long.csv",
     }
@@ -233,7 +237,7 @@ def main() -> int:
         if rule:
             key0, _, ck_int, s_ep = rule
             total = {"I1": 1200, "I2": 1200, "I3": 1200, "J1": 5125, "J2": 2400, "O": 9600, "P": 5125, "Q": 4800,
-                     "K": 9600, "L": 5125, "M": 5125, "N": 5125}.get(key0, 0)
+                     "K": 9600, "L": 5125, "M": 5125, "N": 5125, "R": 6400, "S": 5125}.get(key0, 0)
             started_at = None
             m_t = re.match(r"\[(\d\d)-(\d\d) (\d\d:\d\d:\d\d)\]", started[-1])
             if m_t:
