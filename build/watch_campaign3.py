@@ -67,6 +67,51 @@ def _pid_alive(pid: int) -> bool:
 KEYWORDS = ("train", "train_dp", "score_run", "run_campaign3", "typology", "finalize")
 
 
+def _cim_pids(pattern: bool) -> list[int]:
+    """用 PowerShell CIM 取 python.exe 的 (pid, cmdline)。wmic 在 Win11 24H2 已移除。"""
+    try:
+        out = subprocess.run(
+            ["powershell", "-NoProfile", "-Command",
+             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
+             "ForEach-Object { '{0}|{1}' -f $_.ProcessId, $_.CommandLine }"],
+            capture_output=True, text=True, timeout=60).stdout
+    except Exception:  # noqa: BLE001
+        return []
+    pids = []
+    for line in out.splitlines():
+        pid_s, _, cmd = line.partition("|")
+        if not pid_s.strip().isdigit():
+            continue
+        if pattern and not any(k in cmd.lower() for k in KEYWORDS):
+            continue
+        pids.append(int(pid_s.strip()))
+    return pids
+
+
+def _kill_candidates() -> list[int]:
+    """只返回**本队列自己**的训练进程 pid。
+
+    绝不能退化成"所有 python"：--fix 会对这些 pid 做 taskkill /T /F，
+    11-13 就是 wmic 缺失 → 退路返回全部 python → 把 DSH 宿主进程一起杀掉，
+    命令无输出、退出码 1、队列根本没重启。宁可不杀，也不能杀错。
+    """
+    try:
+        out = subprocess.run(["wmic", "process", "where", "name='python.exe'",
+                              "get", "ProcessId,CommandLine", "/format:csv"],
+                             capture_output=True, text=True, timeout=60).stdout
+        pids: list[int] = []
+        for line in out.splitlines():
+            if any(k in line.lower() for k in KEYWORDS):
+                tail = line.rsplit(",", 2)
+                if len(tail) >= 2 and tail[1].strip().isdigit():
+                    pids.append(int(tail[1].strip()))
+        if pids:
+            return pids
+    except Exception:  # noqa: BLE001
+        pass
+    return _cim_pids(pattern=True)
+
+
 def _python_pids() -> list[int]:
     """只统计本队列的 python 进程。
 
@@ -313,11 +358,19 @@ def main() -> int:
         if not ok:
             print("（--fix：证据不足，暂不重启）")
         else:
-            print("--fix：判定为真卡死，开始清理")
-            for pid in {pid_lock, *pys}:
-                if pid and pid != os.getpid():
-                    subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"],
-                                   capture_output=True, text=True)
+            print("--fix：判定为真卡死，开始清理", flush=True)
+            kill: set[int] = set()
+            if pid_lock and _pid_alive(pid_lock):
+                kill.add(pid_lock)
+            kill.update(_kill_candidates())
+            kill.discard(os.getpid())
+            kill.discard(os.getppid())
+            for pid in sorted(kill):
+                print(f"--fix：taskkill /T /F {pid}", flush=True)
+                subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"],
+                               capture_output=True, text=True)
+            if not kill:
+                print("--fix：没有找到可杀的训练进程（可能已退出）", flush=True)
             time.sleep(5)
             if LOCK.exists():
                 LOCK.unlink()
@@ -331,7 +384,8 @@ def main() -> int:
                 stderr=subprocess.STDOUT,
                 creationflags=0x00000008,  # DETACHED_PROCESS
             )
-            print(f"--fix：已重启队列（--only {','.join(only)}），日志 build/campaign3_revive.log")
+            print(f"--fix：已重启队列（--only {','.join(only)}），日志 build/campaign3_revive.log",
+                  flush=True)
             verdict = "RESTARTED"
     return 0 if verdict in ("OK", "DONE", "RESTARTED") else 1
 
