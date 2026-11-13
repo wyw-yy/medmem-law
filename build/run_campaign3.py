@@ -160,13 +160,16 @@ def main() -> int:
             time.sleep(COOL)
 
     # ---------------- K: 224px × N=1000（分辨率延迟是否随 N 放大）
+    # 预算从 9,600 轮砍到 1,200 轮：224px 下 N=1,000 每 epoch 是 63 个 micro-batch，
+    # 实测 ≈20 s/epoch（比"N=250 的 4 s/epoch 按 4 倍外推"还慢），9,600 轮要 40 h 以上。
+    # 1,200 轮足以回答"同样轮数下 224px 是否仍为 0"——64px 的 N=1000 在 1,200 轮已有 M≈0.03–0.06。
     if want("K") and not out_of_time():
         tag = "bloodmnist_n1000_s21_a4"
         run(["-m", "train", "--dataset", "bloodmnist", "--n", "1000", "--seed", "21",
-             "--epochs", "9600", "--ckpt-every", "800", "--sample-n", "128", "--tag", tag],
+             "--epochs", "1200", "--ckpt-every", "200", "--sample-n", "128", "--tag", tag],
             env_extra={"MEDMEM_IMAGE_SIZE": "224", "MEDMEM_BATCH": "16", "MEDMEM_ACCUM": "4",
                        "MEDMEM_SAMPLE_BATCH": "16"},
-            tag="K 224px N=1000 到 9600 轮")
+            tag="K 224px N=1000 到 1200 轮")
         score(tag, "results/pilot224_blood_n1000_a4.csv", "K")
 
     # ---------------- L/M/N: DP 的剂量-反应（σ=1/2/4 全部跑满 5,125 轮）
@@ -184,11 +187,13 @@ def main() -> int:
     # 无法判断"分辨率把 onset 推后"是固定倍数，还是随 N 变化（即与 γ 交互）。
     if want("O") and not out_of_time():
         tag = "bloodmnist_n1000_s21_128"
+        # 6,400 轮：N=250 时 128px 的 onset 在 e4,600，N=1000 若只是"按 epoch 延后"
+        # 就有希望落在 6,400 以内看到第一个非零点；再往上（9,600）时间翻倍、信息增量很小。
         run(["-m", "train", "--dataset", "bloodmnist", "--n", "1000", "--seed", "21",
-             "--epochs", "9600", "--ckpt-every", "800", "--sample-n", "128", "--tag", tag],
+             "--epochs", "6400", "--ckpt-every", "800", "--sample-n", "128", "--tag", tag],
             env_extra={"MEDMEM_IMAGE_SIZE": "128", "MEDMEM_BATCH": "32", "MEDMEM_ACCUM": "2",
                        "MEDMEM_SAMPLE_BATCH": "32"},
-            tag="O 128px N=1000 到 9600 轮")
+            tag="O 128px N=1000 到 6400 轮")
         score(tag, "results/pilot128_blood_n1000.csv", "O", dataset="bloodmnist", n=1000, seed=21)
         time.sleep(COOL)
 

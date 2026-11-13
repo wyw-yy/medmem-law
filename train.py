@@ -244,6 +244,16 @@ def train_run(dataset: str, n: int, seed: int, epochs: int = C.E_MAX,
         # 训练时不需要任何额外测量 —— 这是给医院用的"零成本"版本。
         is_measure = (epoch % ckpt_every == 0 or epoch == epochs
                       or (stop_epoch is not None and epoch >= stop_epoch))
+
+        # 2096 之后加的：224px × N=1000 的那种长跑，第一个检查点在 e800，
+        # 之前一个多小时日志里一行都没有，看不出是"在跑"还是"卡住"，
+        # 也没法实测 s/epoch（看门狗只能瞎猜）。每 50 轮打一行，成本可忽略。
+        if not is_measure and epoch % 50 == 0:
+            el = time.time() - t_start
+            done_ep = max(epoch - start_epoch, 1)
+            # 必须走 _log：父进程把子进程 stdout 丢掉了，print 到不了 build/logs/*.log
+            _log(f"epoch {epoch:5d}/{epochs} loss={hist[-1]['loss']:.4f} "
+                 f"{el / done_ep:.1f}s/epoch", log_path)
         if is_measure:
             _save_ckpt(run, net, opt, epoch, ema=ema)
 

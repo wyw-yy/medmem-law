@@ -146,6 +146,27 @@ def _python_pids() -> list[int]:
     return pids
 
 
+def _log_progress(tag: str) -> tuple[int, int, float] | None:
+    """从训练日志里取最近一行 `epoch   N/M  loss=… X.Ys/epoch`。
+
+    长跑（224px × N=1000）在第一个检查点之前没有任何落盘产物，只能靠这行；
+    它由 train.py 每 50 轮写一次，是"真的在跑"最直接的证据。
+    """
+    p = ROOT / "build" / "logs" / f"{tag}.log"
+    if not p.exists():
+        return None
+    best = None
+    try:
+        lines = p.read_text(encoding="utf-8", errors="replace").splitlines()[-300:]
+    except OSError:
+        return None
+    for line in lines:
+        m = re.search(r"epoch\s+(\d+)/(\d+).*?([\d.]+)s/epoch", line)
+        if m:
+            best = (int(m.group(1)), int(m.group(2)), float(m.group(3)))
+    return best
+
+
 def _gpu() -> str:
     try:
         out = subprocess.run(
@@ -281,8 +302,8 @@ def main() -> int:
         ep, n_ck, age = _epochs_in(cur_tag)
         if rule:
             key0, _, ck_int, s_ep = rule
-            total = {"I1": 1200, "I2": 1200, "I3": 1200, "J1": 5125, "J2": 2400, "O": 9600, "P": 5125, "Q": 4800,
-                     "K": 9600, "L": 5125, "M": 5125, "N": 5125, "R": 6400, "S": 5125}.get(key0, 0)
+            total = {"I1": 1200, "I2": 1200, "I3": 1200, "J1": 5125, "J2": 2400, "O": 6400, "P": 5125, "Q": 4800,
+                     "K": 1200, "L": 5125, "M": 5125, "N": 5125, "R": 6400, "S": 5125}.get(key0, 0)
             started_at = None
             m_t = re.match(r"\[(\d\d)-(\d\d) (\d\d:\d\d:\d\d)\]", started[-1])
             if m_t:
@@ -294,17 +315,27 @@ def main() -> int:
                     started_at = None
             if total and started_at:
                 elapsed_min = max(0.0, (time.time() - started_at) / 60)
-                ep_time = int(elapsed_min * 60 / s_ep)
                 # 检查点文件名里的 eNNNN 是精确进度；实测 s/epoch 从最近两个检查点的
                 # mtime 差反推（表里的 s_ep 是 3-epoch 基准外推，会系统性偏慢 30%）。
                 s_ep_meas = _s_per_epoch_meas(cur_tag)
                 if s_ep_meas:
                     s_ep = s_ep_meas
+                # 训练日志里的 "epoch N/M … X s/epoch" 是最权威的一手数字：
+                # 检查点每隔 ck_int 轮才落盘一次，第一个检查点之前只能靠它。
+                lp = _log_progress(cur_tag)
+                if lp:
+                    ep = max(ep, lp[0])
+                    total = lp[1] or total
+                    s_ep = lp[2]
+                # s_ep 定稿之后才算时间外推，否则会用基准常数把进度算飞。
+                ep_time = int(elapsed_min * 60 / s_ep)
                 ep_est = min(total, max(ep, ep_time))
                 pct = 100.0 * ep_est / total
                 eta_min = (total - ep_est) * s_ep / 60  # s_ep 已含测量开销
+                ck_note = (f"检查点最新 e{ep}，{age:.0f} min 前" if n_ck
+                           else "尚无检查点")
                 progress = (f"约 e{ep_est}/{total} ({pct:.0f}%)，已跑 {elapsed_min/60:.1f} h，"
-                            f"剩 ~{eta_min/60:.1f} h（检查点最新 e{ep}，{age:.0f} min 前，"
+                            f"剩 ~{eta_min/60:.1f} h（{ck_note}，"
                             f"实测 {s_ep:.1f}s/epoch）")
             expect_min = ck_int * s_ep / 60 + 6
             if age > 2 * expect_min + 15 and (started_at is None or time.time() - started_at > 2 * expect_min * 60):
