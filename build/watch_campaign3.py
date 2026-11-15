@@ -31,7 +31,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-LOG = ROOT / "build" / "campaign3.log"
+LOG = ROOT / "build" / "campaign3c.log"
+# 兼容历史：重启时如果换了日志文件名（campaign3.log / campaign3b.log / campaign3c.log），
+# 取最近修改的那个，避免看门狗盯着一份已经停写的旧文件。
+_LOGS = [p for p in (ROOT / "build").glob("campaign3*.log") if p.is_file()]
+if _LOGS:
+    LOG = max(_LOGS, key=lambda p: p.stat().st_mtime)
 LOCK = ROOT / "build" / "campaign3.lock"
 CKPT = ROOT / "cache" / "ckpt"
 
@@ -323,6 +328,7 @@ def main() -> int:
                 # 训练日志里的 "epoch N/M … X s/epoch" 是最权威的一手数字：
                 # 检查点每隔 ck_int 轮才落盘一次，第一个检查点之前只能靠它。
                 lp = _log_progress(cur_tag)
+                ck_ep = ep  # 检查点里的 eNNNN（可能是 0，此时代表"还没落盘"）
                 if lp:
                     ep = max(ep, lp[0])
                     total = lp[1] or total
@@ -332,7 +338,7 @@ def main() -> int:
                 ep_est = min(total, max(ep, ep_time))
                 pct = 100.0 * ep_est / total
                 eta_min = (total - ep_est) * s_ep / 60  # s_ep 已含测量开销
-                ck_note = (f"检查点最新 e{ep}，{age:.0f} min 前" if n_ck
+                ck_note = (f"检查点 e{ck_ep}，{age:.0f} min 前" if n_ck
                            else "尚无检查点")
                 progress = (f"约 e{ep_est}/{total} ({pct:.0f}%)，已跑 {elapsed_min/60:.1f} h，"
                             f"剩 ~{eta_min/60:.1f} h（{ck_note}，"
