@@ -8,7 +8,7 @@
 
 | 项 | 值 |
 |---|---|
-| 项目根 | `medmem-law/`（本文所有相对路径都相对它） |
+| 项目根 | `diffusion-memorization-law/`（本文所有相对路径都相对它） |
 | Python | 3.12.8（**不要用 3.13**，torch cu128 轮子只到 cp312） |
 | 虚拟环境 | `.venv/`（不要用系统 Python，本机 `~/.cache/torch` 写不进去） |
 | GPU | RTX 5070 Laptop 8 GB（sm_120 → 必须 cu128 轮子） |

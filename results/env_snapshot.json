@@ -4,7 +4,7 @@
   "machine": "AMD64",
   "cpu_count": 24,
   "python": "3.12.8",
-  "executable": "D:\\code\\codetest\\medmem-law\\.venv\\Scripts\\python.exe",
+  "executable": "D:\\code\\codetest\\diffusion-memorization-law\\.venv\\Scripts\\python.exe",
   "packages": {
     "torch": "2.11.0+cu128",
     "torchvision": "0.26.0+cu128",

@@ -1,7 +1,7 @@
 # medmem-law
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24012026.svg)](https://doi.org/10.5281/zenodo.24012026)
-[![CI](https://github.com/wyw-yy/medmem-law/actions/workflows/ci.yml/badge.svg)](https://github.com/wyw-yy/medmem-law/actions/workflows/ci.yml)
+[![CI](https://github.com/wyw-yy/diffusion-memorization-law/actions/workflows/ci.yml/badge.svg)](https://github.com/wyw-yy/diffusion-memorization-law/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 
 **Memorization control law for medical image diffusion models — data scale, training epochs, and memorization rate.**
@@ -23,7 +23,7 @@
 ## 仓库结构
 
 ```
-medmem-law/
+diffusion-memorization-law/
 ├── config.py            全局常量（路径、预算、阈值、环境变量开关）
 ├── data.py              数据集加载 / 嵌套子集 / 参照集
 ├── model.py             小型 UNet + DDPM（13.02M 参数）

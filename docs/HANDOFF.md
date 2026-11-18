@@ -164,7 +164,7 @@ E50_0  = 2133    [1538, 2506]
 > - 相关文档已同步：`PROTOCOL` §24（R16+补充）、`NOTES` §15、`COMPARISON` v2、`ALIGNMENT`、`RELATED_WORK`（全部 ✅）、
 >   `ABSTRACT`、`OUTLINE` §3、`RESULTS_TEXT` §5.1、`RESULTS.md`（26,243 字符）。
 > - 两个课题共用一块 8 GB 卡：`datadiet-ehr/tools/wait_then_small.py` 已恢复运行（等显存空闲再开跑），
->   这边新增对称守卫 `medmem-law/build/wait_gpu.py`，以后两边都先等再抢。
+>   这边新增对称守卫 `diffusion-memorization-law/build/wait_gpu.py`，以后两边都先等再抢。
 
 1. **B9 224px pilot（已跑完，结论是"没结论"）**：`pneumoniamnist` N=1000 seed=21 batch=16，
    **480 epoch = 30,000 步**，8 个测量点 × 128 张，结果在 `results/pilot224_metrics.csv`。

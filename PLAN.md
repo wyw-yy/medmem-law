@@ -131,7 +131,7 @@ T1 数据与配置 | T2 拟合参数(γ, β, M∞, R², 留一 R²) | T3 早停�
 要改的东西（按工作量排序）：
 
 ```
-medmem-law/
+diffusion-memorization-law/
   data.py         MedMNIST → 64×64 tensor，按 N 抽样（嵌套），固定 seed
   model.py        UNet 缩小到 base=32（约 9M 参数），关掉 attention
   train.py        每 25 epoch 存 checkpoint + 采样 256 张 + 落盘
@@ -311,7 +311,7 @@ M(E|N) = M∞ · Φ( (E − τ_mem(N)) / w ),  τ_mem(N) = a · N^γ
 ### 8.1 建环境（照抄）
 
 ```powershell
-cd D:\code\codetest\medmem-law
+cd D:\code\codetest\diffusion-memorization-law
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -U pip
 .\.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cu128
@@ -357,7 +357,7 @@ python -m venv .venv
 ## 附：文件与目录（建议的最终形态）
 
 ```
-medmem-law/
+diffusion-memorization-law/
   PLAN.md                 ← 本文件
   docs/
     OUTLINE.md            论文大纲（§2 抄出来）

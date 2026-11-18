@@ -2,7 +2,7 @@
 
 - 生成时间：`2026-11-06T19:55:59.2931439+08:00`
 - 系统：Windows 11 10.0.26200（AMD64，24 逻辑核）
-- Python：`3.12.8`（`D:\code\codetest\medmem-law\.venv\Scripts\python.exe`）
+- Python：`3.12.8`（`D:\code\codetest\diffusion-memorization-law\.venv\Scripts\python.exe`）
 - GPU：NVIDIA GeForce RTX 5070 Laptop GPU；驱动 `573.22`；显存 8151 MiB；compute capability 12.0；torch 内置 CUDA `12.8`；cuDNN `91900`
 - R：`Rscript (R) version 4.6.1 (2026-06-24)`
 
