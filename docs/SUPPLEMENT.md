@@ -29,7 +29,7 @@
 | 14 | 严格四条件安全表：0/28 行全过（**未达标项**） | ok 22 / ok_emp 28 / ok_quality 6 / informative 11 / recommended 0 | `results/safe_early_stop.csv` | `python -m tools.safety` |
 | 15 | 度量对白化维数稳健（k 不变性） | M 0.789→0.730（τ 0.748→0.128，**τ 不可跨 k 比**） | `docs/NOTES.md` §4 表 | `python -m build.probe_kdim` |
 | 16 | 度量对 FPR 稳健（10× 变化只动 6.7 个百分点） | M 0.7734 / 0.8047 / 0.8398（FPR 0.1/0.5/1%） | `results/fpr_sensitivity.csv` | `python -m build.fpr_sens` |
-| 17 | 换编码器：排序稳健、幅度不稳健 | 斜率 DINOv2 **−2.46** vs ResNet50 **−1.13**；Spearman 0.836–0.994 | `results/encoder_summary.csv` | `python -m build.rescore_encoder --encoder resnet50` |
+| 17 | 换编码器：排序稳健、幅度不稳健 | 斜率 DINOv2 **−2.41** vs ResNet50 **−1.15**；Spearman 0.836–0.994 | `results/encoder_summary.csv` | `python -m build.rescore_encoder --encoder resnet50` |
 | 18 | 记忆化不集中于少数样本 / 非离群 / 类别温和（**限 3 个 run**） | top1 0.08–0.10；离群差 <0.02；overrep <1.6 | `results/typology.csv` | `python -m build.typology` |
 | 19 | 跨数据集：函数族可迁移、参数不可迁移 | bloodmnist free_fit R²_log **0.984** vs 共享参数 0.602（α 0.78 vs 1.89）；pneumoniamnist 0.958 vs 0.833（α 2.21 vs 1.89） | `results/transfer.csv` | `python -m tools.transfer` |
 | 20 | 数据侧审计（重复 / 跨 split 泄漏） | bloodmnist：test→train **5 张**完全重复 + **4 张**近似（≥0.995），val→train 3 张完全重复；pneumoniamnist：test 干净但 **val→train 8 张**完全重复；pathmnist 全 0 | `results/leak_report.json` | `python -m tools.check_leak` |
