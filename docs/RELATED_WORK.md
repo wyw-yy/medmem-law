@@ -14,7 +14,7 @@
 Pizzi et al., SSCD ✅ CVPR 2022；Carlini et al., *Extracting Training Data from Diffusion Models* ✅ arXiv:2301.13188）。
 这一路线的共同局限是**阈值是人为选的**，导致不同论文报告的"记忆率"不可比——
 我们的第 2 个贡献正是把这一步做成可审计的：先用非成员图把假阳性率锚定在 0.5%，
-再取分位数当阈值，并报告"改 10 倍 FPR 只让 M 动 4 个百分点"（`results/fpr_sensitivity.csv`）。
+再取分位数当阈值，并报告"改 10 倍 FPR 只让 M 动 6.7 个百分点"（`results/fpr_sensitivity.csv`）。
 
 与度量并行的一条线是**生成质量/覆盖度指标**（Kynkäänniemi et al., *Improved Precision and Recall* ✅ NeurIPS 2019；
 FID, Heusel et al. ✅ arXiv:1706.08500）。它们衡量"像不像数据分布"，但**不衡量"是不是某几张图"**——
@@ -57,7 +57,7 @@ Gu et al. ✅ arXiv:2310.02664 对扩散模型的动力学分析）。
 我们的度量与它的思路同源（白化后的近邻 + 校准阈值），差别在于：
 ①我们把它接到**训练时间轴**上（每个检查点一次测量），而不只是终点审计；
 ②我们给了 FPR 敏感性、白化维数不变性、编码器替换三种稳健性检验；
-③我们明确写出"α 是条件指数，不能跨编码器比"（DINOv2 −2.46 vs ResNet50 −1.13）。
+③我们明确写出"α 是条件指数，不能跨编码器比"（DINOv2 −2.41 vs ResNet50 −1.15）。
 
 数据集层面，MedMNIST v2（Yang et al. ✅ arXiv:2110.14795）提供了 64×64 / 224×224 的标准切分，
 但没有原始 DICOM；我们因此把"是否换到院内 DICOM"列为 future work，并在 limitation 里写明

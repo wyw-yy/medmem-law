@@ -56,7 +56,7 @@ python -m venv .venv ; .\.venv\Scripts\python.exe -m build.get_wheels ...
 ## 可复现性声明（本仓库的硬约束）
 
 - 每个数字都能追到 `results/*.csv` 的某一行，且该行由已提交的脚本产出；
-- 关键拟合用 **Python + 独立 R 实现**双跑，残差平方和逐位一致（差 3e-9）；
+- 关键拟合用 **Python + 独立 R 实现**双跑，同一参数向量下预测逐位一致、独立重拟合的参数差 1e-5 级、残差平方和差 2.2e-9；
 - `MANIFEST.sha256` 覆盖全部受控文件；`MANIFEST.data.sha256` 覆盖不进 git 的数据集；
 - 环境快照在 [`docs/ENV.md`](docs/ENV.md)（GPU/驱动/CUDA/包版本/离线权重哈希）；
 - 数据审计（完全重复 / 近似重复 / 跨 split 泄漏）见 `results/leak_report.json`。

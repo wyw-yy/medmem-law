@@ -7,30 +7,31 @@ is currently answered case by case, after the fact. We ask a narrower, answerabl
 **for a diffusion model trained on a fixed dataset of size N, how does the memorization
 rate M grow with training time, and can that growth be scheduled against?**
 
-We train 32 DDPM models (13.0 M parameters) on three public medical imaging datasets
+We train 66 model runs (13.0 M parameters) on three public medical imaging datasets
 (PathMNIST, BloodMNIST, PneumoniaMNIST) at 64×64, sweeping N over seven values from 250
 to 4,000 and epochs from 325 to 5,125 under an equal-*update*-budget protocol, and measure M
 with a calibrated near-duplicate metric: DINOv2 features, truncated whitening, and a threshold
 anchored to a 0.5% false-positive rate on a held-out non-member reference set. Each run yields
-~30 checkpoints, giving 973 measurement points.
+The main grid yields 49 memorization curves (1,573 measurement points); 17 further runs cover
+resolution, capacity, differential privacy and positive controls.
 
 Three findings. (i) The **plateau** of M decays steeply with data: fitting a stretched-exponential
-law with power-law amplitude decay, A(N) ∝ N^(−1.90) [95% CI 1.88–2.05 in the 3-seed fit], so that at
+law with power-law amplitude decay, A(N) ∝ N^(−1.89) [95% CI 1.80–1.98], so that at
 N≥2,000 the model never leaves the measurement floor (3/512 = 0.6%) within 80 k updates — four times
 the equal-step budget. (ii) The **onset time** grows with N, but far slower than the update-normalized
 prediction (γ_epoch = −0.83 ⟺ t₅₀ ∝ N^0.17), and per-seed onset varies by up to 8× at fixed N — so a
 fitted schedule can describe the *expectation* but cannot *guarantee* compliance. (iii) Consequently, a
-**closed-loop controller** that measures M online and stops before the threshold is crossed delivers 67%
-savings of the training budget while violating the privacy budget in 0 of 28 runs, versus 75% violations
-for FID-plateau stopping and 11% for the open-loop law. The fitted law reaches R²_lin 0.710 (in-sample)
+**closed-loop controller** that measures M online and stops before the threshold is crossed delivers 69.6%
+savings of the training budget while violating the privacy budget in 0 of 43 runs, versus 83.7% violations
+for FID-plateau stopping and 11.6% for the open-loop law. The fitted law reaches R²_lin 0.710 (in-sample)
 but leave-one-N-out R² 0.46 — we report it as a descriptive law with an explicit validity boundary, not
 as a predictive guarantee.
 
 ## 一句话结论（组会/答辩直接用）
 
 > **"少训一点"这件事有规律，但没有保证；要保证就得在线测。**
-> 规律：平台 ∝ N^(−1.9)，起跳时间 ∝ N^(0.17–0.65)（口径不同）；保证：闭环 0/28 违规、省 64%，
-> 开环律 10.7% 违规，FID 早停 75% 违规。
+> 规律：平台 ∝ N^(−1.9)，起跳时间 ∝ N^(0.17–0.65)（口径不同）；保证：闭环 0/43 违规、省 69.6%，
+> 开环律 11.6% 违规，FID 早停 83.7% 违规。
 
 ## 三条主结论 + 各自的可核对出处
 
@@ -48,7 +49,7 @@ as a predictive guarantee.
    小数据上隐私与质量不可兼得，处方是加数据或闭环 + 质量二次判定。
 3. **分辨率与数据来源**：64×64（由 MedMNIST+ 224 源下采样），不是原始 DICOM 临床分辨率；绝对 M/FID 不可跨分辨率比较（28px 附录给出对照）。
 4. **时间单位与判据口径**：文献用优化步 + 像素最近/次近比判据，本文主坐标用 epoch + 白化特征余弦判据；
-   两者**结构一致（onset ∝ N，斜率 0.95）但常数差约 30 倍**，不可直接比绝对值；换编码器会改变幅度指数（−2.46 vs −1.13）。
+   两者**结构一致（onset ∝ N，斜率 0.95）但常数差约 30 倍**，不可直接比绝对值；换编码器会改变幅度指数（−2.41 vs −1.15）。
 
 ## 与预声明的关系（审稿人最会挑的地方，先说）
 

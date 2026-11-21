@@ -27,7 +27,7 @@
 | `probe_tau.py` | 逐 N 的 τ 与近复制品检出率 | **P** | 是（附录） |
 | `probe_kdim.py` | 白化截断维 k 的不变性（τ 变 6 倍而 M 只动 6%，决定性） | **P** | 是（RESULTS §3.2） |
 | `probe_encoder.py` | DINOv2 vs ResNet50 的 τ/dim 对照（混用会让 M 归零） | **P** | 是（附录） |
-| `fpr_sens.py` | FPR 0.1%/0.5%/1% 下 τ 与 M 的敏感性（M 只动 4 个百分点） | **P** | 是（RESULTS §3.4） |
+| `fpr_sens.py` | FPR 0.1%/0.5%/1% 下 τ 与 M 的敏感性（M 只动 6.7 个百分点） | **P** | 是（RESULTS §3.4） |
 | `backfill_thr.py` | 给旧行补固定阈值列（M_050…M_095） | D | 不必 |
 | **训练稳定性探针** | | | |
 | `probe_blank.py` | 采样塌陷诊断（像素 std / flat 图计数） | **P** | 是（NOTES §1.5） |

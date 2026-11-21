@@ -13,7 +13,7 @@
 
 | # | 论文声明 | 数字（最终） | 出处（文件 / 筛选） | 命令 |
 |---|---|---|---|---|
-| 1 | 数据规模 7 档、每档 2–12 个 seed，共 **49 条记忆率曲线 / 1573 个测量点**（另有对照训练，累计 66 组） | 250/500/1000/1500/2000/3000/4000；每档 seed 数 12/11/12/2/2/2/2 | `results/metrics_long.csv`（逐行 = 一个检查点） | `python -m tools.grid_summary` |
+| 1 | 数据规模 7 档、每档 2–12 个 seed，共 **49 条记忆率曲线 / 1573 个测量点**（另有对照训练，累计 66 组） | 250/500/1000/1500/2000/3000/4000；主网格每档 run 数 12/11/12/2/2/2/2（合计 **43**）+ 2 个下界探针（N=128/192）+ bloodmnist/pneumoniamnist 各 2 个 = **49** | `results/metrics_long.csv`（逐行 = 一个检查点） | `python -m tools.grid_summary` |
 | 2 | 记忆率 M = 近邻相似度超阈值的生成样本占比 | 每行都有 `M` 与 `tau` | 同上；τ 逐 run 校准（FPR=0.5%） | `python -m tools.audit` |
 | 3 | 平台高度随数据量下降：平台 ∝ N^−1.89 | α = 1.8898 [1.8034, 1.9780] | `results/law_fit.json` → `fits.L4_amp_decay.params[1]` | `python -m law --dataset pathmnist` |
 | 4 | 双时间尺度分离（γ 的 95% CI 不含 0） | γ = −0.8362 [−0.9044, −0.7395] | `results/law_bootstrap.json` | `python -m tools.law_ci --n-boot 200` |
@@ -33,8 +33,8 @@
 | 18 | 记忆化不集中于少数样本 / 非离群 / 类别温和（**限 3 个 run**） | top1 0.08–0.10；离群差 <0.02；overrep <1.6 | `results/typology.csv` | `python -m build.typology` |
 | 19 | 跨数据集：函数族可迁移、参数不可迁移 | bloodmnist free_fit R²_log **0.984** vs 共享参数 0.602（α 0.78 vs 1.89）；pneumoniamnist 0.958 vs 0.833（α 2.21 vs 1.89） | `results/transfer.csv` | `python -m tools.transfer` |
 | 20 | 数据侧审计（重复 / 跨 split 泄漏） | bloodmnist：test→train **5 张**完全重复 + **4 张**近似（≥0.995），val→train 3 张完全重复；pneumoniamnist：test 干净但 **val→train 8 张**完全重复；pathmnist 全 0 | `results/leak_report.json` | `python -m tools.check_leak` |
-| 21 | 分辨率：onset 随分辨率单调后移（同子集、同 seed、等效 batch 64） | 64px **e800** → 128px **e4600** → 224px **>16,000 轮仍为 0**（`sim_max` 0.31–0.40 无趋势，FID 234）→ "≥20 倍延迟"，不能写"不记忆" | `results/pilot64_blood_n250_s21.csv`、`results/pilot128_blood_n250.csv`、`results/pilot224_accum_blood_n250.csv`、`results/pilot224_blood_n1000_a4.csv` | `python -m build.summary_r23` |
-| 22 | 阳性对照：度量在 N=64 上有效（欠训练才会 M=0） | 19k 步 M 0.406 / f_mem 0.664 | `results/poscontrol_64_deep.csv` | `python -m build.poscontrol` |
+| 21 | 分辨率：onset 随分辨率单调后移（同子集、同 seed、等效 batch 64） | 64px **e800** → 128px **e4600** → 224px **>16,000 轮仍为 0**（`sim_max` 0.29–0.40 无趋势，FID 234）→ "≥20 倍延迟"，不能写"不记忆" | `results/pilot64_blood_n250_s21.csv`、`results/pilot128_blood_n250.csv`、`results/pilot224_accum_blood_n250.csv`、`results/pilot224_blood_n1000_a4.csv` | `python -m build.summary_r23` |
+| 22 | 阳性对照：度量在 N=64 上有效（欠训练才会 M=0） | 19k 步 M 0.406 / f_mem 0.664 | `results/poscontrol_64_deep.csv`（M）与 `results/eq6.csv`（f_mem） | `python -m build.poscontrol` |
 
 ## 2. 未达标的 3 条（刻意保留在表里）
 
