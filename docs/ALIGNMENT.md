@@ -15,7 +15,7 @@
 | ③做法：拟合规模—轮次—记忆率控制律 | `law.py`：L1 拉伸指数 / L2 Hill / L3 双时间尺度 erf / L4 幂律幅度衰减 / L5 仅幅度衰减 / L6 指数幅度衰减 | ✓ 选定 **L4_amp_decay**：`M = A₀·(N/250)^-α·[1-exp(-(E/(E50₀·(N/250)^γ))^β)]`，A₀=0.4995、α=1.890、β=2.375、E50₀=2133、**γ=−0.836**（补齐深度档与全部 seed 后重拟合；逐 run 口径 α=2.134、γ=−0.872） |
 | ③做法：给出安全早停准则 | `law.solve_E_star`（brentq 反解）+ `tools/safety.py`（实测对照表）+ `controller.py`（4+1 策略） | ✓ E\\* 表 + 策略对比 + 最差 seed 口径安全表 |
 | ④产出：控制律（R²≥0.9） | 预声明验收：样本内 R²_log≥0.9 **且** 留一池化 R²≥0.8 | **R²_log 0.683（✗）、R²_lin 0.710（✗）、留一池化 0.467（✗）**；可测区间（M≥0.02 子集）对数尺度 0.564、线性尺度 0.426；逐 run 口径 R²_log 0.796 / R²_lin 0.783。未达线原因见下 §偏差 1、2 |
-| ④产出：安全早停点 | `results/law_fit.json` 的 `E_star` + `results/safe_early_stop.csv` | ✓ E\*(ε=0.01)=389/390/407/453/nan/nan/nan；安全表 28 行，**四条件全过 0 行**（见 §偏差 6） |
+| ④产出：安全早停点 | `results/law_fit.json` 的 `E_star` + `results/safe_early_stop.csv` | ✓ E\*(ε=0.01)=413/406/415/455/nan/nan/nan（与 `results/seed_margin.csv` 的 `E_law` 一致）；安全表 28 行，**四条件全过 0 行**（见 §偏差 6） |
 | ④产出：风险控制建议 | `RESULTS.md` §5 + `docs/PRIVACY_AUDIT.md` | ✓ 已写 |
 
 ## 02 数据

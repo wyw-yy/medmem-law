@@ -7,7 +7,7 @@ is currently answered case by case, after the fact. We ask a narrower, answerabl
 **for a diffusion model trained on a fixed dataset of size N, how does the memorization
 rate M grow with training time, and can that growth be scheduled against?**
 
-We train 66 model runs (13.0 M parameters) on three public medical imaging datasets
+We train 80 model runs (13.0 M parameters) on three public medical imaging datasets
 (PathMNIST, BloodMNIST, PneumoniaMNIST) at 64×64, sweeping N over seven values from 250
 to 4,000 and epochs from 325 to 5,125 under an equal-*update*-budget protocol, and measure M
 with a calibrated near-duplicate metric: DINOv2 features, truncated whitening, and a threshold
@@ -38,8 +38,8 @@ as a predictive guarantee.
 
 | # | 结论 | 数字 | 出处 |
 |---|---|---|---|
-| 1 | 平台高度随数据量快速衰减 | A(N) ∝ N^(−1.90)；7 档平台 0.863/0.469/0.092/0.021/0.007/0.011/0.014（N=250→4000，后三档贴地板） | `results/law_fit.json`、`figs/fig1_triptych.png (b)` |
-| 2 | 起跳时间随 N 线性推迟（结构上复现文献），但常数小 30 倍、且 seed 方差极大 | `onset/N` = 11.07/10.63/10.40 步/张（N=250/500/1000），斜率 **+0.95**；文献 ≈300 步/张（Eq.6 像素判据）；γ_epoch=−0.836 ⟺ 名义 t₅₀∝N^0.164；同 N 不同 seed 的 onset 极差 8–60× | `results/grid_summary.csv`、`results/eq6.csv`、`docs/COMPARISON.md` §2 |
+| 1 | 平台高度随数据量快速衰减 | A(N) ∝ N^(−1.89)；7 档末点中位数 0.815/0.475/0.086/0.017/0.004/0.006/0.009（N=250→4000；N≥1500 四档都在 1.7% 以下） | `results/law_fit.json`、`figs/fig1_triptych.png (b)` |
+| 2 | 起跳时间随 N 线性推迟（结构上复现文献），但常数小 30 倍、且 seed 方差极大 | `onset/N` = 11.07/10.63/10.40 步/张（N=250/500/1000），斜率 **+0.95**；文献 ≈300 步/张（Eq.6 像素判据）；γ_epoch=−0.836 ⟺ 名义 t₅₀∝N^0.164；同 N 不同 seed 的 onset 极差最大 8×（N=1000：150–1200 轮；`M_max` 极差可达 63×，两者量纲不同） | `results/grid_summary.csv`、`results/eq6.csv`、`docs/COMPARISON.md` §2 |
 | 3 | 只有闭环能在"省时间"和"守隐私"之间同时成立 | D/D′：省 69.6%、违规 0/43；C 开环：省 68.8%、违规 11.6%；B(FID)：省 20.2%、违规 83.7%；A：违规 83.7% | `results/stop_policy_summary.csv`、`figs/fig1_triptych.png (c)` |
 
 ## 必须写进 limitation 的四件事

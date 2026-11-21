@@ -52,6 +52,7 @@ def main() -> int:
     eps_set = [float(x) for x in a.eps_set.split(",")]
 
     df = pd.read_csv(C.RESULTS / "metrics_long.csv")
+    df = L.drop_probes(df)  # 128/192 是下界探针（白化维数 k 不同、1 seed），不进交付分析
     df = df[df["dataset"] == a.dataset]
     law_fit = __import__("json").loads((C.RESULTS / "law_fit.json").read_text(encoding="utf-8"))
     best = law_fit["best"]
