@@ -314,7 +314,7 @@ def section_robust():
         lines.append("")
         lines.append("- **定性结论全部保留**：M 随训练上升（ρ 0.84–0.99）、平台随 N 单调下降（两种编码器都成立）、"
                      "闭环有效性不依赖编码器。")
-        lines.append("- **定量幅度改变**：平台随 N 的下降斜率在 N=250→1500 上，DINOv2 约 −2.46、ResNet50 约 −1.13。"
+        lines.append("- **定量幅度改变**：平台随 N 的下降斜率在 N=250→1500 上，DINOv2 约 −2.41、ResNet50 约 −1.15。"
                      "所以 α 是「条件指数」（依赖 dataset + 编码器 + FPR 口径），跨论文比较 α 无效。")
         lines.append("- 低 M 区间最不稳（N=1500：0.008 vs 0.066 = 4 张 vs 34 张图），与 §3.2、§8 的地板教训同源。")
         lines.append("")
@@ -676,7 +676,7 @@ def section_appendix():
         L.append("- **DP-SGD**：σ=1.0（ε 上界 85.1）与 σ=8.0（10.6）下 M 全 0（15 点 × 1200 轮），"
                  "但 FID 从 123 劣到 309–353 → 这两档只能写「噪声够大时记忆化消失、质量不可用」，"
                  "不能写「DP-SGD 解决了记忆化」。")
-        L.append("- **224px**：续到 16,000 轮（56 点）仍 M=0，`sim_max` 落在 0.31–0.40 带状、无趋势"
+        L.append("- **224px**：续到 16,000 轮（56 点）仍 M=0，`sim_max` 落在 0.29–0.40 带状、无趋势"
                  " → 分辨率结论是「≥20 倍 onset 延迟」；此前「sim_max 在缓慢上爬」的说法被这次延长否掉。")
     else:
         L.append("`results/r22_summary.csv` 不存在 —— `python -m build.summary_r22` 生成。")
