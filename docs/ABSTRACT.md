@@ -11,8 +11,9 @@ We train 66 model runs (13.0 M parameters) on three public medical imaging datas
 (PathMNIST, BloodMNIST, PneumoniaMNIST) at 64×64, sweeping N over seven values from 250
 to 4,000 and epochs from 325 to 5,125 under an equal-*update*-budget protocol, and measure M
 with a calibrated near-duplicate metric: DINOv2 features, truncated whitening, and a threshold
-anchored to a 0.5% false-positive rate on a held-out non-member reference set. Each run yields
-The main grid yields 49 memorization curves (1,573 measurement points); 17 further runs cover
+anchored to a 0.5% false-positive rate on a held-out non-member reference set. Each run yields about 30 checkpoints. The **main grid** yields **43** memorization curves
+(1,573 measurement points in total, counting the 6 contrast runs that also enter the same table);
+17 further runs cover
 resolution, capacity, differential privacy and positive controls.
 
 Three findings. (i) The **plateau** of M decays steeply with data: fitting a stretched-exponential
@@ -43,7 +44,7 @@ as a predictive guarantee.
 
 ## 必须写进 limitation 的四件事
 
-1. **R² 没到 0.9**：样本内 R²_lin 0.710 / R²_log 0.683；留一池化 0.467（逐 run 0.793/0.811）。预声明线未达成，如实报告。
+1. **R² 没到 0.9**：样本内 R²_lin 0.710 / R²_log 0.683；留一池化 0.467（逐 run R²_log 0.796 / R²_lin 0.783）。预声明线未达成，如实报告。
    原因是可测范围只到 N≲1500（N≥2000 的 M 低于检出限 3/512），且**误差主要在幅度项**（只放开幅度可消 78.6% 残差，只放开时间轴只消 44%）。
 2. **安全表 0/28 行全过**：严格四条件（最差 seed ≤ ε、经验停点不违约、FID ≤ 1.5×、ε > 2×FPR）没有任何一行同时成立 ——
    小数据上隐私与质量不可兼得，处方是加数据或闭环 + 质量二次判定。
@@ -54,7 +55,7 @@ as a predictive guarantee.
 ## 与预声明的关系（审稿人最会挑的地方，先说）
 
 - 预声明（`docs/PROTOCOL.md` §10/§14）写明"R²_log ≥ 0.9 且留一 ≥ 0.8" → **未达成**，且**没有为了达标而换口径**：
-  两套口径（种子均值 / 逐 run）都报，可测区间 R² 也报（0.727/0.649）。
+  两套口径（种子均值 / 逐 run）都报，可测区间 R² 也报（对数尺度 0.564、线性尺度 0.426）。
 - 中途新增候选律 L4/L5/L6 时记录了日期与理由（§10 R3），并在 cross/seed2 数据出来之前就固定；
   L6（指数幅度）与 L7（形状随 N 变）试过并明确记录为"被否决"——不是只报赢家。
 - 干预组（开环/闭环早停的 run）**不进律拟合**（`law._stopped_runs`），否则结论自我循环。
