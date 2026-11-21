@@ -26,7 +26,7 @@ OUT = ROOT / "docs" / "NUMBERS.md"
 SCAN = [
     "README.md", "START_HERE.md", "docs/ABSTRACT.md", "docs/ALIGNMENT.md",
     "docs/OUTLINE.md", "docs/HANDOFF.md", "docs/RESULTS_TEXT.md",
-    "docs/COMPARISON.md", "docs/METHODS.md",
+    "docs/COMPARISON.md", "docs/METHODS.md", "docs/SUPPLEMENT.md",
 ]
 # 这些文件里合法地会出现"历史值"（改了也说明改过），扫描时给出提示而不是错误
 HISTORY_OK = {"docs/PROTOCOL.md", "docs/NOTES.md", "docs/NUMBERS.md"}

@@ -73,7 +73,8 @@ $env:ZENODO_TOKEN = "..."
 > Every number in this manuscript is mapped to a file and a command in
 > `docs/SUPPLEMENT.md`; `tools/ci_check.py` re-verifies the mapping on every
 > commit, and an independent implementation of the fit in base R reproduces the
-> residual sum of squares to within 3e-9.
+> residual sum of squares to within 2.2e-9 (fitted parameters agree to ~1e-5;
+> predictions are bit-identical).
 
 **Ethics statement**
 
