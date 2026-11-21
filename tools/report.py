@@ -512,10 +512,16 @@ def section_safe():
             L.append(f"| {int(r.n)} | {r.eps} | {int(r.n_seeds)} | {r.sigma_log:.3f} | {e_law} | "
                      f"{e_safe} | {sav} | {mlaw} | {msafe} | {q} |")
         L.append("")
-        L.append("- **廉价方案成立，但只在「隐私优先、质量可退」时成立**：N=250/500/1000 在 ε=0.01 上都能做到"
-                 "全部 seed 合规且省 88–94%，代价是 FID 为跑满的 1.55–2.54 倍。")
-        L.append("- **σ_log 随 N 变大**（250/500 约 0.05，N=1000 达 0.34）：数据越多平台越低，但「什么时候发作」更飘，"
-                 "所以固定时刻表的可信区间反而更宽。")
+        _sub = sd[(sd["eps"] == 0.01) & (sd["n"] <= 1000)]
+        _fid = f"{float(_sub['fid_rel_safe'].min()):.2f}–{float(_sub['fid_rel_safe'].max()):.2f}"
+        _sav = (f"{float(_sub['saving_safe'].min()) * 100:.0f}–"
+                f"{float(_sub['saving_safe'].max()) * 100:.0f}")
+        _sig = sd[sd["eps"] == 0.01].set_index("n")["sigma_log"]
+        L.append(f"- **廉价方案成立，但只在「隐私优先、质量可退」时成立**：N=250/500/1000 在 ε=0.01 上都能做到"
+                 f"全部 seed 合规且省 {_sav}%，代价是 FID 为跑满的 {_fid} 倍。")
+        L.append(f"- **σ_log 随 N 变大**（250/500 约 {_sig.get(250, float('nan')):.2f}/"
+                 f"{_sig.get(500, float('nan')):.2f}，N=1000 达 {_sig.get(1000, float('nan')):.2f}）："
+                 "数据越多平台越低，但「什么时候发作」更飘，所以固定时刻表的可信区间反而更宽。")
         # 这一行以前是手写常量，补数据后就过期了（2026-11-09 踩过）——改成现算：
         # 策略数字取自 stop_policy_summary.csv，2σ 形态的省轮区间取自 seed_margin.csv。
         sp = C.RESULTS / "stop_policy_summary.csv"

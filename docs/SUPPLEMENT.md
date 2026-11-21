@@ -25,7 +25,7 @@
 | 10 | 闭环停训 0 违规、省 69.6% | 660.7 / 2860.5 轮，违规 **0/43** | `results/stop_policy_summary.csv`（列 `violation_rate`） | `python -m controller --dataset pathmnist` |
 | 11 | FID 早停不可靠 | 违规 **83.7%**（省 20.2%） | 同上（`policy=B_fid_plateau`） | 同上 |
 | 12 | 开环律只给期望：省 68.8%，违规 11.6% | 635.2 轮 | 同上（`policy=C_open_loop`） | 同上 |
-| 13 | 2σ 余量形态：省 88–94%、违规 0、FID 1.55–2.54× | 见表 | `results/seed_margin.csv` | `python -m build.seed_margin` |
+| 13 | 2σ 余量形态：省 88–94%、违规 0、FID 1.52–2.50× | 见表 | `results/seed_margin.csv` | `python -m build.seed_margin` |
 | 14 | 严格四条件安全表：0/28 行全过（**未达标项**） | ok 22 / ok_emp 28 / ok_quality 6 / informative 11 / recommended 0 | `results/safe_early_stop.csv` | `python -m tools.safety` |
 | 15 | 度量对白化维数稳健（k 不变性） | M 0.789→0.730（τ 0.748→0.128，**τ 不可跨 k 比**） | `docs/NOTES.md` §4 表 | `python -m build.probe_kdim` |
 | 16 | 度量对 FPR 稳健（10× 变化只动 6.7 个百分点） | M 0.7734 / 0.8047 / 0.8398（FPR 0.1/0.5/1%） | `results/fpr_sensitivity.csv` | `python -m build.fpr_sens` |
