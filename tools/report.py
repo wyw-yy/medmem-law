@@ -483,6 +483,9 @@ def section_safe():
     n_ok = int(d["recommended"].sum())
     L.append(f"- 四个条件（最差 seed ≤ ε、经验保守停点也不违约、FID ≤ 跑满的 1.5 倍、ε > 2×FPR）"
              f"同时满足的组合：**{n_ok} / {len(d)}**。")
+    L.append("- **口径提示**：本表的 `seed数` 是「剔除早停干预 run 之后可比的 run 数」"
+             "（pathmnist 的 250/500/1000 各为 10），与 §5.2 的全量 seed 数（12/11/12）不是同一个口径；"
+             "两处相差的正是被闭环/开环策略提前停掉的 run。")
     # 把张力说白了：小 N 的安全停点远早于图像变好看的轮次，所以"又安全又好看"在小 N 上不存在。
     small = d[(d["n"] <= 500) & (d["ok"])]
     if len(small) and not small["recommended"].any():
@@ -494,7 +497,7 @@ def section_safe():
     # 5.2 带 seed 余量的"廉价"开环方案（B11）：不测量、只靠时刻表 + 2σ 余量
     sm = _read_csv(C.RESULTS / "seed_margin.csv")
     if sm is not None and len(sm):
-        L.append("### 5.2 带 seed 余量的开环方案（`build/seed_margin.py`，B11 的 7–9 个 seed）")
+        L.append("### 5.2 带 seed 余量的开环方案（`build/seed_margin.py`，seed 已补齐：250/500/1000 = 12/11/12，1500–4000 = 2）")
         L.append("")
         L.append("`E*_safe = E*_law · 10^(−2σ_log)`，σ_log = std(log10 onset)。判据：在该停点上"
                  "**所有 seed** 的 M 都 ≤ ε 才算安全。")
